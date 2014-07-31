@@ -1,0 +1,85 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package fr.profi.mzscope.mzml;
+
+import fr.profi.mzdb.model.Feature;
+import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.mzml.Scan;
+import java.io.File;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author CB205360
+ */
+public class MzMLRawFile implements IRawFile {
+
+   private static Logger logger = LoggerFactory.getLogger(MzMLRawFile.class);
+   private File mzMLFile;
+   private List<Scan> scans;
+
+   public MzMLRawFile(File file) {
+      mzMLFile = file;
+      init();
+   }
+
+   private void init() {
+      try {
+         long start = System.currentTimeMillis();
+         logger.info("Start reading mzMLRawFile "+mzMLFile.getAbsolutePath());
+         scans = mzMLReader.read(mzMLFile.getAbsolutePath());
+         logger.info("File mzML read in :: " + (System.currentTimeMillis() - start) + " ms");
+      } catch (Exception e) {
+         logger.error("cannot read file " + mzMLFile.getAbsolutePath(), e);
+      }
+   }
+
+    public Chromatogram getTIC() {
+      return null;      
+   }
+    
+   public Chromatogram getXIC(double min, double max) {
+      Chromatogram chromatogram  = XICExtractor.extract(scans, (float)min, (float)max);      
+      return chromatogram;      
+   }
+
+   public List<Feature> extractFeatures() {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+   }
+
+   public fr.profi.mzscope.model.Scan getScan(int scanIndex) {
+      return toModelScan(scans.get(scanIndex));
+   }
+
+   public int getScanId(double retentionTime) {
+      for (Scan s : scans) {
+         if (Math.abs(s.getRetentionTime() - retentionTime) < 0.001) 
+            return s.getIndex();
+      }
+      return 0;
+   }
+
+   public int getNextScanId(int scanIndex, int msLevel) {
+      return (int)Math.min(scanIndex+1, scans.size());
+   }
+
+   public int getPreviousScanId(int scanIndex, int msLevel) {
+      return (int)Math.max(scanIndex-1, 0);
+   }
+
+   private fr.profi.mzscope.model.Scan toModelScan(Scan mzmlScan) {
+      
+      double[] masses = new double[mzmlScan.getMasses().length];
+      for (int k = 0; k < masses.length; k++) {
+         masses[k] = (double)mzmlScan.getMasses()[k];
+      }
+      return new fr.profi.mzscope.model.Scan(mzmlScan.getIndex(), mzmlScan.getRetentionTime(), masses, mzmlScan.getIntensities(), 1);
+   }
+
+}
