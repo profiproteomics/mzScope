@@ -9,7 +9,9 @@ import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.mzdb.ThreadedMzdbRawFile;
 import fr.profi.mzscope.mzml.MzMLRawFile;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,4 +68,7 @@ public class RawFileManager {
         return null;
     }
 
+    public List<IRawFile> getAllFiles(){
+        return new ArrayList<IRawFile>(files.values());
+    }
 }
