@@ -79,7 +79,7 @@ public class Main {
          System.out.println("Feature intentitySum: " + f.getIntensitySum());
          System.out.println("Feature area: " + f.getArea());
 
-         System.out.println("headers length: " + f.getScanHeaders().length);
+//         System.out.println("headers length: " + f.getScanHeaders().length);
          System.out.println("Extract Chromatogram from selected feature ...");
          Peak[] chromato = reader.getXIC(f.getMz() - f.getMz() * tolPPM / 1e6, f.getMz() + f.getMz() * tolPPM / 1e6, 1, XicMethod.SUM);
          System.out.println("Chromato length: " + chromato.length);
