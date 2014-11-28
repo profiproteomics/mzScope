@@ -258,10 +258,14 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
          protected void done() {
             try {
                displayChromatogram(get());
-               displayScan(f.getApexScanHeader().getScanId());
-               ScanHeader[] sch = f.getScanHeaders();
+//               displayScan(f.getApexScanHeader().getScanId());
+               displayScan(f.getBasePeakel().getApexScanId());
+//               ScanHeader[] sch = Feature.getPeakelsScanHeaders(f.getPeakels()) ;
+               
                // draw a horizontal line across the chart at y == 0
-               chromatogramPanel.getChart().getXYPlot().addDomainMarker(new IntervalMarker(sch[0].getElutionTime() / 60.0, sch[sch.length - 1].getElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1),
+//               chromatogramPanel.getChart().getXYPlot().addDomainMarker(new IntervalMarker(sch[0].getElutionTime() / 60.0, sch[sch.length - 1].getElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1),
+//                       Color.RED, new BasicStroke(1), 0.3f));
+               chromatogramPanel.getChart().getXYPlot().addDomainMarker(new IntervalMarker(f.getBasePeakel().getFirstElutionTime() / 60.0, f.getBasePeakel().getLastElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1),
                        Color.RED, new BasicStroke(1), 0.3f));
 
             } catch (Exception e) {
