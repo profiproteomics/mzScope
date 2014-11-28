@@ -49,6 +49,17 @@ public class ThreadedMzdbRawFile implements IRawFile {
          logger.error("mzdbRawFile initialisation failed", ex);
       } 
    }
+
+    @Override
+    public String getName() {
+        return file.getName();
+    }
+   
+   
+    @Override
+   public String toString(){
+       return file.getName();
+   }
    
    public int getPreviousScanId(final int scanIndex, final int msLevel) {
       try {
@@ -118,11 +129,29 @@ public class ThreadedMzdbRawFile implements IRawFile {
       return null;
    }
 
+   @Override
    public Chromatogram getXIC(final double min, final double max) {
       try {
          return service.submit(new Callable<Chromatogram>() {
+            @Override
             public Chromatogram call() {
                return mzdbRawFile.getXIC(min, max);
+            }
+         }).get();
+      } catch (Exception ex ) {
+         logger.error("getXIC call fail", ex);
+      } 
+      return null;
+   }
+   
+   
+   @Override
+    public Chromatogram getXIC(final double minMz,final  double maxMz, final float minRT,final  float maxRT) {
+      try {
+         return service.submit(new Callable<Chromatogram>() {
+            @Override
+            public Chromatogram call() {
+               return mzdbRawFile.getXIC(minMz, maxMz, minRT, maxRT);
             }
          }).get();
       } catch (Exception ex ) {
