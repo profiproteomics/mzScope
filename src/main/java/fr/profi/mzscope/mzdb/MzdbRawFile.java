@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -42,27 +41,50 @@ public class MzdbRawFile implements IRawFile {
    private static Logger logger = LoggerFactory.getLogger(MzdbRawFile.class);
    final private static DecimalFormat formatter = new DecimalFormat("0.000");
    
-   private File mzDbFile;
+   private final File mzDbFile;
    private MzDbReader reader;
-   private Map<Integer, ScanHeader> scanHeadersById;
-   private double EPSILON = 1e-5;
+   private Map<Integer, ScanHeader> scanHeadersById = null;
+   private final double EPSILON = 1e-5;
 
    public MzdbRawFile(File file) {
       mzDbFile = file;
       init();
    }
 
-   protected void init() {
-      try {
-         long start = System.currentTimeMillis();
+   private void init() {
+      try {         
          reader = new MzDbReader(mzDbFile, true);
-         scanHeadersById = reader.getScanHeaderById();
-         logger.info("File mzDb headers red in :: " + (System.currentTimeMillis() - start) + " ms");
       } catch (Exception e) {
          logger.error("cannot read file " + mzDbFile.getAbsolutePath(), e);
       }
    }
 
+    @Override
+    public String getName() {
+        return mzDbFile.getName();
+    }
+
+   
+   private Map<Integer, ScanHeader> getScanHeadersById(){
+       try {
+           if(scanHeadersById == null){
+                long start = System.currentTimeMillis();
+               scanHeadersById = reader.getScanHeaderById();           
+               logger.info("File mzDb headers red in :: " + (System.currentTimeMillis() - start) + " ms");
+           }
+       } catch (SQLiteException ex) {
+           logger.error("cannot read file " + mzDbFile.getAbsolutePath(), ex);
+       }
+       return scanHeadersById;
+   }
+   
+   @Override
+   public String toString(){
+       return mzDbFile.getName();
+   }
+   
+ 
+     @Override
    public Chromatogram getTIC() {
       logger.info("mzdb extract TIC Chromatogram");
       Chromatogram chromatogram = null;
@@ -86,45 +108,78 @@ public class MzdbRawFile implements IRawFile {
       return chromatogram;
    }
    
+   @Override
+   public Chromatogram getXIC(double minMz, double maxMz, float minRT, float maxRT) {
+      Chromatogram chromatogram = null;
+      try {
+         logger.info("mzdb extract Chromato : {} - {} in time range {} - {}", minMz, maxMz, minRT, maxRT);
+         Peak[] peaks = reader.getXIC(minMz, maxMz, minRT, maxRT, 1, MzDbReader.XicMethod.SUM);
+         logger.info("mzdb Chromato peaks count : " + peaks.length);
+         chromatogram = createChromatoFromPeak(peaks);
+         chromatogram.minMz = minMz;
+         chromatogram.maxMz = maxMz;
+         StringBuilder builder = new StringBuilder("Mass range: ");
+         builder.append(formatter.format(minMz)).append("-").append(formatter.format(maxMz));
+         chromatogram.title = builder.toString();
+         
+      } catch (Exception e) {
+         logger.error("Error during chromatogram extraction", e);
+      }
+      return chromatogram;
+   }
+   
+   
+   @Override
    public Chromatogram getXIC(double min, double max) {
       Chromatogram chromatogram = null;
       try {
-         logger.info("mzdb extract Chromato : {} - {}", min, max);
-         Peak[] peaks = reader.getXIC(min, max, 1, MzDbReader.XicMethod.SUM);
-         logger.info("mzdb Chromato peaks count : " + peaks.length);
-         List<Double> xAxisData = new ArrayList<Double>(peaks.length);
-         List<Double> yAxisData = new ArrayList<Double>(peaks.length);
-         int previousScanId = 1;
-         for (int k = 0; k < peaks.length; k++) {
-            int scanId = peaks[k].getLcContext().getScanId();
-            if (previousScanId != getPreviousScanId(scanId, 1)) {
-               // there is a gap between peaks, add 0 values after the previous peak and before this one
-               xAxisData.add(scanHeadersById.get(getNextScanId(previousScanId, 1)).getElutionTime() / 60.0);
-               yAxisData.add(0.0);
-               xAxisData.add(scanHeadersById.get(getPreviousScanId(scanId, 1)).getElutionTime() / 60.0);
-               yAxisData.add(0.0);
-            }
-            double rt = peaks[k].getLcContext().getElutionTime() / 60.0;
-            xAxisData.add(rt);
-            yAxisData.add((double) peaks[k].getIntensity());
-            previousScanId = peaks[k].getLcContext().getScanId();
-         }
-         chromatogram = new Chromatogram();
-         chromatogram.time = Doubles.toArray(xAxisData);
-         chromatogram.intensities = Doubles.toArray(yAxisData);
-         chromatogram.minMz = min;
-         chromatogram.maxMz = max;
-         StringBuilder builder = new StringBuilder("Mass range: ");
-         builder.append(formatter.format(min)).append("-").append(formatter.format(max));
-         chromatogram.title = builder.toString();
-         
-         logger.info("mzdb Chromato length: " + xAxisData.size());
+        logger.info("mzdb extract Chromato : {} - {}", min, max);
+        Peak[] peaks = reader.getXIC(min, max, 1, MzDbReader.XicMethod.SUM);
+        logger.info("mzdb Chromato peaks count : " + peaks.length);
+        chromatogram = createChromatoFromPeak(peaks);
+        chromatogram.minMz = min;
+        chromatogram.maxMz = max;      
+        
+        StringBuilder builder = new StringBuilder("Mass range: ");
+        builder.append(formatter.format(min)).append("-").append(formatter.format(max));
+        chromatogram.title = builder.toString();
+        
       } catch (Exception e) {
          logger.error("Error during chromatogram extraction", e);
       }
       return chromatogram;
    }
 
+   
+   private Chromatogram createChromatoFromPeak(Peak[] peaks) {
+        Chromatogram chromatogram = null;
+        List<Double> xAxisData = new ArrayList<Double>(peaks.length);
+        List<Double> yAxisData = new ArrayList<Double>(peaks.length);
+        int previousScanId = 1;
+        for (Peak peak : peaks) {
+           int scanId = peak.getLcContext().getScanId();
+           if (previousScanId != getPreviousScanId(scanId, 1)) {
+               // there is a gap between peaks, add 0 values after the previous peak and before this one
+               xAxisData.add(getScanHeadersById().get(getNextScanId(previousScanId, 1)).getElutionTime() / 60.0);
+               yAxisData.add(0.0);
+               xAxisData.add(getScanHeadersById().get(getPreviousScanId(scanId, 1)).getElutionTime() / 60.0);
+               yAxisData.add(0.0);
+           }
+           double rt = peak.getLcContext().getElutionTime() / 60.0;
+           xAxisData.add(rt);
+           yAxisData.add((double) peak.getIntensity());
+           previousScanId = peak.getLcContext().getScanId();
+        }
+        
+        chromatogram = new Chromatogram();
+        chromatogram.time = Doubles.toArray(xAxisData);
+        chromatogram.intensities = Doubles.toArray(yAxisData);       
+        logger.info("mzdb Chromato length: " + xAxisData.size());
+        
+        return chromatogram;
+   }
+   
+   @Override
    public List<Feature> extractFeatures() {
       List<Feature> result = null;
       try {
@@ -132,6 +187,7 @@ public class MzdbRawFile implements IRawFile {
          ScanHeader[] scanHeaders = reader.getScanHeaders();
 
          Iterator<ScanHeader> ms2ScanHeaders = Iterators.filter(Iterators.forArray(scanHeaders), new Predicate<ScanHeader>() {
+            @Override
             public boolean apply(ScanHeader sh) {
                return sh.getMsLevel() == 2;
             }
@@ -172,6 +228,7 @@ public class MzdbRawFile implements IRawFile {
       return result;
    }
 
+   @Override
    public Scan getScan(int scanIndex) {
       Scan scan = null;
       try {
@@ -250,6 +307,7 @@ public class MzdbRawFile implements IRawFile {
       return scan;
    }
 
+   @Override
    public int getScanId(double retentionTime) {
       try {
          return reader.getScanHeaderForTime((float) retentionTime, 1).getScanId();
@@ -259,21 +317,23 @@ public class MzdbRawFile implements IRawFile {
       return 0;
    }
 
+   @Override
    public int getNextScanId(int scanIndex, int msLevel) {
       return getNextSiblingScanId(scanIndex, msLevel, 1);
    }
 
+   @Override
    public int getPreviousScanId(int scanIndex, int msLevel) {
       return getNextSiblingScanId(scanIndex, msLevel, -1);
    }
 
    private int getNextSiblingScanId(int scanIndex, int msLevel, int way) {
       try {
-         ScanHeader header = scanHeadersById.get(scanIndex);
+         ScanHeader header = getScanHeadersById().get(scanIndex);
          int maxScan = reader.getScansCount();
          int k = header.getScanId() + way;
          for (; (k > 0) && (k < maxScan); k += way) {
-            if (scanHeadersById.get(k).getMsLevel() == msLevel) {
+            if (getScanHeadersById().get(k).getMsLevel() == msLevel) {
                break;
             }
          }

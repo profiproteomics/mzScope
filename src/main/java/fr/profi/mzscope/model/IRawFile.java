@@ -14,6 +14,10 @@ import java.util.List;
  */
 public interface IRawFile {
 
+   public String getName();
+
+   public Chromatogram getXIC(double minMz, double maxMz, float minRT, float maxRT);
+      
    public Chromatogram getXIC(double min, double max);
    
    public Chromatogram getTIC();

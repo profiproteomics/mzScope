@@ -40,6 +40,12 @@ public class MzMLRawFile implements IRawFile {
       }
    }
 
+    @Override
+    public String getName() {
+        return mzMLFile.getName();
+    }
+
+   
     public Chromatogram getTIC() {
       return null;      
    }
@@ -49,6 +55,13 @@ public class MzMLRawFile implements IRawFile {
       return chromatogram;      
    }
 
+    @Override
+    public Chromatogram getXIC(double minMz, double maxMz, float minRT, float maxRT) {
+        logger.warn(" Extraction using specific time windows not yet supported ! Extraction from all scans will be done ");
+        return getXIC(minMz, maxMz);
+    }
+
+   
    public List<Feature> extractFeatures() {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
