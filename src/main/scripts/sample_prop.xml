@@ -1,0 +1,14 @@
+<list>
+  <ion>
+    <ppm>10.0</ppm>
+    <ionMz>567.5128</ionMz>
+    <startRT>0.5</startRT>
+    <stopRT>1.5</stopRT>
+  </ion>
+  <ion>
+    <ppm>10.0</ppm>
+    <ionMz>875.1189</ionMz>
+    <startRT>0</startRT> <!-- Do NOT Specify RTs -->
+    <stopRT>0</stopRT>
+  </ion>
+</list>
