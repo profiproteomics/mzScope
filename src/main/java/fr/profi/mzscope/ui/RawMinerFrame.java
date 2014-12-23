@@ -182,24 +182,22 @@ public class RawMinerFrame extends javax.swing.JFrame {
           prefs.put(LAST_DIR, file.getParentFile().getAbsolutePath());
           IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
           rawFilesPanel1.addFile(rawfile);
-
        } else {
           System.out.println("File access cancelled by user.");
        }
     }//GEN-LAST:event_openRawMIActionPerformed
 
-    protected void displayRawAction(String fileName){
-        IRawFile rawfile = RawFileManager.getInstance().getFile(fileName);
+    protected void displayRawAction(IRawFile rawfile){
         RawFilePlotPanel plotPanel = new RawFilePlotPanel(rawfile);
-        viewersTabPane.add(fileName, plotPanel);
+        viewersTabPane.add(rawfile.getName(), plotPanel);
         FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
-        featuresTabPane.add(fileName, featuresPanel);
+        featuresTabPane.add(rawfile.getName(), featuresPanel);
     }
     
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
        if ((selectedRawFilePanel != null) && (viewersTabPane.getSelectedIndex() >= 0)) {
           final String tabName = viewersTabPane.getTitleAt(viewersTabPane.getSelectedIndex());
-          final IRawFile rawFile = selectedRawFilePanel.getRawfile();
+          final IRawFile rawFile = selectedRawFilePanel.getCurrentRawfile();
           extractFeaturesMI.setEnabled(false);
           SwingWorker worker = new SwingWorker<List<Feature>, Void>() {
              @Override
@@ -255,7 +253,7 @@ public class RawMinerFrame extends javax.swing.JFrame {
 
    private void viewersTabPaneStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_viewersTabPaneStateChanged
       selectedRawFilePanel = (IRawFilePlot) viewersTabPane.getSelectedComponent();
-      extractXICPanel.setRawFile(selectedRawFilePanel.getRawfile());
+      extractXICPanel.setCurrentRawFilePlot(selectedRawFilePanel);
    }//GEN-LAST:event_viewersTabPaneStateChanged
 
    /**
@@ -270,7 +268,6 @@ public class RawMinerFrame extends javax.swing.JFrame {
       try {
 //         javax.swing.UIManager.setLookAndFeel("com.jtattoo.plaf.fast.FastLookAndFeel");
          for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-            logger.info("L&F = " + info.getName());
             if ("Windows".equals(info.getName())) {
                javax.swing.UIManager.setLookAndFeel(info.getClassName());
             }
