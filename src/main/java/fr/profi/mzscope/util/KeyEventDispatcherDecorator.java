@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package fr.profi.mzscope.ui;
+package fr.profi.mzscope.util;
 
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -17,7 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Dispatch KeyEvents depending on the mouse position not on the component focus.Used by RawFilePlotPanel
+ * 
  * @author CB205360
  */
 public class KeyEventDispatcherDecorator {
