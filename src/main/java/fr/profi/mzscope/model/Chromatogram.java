@@ -12,6 +12,7 @@ package fr.profi.mzscope.model;
  */
 public class Chromatogram {
    
+   public IRawFile rawFile;
    public String title;
    public double minMz;
    public double maxMz;
