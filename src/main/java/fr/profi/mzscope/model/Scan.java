@@ -2,21 +2,28 @@ package fr.profi.mzscope.model;
 
 public class Scan {
    
+   public static enum ScanType { CENTROID, PROFILE }
    private String title;
    private Integer index;
    private int msLevel;
+   private ScanType dataType; 
+   private float retentionTime;
    private double[] masses;
    private float[] intensities;
-   private float retentionTime;
    private double[] peaksMz = null;
    private float[] peaksIntensities = null;
    
    public Scan(Integer index, float rt, double[] masses, float[] intensities, int msLevel) {
+      this(index, rt, masses, intensities, msLevel, (msLevel == 2) ? ScanType.CENTROID : ScanType.PROFILE);
+   }
+   
+     public Scan(Integer index, float rt, double[] masses, float[] intensities, int msLevel, ScanType type) {
       this.index = index;
       this.masses = masses;
       this.intensities = intensities;
       this.retentionTime = rt;
       this.msLevel = msLevel;
+      this.dataType = type;
    }
 
    public double[] getMasses() {
@@ -74,5 +81,15 @@ public class Scan {
    public int getMsLevel() {
       return msLevel;
    }
+   
+   /**
+    * Returns the data type : CENTROID or PROFILE
+    * 
+    * @return 
+    */
+   public ScanType getDataType() {
+      return dataType;
+   }
+
 
 }
