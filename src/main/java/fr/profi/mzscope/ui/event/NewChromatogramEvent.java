@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package fr.profi.mzscope.ui;
+package fr.profi.mzscope.ui.event;
 
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
