@@ -22,7 +22,7 @@ public interface IRawFilePlot {
 
    void displayScan(int index);
 
-   IRawFile getRawfile();
+   IRawFile getCurrentRawfile();
       
    Chromatogram getCurrentChromatogram();
 }
