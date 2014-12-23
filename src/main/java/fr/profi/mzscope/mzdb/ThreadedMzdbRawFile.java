@@ -135,7 +135,9 @@ public class ThreadedMzdbRawFile implements IRawFile {
          return service.submit(new Callable<Chromatogram>() {
             @Override
             public Chromatogram call() {
-               return mzdbRawFile.getXIC(min, max);
+               Chromatogram chromatogram = mzdbRawFile.getXIC(min, max);
+               chromatogram.rawFile = ThreadedMzdbRawFile.this;
+               return chromatogram;
             }
          }).get();
       } catch (Exception ex ) {
@@ -151,7 +153,9 @@ public class ThreadedMzdbRawFile implements IRawFile {
          return service.submit(new Callable<Chromatogram>() {
             @Override
             public Chromatogram call() {
-               return mzdbRawFile.getXIC(minMz, maxMz, minRT, maxRT);
+               Chromatogram chromatogram = mzdbRawFile.getXIC(minMz, maxMz, minRT, maxRT);
+               chromatogram.rawFile = ThreadedMzdbRawFile.this;
+               return chromatogram;
             }
          }).get();
       } catch (Exception ex ) {
@@ -164,7 +168,9 @@ public class ThreadedMzdbRawFile implements IRawFile {
       try {
          return service.submit(new Callable<Chromatogram>() {
             public Chromatogram call() {
-               return mzdbRawFile.getTIC();
+               Chromatogram chromatogram =  mzdbRawFile.getTIC();
+                chromatogram.rawFile = ThreadedMzdbRawFile.this;
+               return chromatogram;
             }
          }).get();
       } catch (Exception ex ) {
