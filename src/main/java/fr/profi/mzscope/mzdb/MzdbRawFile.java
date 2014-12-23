@@ -51,8 +51,12 @@ public class MzdbRawFile implements IRawFile {
       init();
    }
 
-   private void init() {
-      try {         
+   public MzDbReader getMzDbReader() {
+      return reader;
+   }
+   
+   protected void init() {
+      try {
          reader = new MzDbReader(mzDbFile, true);
       } catch (Exception e) {
          logger.error("cannot read file " + mzDbFile.getAbsolutePath(), e);
@@ -100,7 +104,7 @@ public class MzdbRawFile implements IRawFile {
          chromatogram = new Chromatogram();
          chromatogram.time = xAxisData;
          chromatogram.intensities = yAxisData;
-         
+         chromatogram.rawFile = this;
          return chromatogram;
       } catch (SQLiteException ex) {
          logger.error("Cannot generate TIC chromatogram", ex);
@@ -300,7 +304,7 @@ public class MzdbRawFile implements IRawFile {
          scan.setTitle(builder.toString());
          scan.setPeaksMz(mzList);
          scan.setPeaksIntensities(intensityList);
-         logger.debug("mzdb Scan length {} rebuilded in Scan length {} ", mzList.length, xAxisData.size());
+         //logger.debug("mzdb Scan length {} rebuilded in Scan length {} ", mzList.length, xAxisData.size());
       } catch (SQLiteException ex) {
          logger.error("enable to retrieve Scan data", ex);
       }
