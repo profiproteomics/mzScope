@@ -6,9 +6,6 @@
 
 package fr.profi.mzscope.ui;
 
-import com.google.common.eventbus.Subscribe;
-import fr.profi.mzscope.model.Chromatogram;
-import fr.profi.mzscope.model.IRawFile;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,42 +17,16 @@ import org.slf4j.LoggerFactory;
 public class XICExtractionPanel extends javax.swing.JPanel {
    
    private static Logger logger = LoggerFactory.getLogger(XICExtractionPanel.class);
-   private IRawFile rawFile;
-
-   
-   class ExtractionWorker extends SwingWorker<Chromatogram, Void>  {
-      
-         private double minMz, maxMz;
-         
-         public ExtractionWorker(double min, double max) {
-            this.minMz = min;
-            this.maxMz = max;
-         }
-         
-         @Override
-         protected Chromatogram doInBackground() throws Exception {
-            return rawFile.getXIC(minMz, maxMz);
-         }
-
-         @Override
-         protected void done() {
-            try {
-               AppEventBus.eventBus.post(new NewChromatogramEvent(XICExtractionPanel.this, get(), rawFile));
-            } catch (Exception e) {
-               logger.error("Error while reading chromatogram");
-            }
-         }
-      }
+   private IRawFilePlot rawFilePlot;
    /**
     * Creates new form ExtractXICPanel
     */
    public XICExtractionPanel() {
       initComponents();
-      AppEventBus.eventBus.register(this);
    }
 
-   public void setRawFile(IRawFile rawfile) {
-      this.rawFile = rawfile;
+   public void setCurrentRawFilePlot(IRawFilePlot rawfilePlot) {
+      this.rawFilePlot = rawfilePlot;
    }
    /**
     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -159,17 +130,21 @@ public class XICExtractionPanel extends javax.swing.JPanel {
       } else {
          maxMz = Double.parseDouble(masses[1]);
       }
-      SwingWorker worker = new ExtractionWorker(minMz, maxMz);
-      worker.execute();
+      if (rawFilePlot != null && rawFilePlot.getCurrentRawfile() != null) {
+         SwingWorker worker = new AbstractXICExtractionWorker(this, rawFilePlot.getCurrentRawfile(), minMz, maxMz){
+            @Override
+            protected void done() {
+               try {
+                  rawFilePlot.displayChromatogram(get());
+               } catch (Exception e) {
+                  logger.error("Error while extracting Chromatogram",e);
+               }
+            }
+         };
+         worker.execute();
+      }
    }//GEN-LAST:event_massRangeTFActionPerformed
 
- @Subscribe public void handleNewChromatogramEvent(NewChromatogramEvent event) {
-      if (event.source != this) {
-         logger.info("New Chromatogram event received");
-      } else {
-         logger.info("receive my own event ... ");
-      }
-}
    
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JCheckBox jCheckBox1;
