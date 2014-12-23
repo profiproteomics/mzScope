@@ -107,6 +107,7 @@
                 <Property name="layoutOrientation" type="int" value="2"/>
               </Properties>
               <Events>
+                <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rawFilesList1MouseClicked"/>
                 <EventHandler event="mousePressed" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rawFilesList1MousePressed"/>
               </Events>
             </Component>
