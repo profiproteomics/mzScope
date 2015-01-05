@@ -6,7 +6,6 @@
 
 package fr.profi.mzscope.ui;
 
-import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,18 +129,8 @@ public class XICExtractionPanel extends javax.swing.JPanel {
       } else {
          maxMz = Double.parseDouble(masses[1]);
       }
-      if (rawFilePlot != null && rawFilePlot.getCurrentRawfile() != null) {
-         SwingWorker worker = new AbstractXICExtractionWorker(this, rawFilePlot.getCurrentRawfile(), minMz, maxMz){
-            @Override
-            protected void done() {
-               try {
-                  rawFilePlot.displayChromatogram(get());
-               } catch (Exception e) {
-                  logger.error("Error while extracting Chromatogram",e);
-               }
-            }
-         };
-         worker.execute();
+      if (rawFilePlot != null) {
+         rawFilePlot.extractChromatogram(minMz, maxMz);
       }
    }//GEN-LAST:event_massRangeTFActionPerformed
 
