@@ -6,7 +6,6 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.util.KeyEventDispatcherDecorator;
-import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.Scan;
@@ -29,6 +28,10 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.block.BlockContainer;
+import org.jfree.chart.block.BorderArrangement;
+import org.jfree.chart.block.EmptyBlock;
+import org.jfree.chart.block.LabelBlock;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.Marker;
@@ -40,6 +43,7 @@ import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRendererState;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.title.CompositeTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -52,19 +56,19 @@ import org.slf4j.LoggerFactory;
  *
  * @author CB205360
  */
-public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot, KeyEventDispatcher {
+abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements IRawFilePlot, KeyEventDispatcher {
 
-   final private static Logger logger = LoggerFactory.getLogger(RawFilePlotPanel.class);
+   final private static Logger logger = LoggerFactory.getLogger(AbstractRawFilePanel.class);
    final private static DecimalFormat xFormatter = new DecimalFormat("0.000");
    final private static DecimalFormat yFormatter = new DecimalFormat("#,###,###");
    final private static Font tickLabelFont = new Font("SansSerif", java.awt.Font.PLAIN, 10);
    final private static Font titleFont = new Font("SansSerif", java.awt.Font.PLAIN, 12);
-   //final private IRawFile rawfile;
-   private ChartPanel chromatogramPanel;
-   private ChartPanel spectrumPanel;
+   
+   protected ChartPanel chromatogramPanel;
+   protected ChartPanel spectrumPanel;
 
-   private Chromatogram currentChromatogram;
-   private Scan currentScan;
+   protected Chromatogram currentChromatogram;
+   protected Scan currentScan;
 
    private XYItemRenderer stickRenderer = new XYItemStickRenderer();
    private XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
@@ -72,12 +76,10 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
    /**
     * Creates new form IRawFilePlotPanel
     */
-   public RawFilePlotPanel(IRawFile rawfile) {
-      //this.rawfile = rawfile;
+   public AbstractRawFilePanel() {
       initComponents();
       initChartPanels();
       KeyEventDispatcherDecorator.addKeyEventListener(this);
-      displayTIC(rawfile);
    }
 
    private void initChartPanels() {
@@ -109,19 +111,16 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
          }
 
          public void chartMouseClicked(ChartMouseEvent event) {
-            int deviceX = event.getTrigger().getX();
             JFreeChart jfreechart = event.getChart();
             if ((jfreechart != null) && (currentChromatogram != null)) {
-               XYPlot xyplot = event.getChart().getXYPlot();
-               double d = xyplot.getDomainAxis().java2DToValue(deviceX, chromatogramPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
-               int scanIdx = getCurrentRawfile().getScanId(d * 60.0);
-               displayScan(scanIdx);
+               chromatogramMouseClicked(event);
             }
          }
       });
 
       chromatogramContainerPanel.removeAll();
       chromatogramContainerPanel.add(chromatogramPanel, BorderLayout.CENTER);
+      chromatogramPanel.setMouseWheelEnabled(true);
       XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
       xyplot.getDomainAxis().setTickLabelFont(tickLabelFont);
       xyplot.getRangeAxis().setTickLabelFont(tickLabelFont);
@@ -134,7 +133,7 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
       
       // Create Scan Charts
       dataset = new XYSeriesCollection();
-      JFreeChart scanChart = ChartFactory.createXYLineChart("Scan", null, null, dataset, PlotOrientation.VERTICAL, false, true, false);
+      JFreeChart scanChart = ChartFactory.createXYLineChart("", null, null, dataset, PlotOrientation.VERTICAL, false, true, false);
       xyplot = scanChart.getXYPlot();
       XYItemRenderer renderer = xyplot.getRenderer();
       renderer.setSeriesPaint(0, CyclicColorPalette.getColor(1));
@@ -147,6 +146,23 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
       xyplot.setBackgroundPaint(CyclicColorPalette.GRAY_BACKGROUND);
       xyplot.setRangeGridlinePaint(CyclicColorPalette.GRAY_GRID);
       spectrumPanel = new ChartPanel(scanChart);
+      spectrumPanel.setMouseWheelEnabled(true);
+      
+      
+//      LabelBlock leftScanTitle = new LabelBlock("left");
+//      leftScanTitle.setFont(titleFont);
+//      LabelBlock rightScanTitle = new LabelBlock("right");
+//      rightScanTitle.setFont(titleFont);
+// 
+//      BlockContainer blockcontainer = new BlockContainer(new BorderArrangement());
+//      blockcontainer.add(leftScanTitle, RectangleEdge.LEFT);
+//      blockcontainer.add(rightScanTitle, RectangleEdge.RIGHT);
+//      blockcontainer.add(new EmptyBlock(2000D, 0.0D));
+//      CompositeTitle compositetitle = new CompositeTitle(blockcontainer);
+//      compositetitle.setPosition(RectangleEdge.TOP);
+//      spectrumPanel.getChart().addSubtitle(compositetitle);
+
+      
       spectrumPanel.addChartMouseListener(new ChartMouseListener() {
 
          public void chartMouseMoved(ChartMouseEvent event) {
@@ -176,37 +192,8 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
 
          public void chartMouseClicked(ChartMouseEvent event) {
             JFreeChart jfreechart = event.getChart();
-            if ((event.getTrigger().getClickCount() == 2) && (jfreechart != null) && (currentScan != null)) {
-               XYPlot xyplot = event.getChart().getXYPlot();
-               double domain = xyplot.getDomainAxis().java2DToValue(event.getTrigger().getX(), spectrumPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
-               //TODO : choose extraction ppm value (10 ppm)
-               double maxMz = domain + domain * 10.0 / 1e6;
-               double minMz = domain - domain * 10.0 / 1e6;
-               if ((event.getTrigger().getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                  SwingWorker worker = new AbstractXICExtractionWorker(RawFilePlotPanel.this, getCurrentRawfile(), minMz, maxMz) {
-                     @Override
-                     protected void done() {
-                        try {
-                           addChromatogram(get());
-                        } catch (Exception e) {
-                           logger.error("Error while extraction chromatogram", e);
-                        }
-                     }
-                  };
-                  worker.execute();
-               } else {
-                  SwingWorker worker = new AbstractXICExtractionWorker(RawFilePlotPanel.this, getCurrentRawfile(), minMz, maxMz) {
-                     @Override
-                     protected void done() {
-                        try {
-                           displayChromatogram(get());
-                        } catch (Exception e) {
-                           logger.error("Error while extraction chromatogram", e);
-                        }
-                     }
-                  };
-                  worker.execute();
-               }
+            if ((jfreechart != null) && (currentScan != null)) {
+               scanMouseClicked(event);
             }
          }
       });
@@ -246,6 +233,53 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
 
       add(jSplitPane1, java.awt.BorderLayout.CENTER);
    }// </editor-fold>//GEN-END:initComponents
+
+   protected void chromatogramMouseClicked(ChartMouseEvent event) {
+      XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
+      double d = xyplot.getDomainAxis().java2DToValue(event.getTrigger().getX(), chromatogramPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
+      int scanIdx = getCurrentRawfile().getScanId(d * 60.0);
+      displayScan(scanIdx);
+   }
+  
+   protected void scanMouseClicked(ChartMouseEvent event) {
+      if ((event.getTrigger().getClickCount() == 2)) {
+         XYPlot xyplot = event.getChart().getXYPlot();
+         double domain = xyplot.getDomainAxis().java2DToValue(event.getTrigger().getX(), spectrumPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
+         //TODO : choose extraction ppm value (10 ppm)
+         double maxMz = domain + domain * 10.0 / 1e6;
+         double minMz = domain - domain * 10.0 / 1e6;
+         if ((event.getTrigger().getModifiers() & KeyEvent.ALT_MASK) != 0) {
+            SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
+               @Override
+               protected void done() {
+                  try {
+                     addChromatogram(get());
+                  } catch (Exception e) {
+                     logger.error("Error while extraction chromatogram", e);
+                  }
+               }
+            };
+            worker.execute();
+         } else {
+            extractChromatogram(minMz, maxMz);
+         }
+      }
+   }
+
+   @Override
+   public void extractChromatogram(double minMz, double maxMz) {
+      SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
+         @Override
+         protected void done() {
+            try {
+               displayChromatogram(get());
+            } catch (Exception e) {
+               logger.error("Error while extraction chromatogram", e);
+            }
+         }
+      };
+      worker.execute();
+   }
 
    @Override
    public void displayChromatogram(Chromatogram chromato) {
@@ -337,11 +371,6 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
 
    }
 
-   @Override
-   public IRawFile getCurrentRawfile() {
-      return currentChromatogram.rawFile;
-   }
-
    public Chromatogram getCurrentChromatogram() {
       return currentChromatogram;
    }
@@ -383,26 +412,6 @@ public class RawFilePlotPanel extends javax.swing.JPanel implements IRawFilePlot
          }
       }
       return false;
-   }
-
-   private void displayTIC(final IRawFile rawFile) {
-      logger.info("Display TIC chromatogram");
-      SwingWorker worker = new SwingWorker<Chromatogram, Void>() {
-         @Override
-         protected Chromatogram doInBackground() throws Exception {
-            return rawFile.getTIC();
-         }
-
-         @Override
-         protected void done() {
-            try {
-               displayChromatogram(get());
-            } catch (Exception e) {
-               logger.error("Error while reading chromatogram");
-            }
-         }
-      };
-      worker.execute();
    }
 
    private class XYItemStickRenderer extends AbstractXYItemRenderer {
