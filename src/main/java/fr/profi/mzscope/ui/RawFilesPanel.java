@@ -66,7 +66,6 @@ public class RawFilesPanel extends javax.swing.JPanel  {
 
       rawFilesList1.setModel(new RawFileListModel()
       );
-      rawFilesList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
       rawFilesList1.setComponentPopupMenu(jPopupMenu1);
       rawFilesList1.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
       rawFilesList1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -83,17 +82,17 @@ public class RawFilesPanel extends javax.swing.JPanel  {
       jPanel1.setLayout(jPanel1Layout);
       jPanel1Layout.setHorizontalGroup(
          jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 0, Short.MAX_VALUE)
+         .addGap(0, 182, Short.MAX_VALUE)
          .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE))
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE))
       );
       jPanel1Layout.setVerticalGroup(
          jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 163, Short.MAX_VALUE)
+         .addGap(0, 194, Short.MAX_VALUE)
          .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-               .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-               .addGap(0, 0, Short.MAX_VALUE)))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+               .addGap(0, 0, Short.MAX_VALUE)
+               .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)))
       );
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -102,19 +101,19 @@ public class RawFilesPanel extends javax.swing.JPanel  {
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
             .addGap(6, 6, 6)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGap(6, 6, 6))
-         .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(openedRawFilesLabel)
-            .addContainerGap(100, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addGroup(layout.createSequentialGroup()
+                  .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                  .addGap(6, 6, 6))))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
-            .addContainerGap()
-            .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(0, 0, 0)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGap(5, 5, 5))
       );
@@ -122,7 +121,11 @@ public class RawFilesPanel extends javax.swing.JPanel  {
 
     private void viewRawFileMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewRawFileMIActionPerformed
         if(m_parentFrame != null ) {
-            m_parentFrame.displayRawAction((IRawFile)rawFilesList1.getSelectedValue());
+            if (rawFilesList1.getSelectedValuesList().size() > 1) {
+               m_parentFrame.displayRawAction(rawFilesList1.getSelectedValuesList());
+            } else {
+               m_parentFrame.displayRawAction((IRawFile)rawFilesList1.getSelectedValue());
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Unable to view selected data, unspecified main frame !", "View Data  Error", JOptionPane.ERROR_MESSAGE);
         }
