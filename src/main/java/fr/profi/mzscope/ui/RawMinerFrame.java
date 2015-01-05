@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import com.google.common.base.Strings;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
@@ -176,24 +177,53 @@ public class RawMinerFrame extends javax.swing.JFrame {
        Preferences prefs = Preferences.userNodeForPackage(this.getClass());
        String directory = prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath());
        fileChooser.setCurrentDirectory(new File(directory));
+       fileChooser.setMultiSelectionEnabled(true);
        int returnVal = fileChooser.showOpenDialog(this);
        if (returnVal == JFileChooser.APPROVE_OPTION) {
-          File file = fileChooser.getSelectedFile();          
-          prefs.put(LAST_DIR, file.getParentFile().getAbsolutePath());
-          IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
-          rawFilesPanel1.addFile(rawfile);
+          File[] files = fileChooser.getSelectedFiles();
+          for (File file : files) {
+             prefs.put(LAST_DIR, file.getParentFile().getAbsolutePath());
+             IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
+             rawFilesPanel1.addFile(rawfile);
+          }
        } else {
           System.out.println("File access cancelled by user.");
        }
     }//GEN-LAST:event_openRawMIActionPerformed
 
     protected void displayRawAction(IRawFile rawfile){
-        RawFilePlotPanel plotPanel = new RawFilePlotPanel(rawfile);
+        AbstractRawFilePanel plotPanel = new SingleRawFilePanel(rawfile);
         viewersTabPane.add(rawfile.getName(), plotPanel);
         FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
         featuresTabPane.add(rawfile.getName(), featuresPanel);
     }
-    
+
+    protected void displayRawAction(List<IRawFile> rawfiles){
+        String name = "";
+        if (rawfiles.size() > 1) {
+           String prefix = Strings.commonPrefix(rawfiles.get(0).getName(), rawfiles.get(1).getName());
+           if (!prefix.isEmpty()) {
+              StringBuilder builder = new StringBuilder();
+              for (IRawFile rawfile : rawfiles) {
+                 String shortName = rawfile.getName().substring(prefix.length()-1);
+                 shortName = shortName.substring(0, shortName.lastIndexOf('.'));
+                 builder.append("..").append(shortName).append(',');
+              }
+              // trim to 30 char max
+//              name = builder.substring(0, Math.min(builder.length()-1, 30))+"...";
+              builder.deleteCharAt(builder.length()-1);
+              name = builder.toString();
+           } else {
+              name = Integer.toString(rawfiles.size())+" files";
+           }
+        } else {
+           name = rawfiles.get(0).getName();
+        }
+        AbstractRawFilePanel plotPanel = new MultiRawFilePanel(rawfiles);
+        viewersTabPane.add(name, plotPanel);
+    }
+
+        
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
        if ((selectedRawFilePanel != null) && (viewersTabPane.getSelectedIndex() >= 0)) {
           final String tabName = viewersTabPane.getTitleAt(viewersTabPane.getSelectedIndex());
