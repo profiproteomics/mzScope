@@ -7,8 +7,6 @@ package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
-import fr.profi.mzscope.ui.event.AppEventBus;
-import fr.profi.mzscope.ui.event.NewChromatogramEvent;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +18,12 @@ import org.slf4j.LoggerFactory;
 abstract class AbstractXICExtractionWorker extends SwingWorker<Chromatogram, Void> {
 
    private static Logger logger = LoggerFactory.getLogger(AbstractXICExtractionWorker.class);
+   
    private IRawFile rawFile;
-   private Object source;
    private double minMz;
    private double maxMz;
 
-   public AbstractXICExtractionWorker(Object source, IRawFile rawFile, double min, double max) {
-      this.source = source;
+   public AbstractXICExtractionWorker(IRawFile rawFile, double min, double max) {
       this.rawFile = rawFile;
       this.minMz = min;
       this.maxMz = max;
