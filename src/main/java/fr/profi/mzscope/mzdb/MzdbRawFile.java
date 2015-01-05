@@ -39,12 +39,12 @@ import scala.Option;
 public class MzdbRawFile implements IRawFile {
 
    private static Logger logger = LoggerFactory.getLogger(MzdbRawFile.class);
-   final private static DecimalFormat formatter = new DecimalFormat("0.000");
+   final private static DecimalFormat massFormatter = new DecimalFormat("0.####");
+   final private static DecimalFormat timeFormatter = new DecimalFormat("0.00");
    
    private final File mzDbFile;
    private MzDbReader reader;
    private Map<Integer, ScanHeader> scanHeadersById = null;
-   private final double EPSILON = 1e-5;
 
    public MzdbRawFile(File file) {
       mzDbFile = file;
@@ -88,9 +88,32 @@ public class MzdbRawFile implements IRawFile {
    }
    
  
-     @Override
+   @Override
    public Chromatogram getTIC() {
       logger.info("mzdb extract TIC Chromatogram");
+      Chromatogram chromatogram = null;
+      try {
+         ScanHeader[] headers = reader.getScanHeaders();
+         double[] xAxisData = new double[headers.length];
+         double[] yAxisData = new double[headers.length];
+         for (int i = 0; i < headers.length; i++) {
+            xAxisData[i] = (headers[i].getElutionTime()/ 60.0);
+            yAxisData[i] = ((double) headers[i].getTIC());
+         }
+         
+         chromatogram = new Chromatogram();
+         chromatogram.time = xAxisData;
+         chromatogram.intensities = yAxisData;
+         chromatogram.rawFile = this;
+         return chromatogram;
+      } catch (SQLiteException ex) {
+         logger.error("Cannot generate TIC chromatogram", ex);
+      }
+      return chromatogram;
+   }
+
+   public Chromatogram getBPI() {
+      logger.info("mzdb extract BPI Chromatogram");
       Chromatogram chromatogram = null;
       try {
          ScanHeader[] headers = reader.getScanHeaders();
@@ -107,11 +130,11 @@ public class MzdbRawFile implements IRawFile {
          chromatogram.rawFile = this;
          return chromatogram;
       } catch (SQLiteException ex) {
-         logger.error("Cannot generate TIC chromatogram", ex);
+         logger.error("Cannot generate BPI chromatogram", ex);
       }
       return chromatogram;
    }
-   
+
    @Override
    public Chromatogram getXIC(double minMz, double maxMz, float minRT, float maxRT) {
       Chromatogram chromatogram = null;
@@ -123,7 +146,7 @@ public class MzdbRawFile implements IRawFile {
          chromatogram.minMz = minMz;
          chromatogram.maxMz = maxMz;
          StringBuilder builder = new StringBuilder("Mass range: ");
-         builder.append(formatter.format(minMz)).append("-").append(formatter.format(maxMz));
+         builder.append(massFormatter.format(minMz)).append("-").append(massFormatter.format(maxMz));
          chromatogram.title = builder.toString();
          
       } catch (Exception e) {
@@ -145,7 +168,7 @@ public class MzdbRawFile implements IRawFile {
         chromatogram.maxMz = max;      
         
         StringBuilder builder = new StringBuilder("Mass range: ");
-        builder.append(formatter.format(min)).append("-").append(formatter.format(max));
+        builder.append(massFormatter.format(min)).append("-").append(massFormatter.format(max));
         chromatogram.title = builder.toString();
         
       } catch (Exception e) {
@@ -296,11 +319,11 @@ public class MzdbRawFile implements IRawFile {
          StringBuilder builder = new StringBuilder();
          
          if (scan.getMsLevel() == 2) {
-            builder.append("mz=").append(formatter.format(rawScan.getHeader().getPrecursorMz())).append(" (");
+            builder.append(massFormatter.format(rawScan.getHeader().getPrecursorMz())).append(" (");
             builder.append(rawScan.getHeader().getPrecursorCharge()).append("+) - ");
          }
-         builder.append("sc=").append(scanIndex).append(",rt=").append(formatter.format(rawScan.getHeader().getElutionTime()/60.0));
-         builder.append(",lv=ms").append(scan.getMsLevel());
+         builder.append("sc=").append(scanIndex).append(",rt=").append(timeFormatter.format(rawScan.getHeader().getElutionTime()/60.0));
+         builder.append(",ms").append(scan.getMsLevel());
          scan.setTitle(builder.toString());
          scan.setPeaksMz(mzList);
          scan.setPeaksIntensities(intensityList);
