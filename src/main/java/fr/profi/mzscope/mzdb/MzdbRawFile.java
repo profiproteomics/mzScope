@@ -316,14 +316,14 @@ public class MzdbRawFile implements IRawFile {
 
          }
          scan = new Scan(scanIndex, rawScan.getHeader().getElutionTime(), Doubles.toArray(xAxisData), Floats.toArray(yAxisData), rawScan.getHeader().getMsLevel());
-         StringBuilder builder = new StringBuilder();
+         StringBuilder builder = new StringBuilder(getName());
          
          if (scan.getMsLevel() == 2) {
             builder.append(massFormatter.format(rawScan.getHeader().getPrecursorMz())).append(" (");
             builder.append(rawScan.getHeader().getPrecursorCharge()).append("+) - ");
          }
-         builder.append("sc=").append(scanIndex).append(",rt=").append(timeFormatter.format(rawScan.getHeader().getElutionTime()/60.0));
-         builder.append(",ms").append(scan.getMsLevel());
+         builder.append(", sc=").append(scanIndex).append(", rt=").append(timeFormatter.format(rawScan.getHeader().getElutionTime()/60.0));
+         builder.append(", ms").append(scan.getMsLevel());
          scan.setTitle(builder.toString());
          scan.setPeaksMz(mzList);
          scan.setPeaksIntensities(intensityList);

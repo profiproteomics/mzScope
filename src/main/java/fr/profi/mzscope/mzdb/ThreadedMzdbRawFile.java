@@ -146,6 +146,21 @@ public class ThreadedMzdbRawFile implements IRawFile {
       return null;
    }
    
+   public Chromatogram getBPI() {
+      try {
+         return service.submit(new Callable<Chromatogram>() {
+            @Override
+            public Chromatogram call() {
+               Chromatogram chromatogram = mzdbRawFile.getBPI();
+               chromatogram.rawFile = ThreadedMzdbRawFile.this;
+               return chromatogram;
+            }
+         }).get();
+      } catch (Exception ex ) {
+         logger.error("getBPI call fail", ex);
+      } 
+      return null;
+   }
    
    @Override
     public Chromatogram getXIC(final double minMz,final  double maxMz, final float minRT,final  float maxRT) {

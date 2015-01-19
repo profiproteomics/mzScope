@@ -22,6 +22,8 @@ public interface IRawFile {
    
    public Chromatogram getTIC();
 
+   public Chromatogram getBPI();
+
    public List<Feature> extractFeatures();
    
    public Scan getScan(int scanIndex);
