@@ -7,7 +7,6 @@ package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
-import fr.profi.mzscope.util.KeyEventDispatcherDecorator;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
    public SingleRawFilePanel(IRawFile rawfile) {
       super();
       this.rawfile = rawfile;
-      displayTIC(rawfile);
+      displayTIC();
    }
 
    @Override
@@ -33,7 +32,8 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
       return rawfile;
    }
 
-   protected void displayTIC(final IRawFile rawFile) {
+   public void displayTIC() {
+      final IRawFile rawFile = this.rawfile;
       logger.info("Display single TIC chromatogram");
       SwingWorker worker = new SwingWorker<Chromatogram, Void>() {
          @Override
@@ -53,4 +53,24 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
       worker.execute();
    }
 
+   public void displayBPI() {
+      final IRawFile rawFile = this.rawfile;
+      logger.info("Display single BPI chromatogram");
+      SwingWorker worker = new SwingWorker<Chromatogram, Void>() {
+         @Override
+         protected Chromatogram doInBackground() throws Exception {
+            return rawFile.getBPI();
+         }
+
+         @Override
+         protected void done() {
+            try {
+               displayChromatogram(get());
+            } catch (Exception e) {
+               logger.error("Error while reading chromatogram");
+            }
+         }
+      };
+      worker.execute();
+   }
 }

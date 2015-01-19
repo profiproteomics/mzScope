@@ -16,10 +16,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.KeyEventDispatcher;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.Arrays;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
@@ -28,10 +33,6 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYPointerAnnotation;
 import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.block.BlockContainer;
-import org.jfree.chart.block.BorderArrangement;
-import org.jfree.chart.block.EmptyBlock;
-import org.jfree.chart.block.LabelBlock;
 import org.jfree.chart.plot.CrosshairState;
 import org.jfree.chart.plot.IntervalMarker;
 import org.jfree.chart.plot.Marker;
@@ -43,7 +44,6 @@ import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRendererState;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.chart.title.CompositeTitle;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
@@ -60,18 +60,18 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
    final private static Logger logger = LoggerFactory.getLogger(AbstractRawFilePanel.class);
    final private static DecimalFormat xFormatter = new DecimalFormat("0.000");
-   final private static DecimalFormat yFormatter = new DecimalFormat("#,###,###");
+   final private static DecimalFormat yFormatter = new DecimalFormat("0.###E0");
    final private static Font tickLabelFont = new Font("SansSerif", java.awt.Font.PLAIN, 10);
    final private static Font titleFont = new Font("SansSerif", java.awt.Font.PLAIN, 12);
    
    protected ChartPanel chromatogramPanel;
    protected ChartPanel spectrumPanel;
-
+   protected JToolBar toolbar;
    protected Chromatogram currentChromatogram;
    protected Scan currentScan;
 
-   private XYItemRenderer stickRenderer = new XYItemStickRenderer();
-   private XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
+   private final XYItemRenderer stickRenderer = new XYItemStickRenderer();
+   private final XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
 
    /**
     * Creates new form IRawFilePlotPanel
@@ -119,6 +119,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
       });
 
       chromatogramContainerPanel.removeAll();
+      chromatogramContainerPanel.add(initToolbar(), BorderLayout.WEST);
       chromatogramContainerPanel.add(chromatogramPanel, BorderLayout.CENTER);
       chromatogramPanel.setMouseWheelEnabled(true);
       XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
@@ -147,22 +148,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
       xyplot.setRangeGridlinePaint(CyclicColorPalette.GRAY_GRID);
       spectrumPanel = new ChartPanel(scanChart);
       spectrumPanel.setMouseWheelEnabled(true);
-      
-      
-//      LabelBlock leftScanTitle = new LabelBlock("left");
-//      leftScanTitle.setFont(titleFont);
-//      LabelBlock rightScanTitle = new LabelBlock("right");
-//      rightScanTitle.setFont(titleFont);
-// 
-//      BlockContainer blockcontainer = new BlockContainer(new BorderArrangement());
-//      blockcontainer.add(leftScanTitle, RectangleEdge.LEFT);
-//      blockcontainer.add(rightScanTitle, RectangleEdge.RIGHT);
-//      blockcontainer.add(new EmptyBlock(2000D, 0.0D));
-//      CompositeTitle compositetitle = new CompositeTitle(blockcontainer);
-//      compositetitle.setPosition(RectangleEdge.TOP);
-//      spectrumPanel.getChart().addSubtitle(compositetitle);
 
-      
       spectrumPanel.addChartMouseListener(new ChartMouseListener() {
 
          public void chartMouseMoved(ChartMouseEvent event) {
@@ -178,7 +164,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
                if (~result < domainValues.length) {
                   xyplot.clearAnnotations();
                   StringBuilder builder = new StringBuilder();
-                  builder.append(xFormatter.format(domainValues[~result])).append("-");
+                  builder.append(xFormatter.format(domainValues[~result])).append(" - ");
                   builder.append(yFormatter.format(rangeValues[~result]));
                   double y = rangeValues[~result];
                   final Rectangle2D area = spectrumPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
@@ -203,6 +189,36 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
    }
 
+   
+   private JToolBar initToolbar() {
+      toolbar = new JToolBar();
+      toolbar.setOrientation(JToolBar.VERTICAL);
+      JButton displayTICbtn = new JButton("TIC");
+      displayTICbtn.setToolTipText("Display TIC Chromatogram");
+      displayTICbtn.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            displayTIC();
+         }
+      });
+      toolbar.add(displayTICbtn);
+      
+      JButton displayBPIbtn = new JButton("BPI");
+      displayBPIbtn.setToolTipText("Display BPI Chromatogram");
+      displayBPIbtn.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent e) {
+            displayBPI();
+         }
+      });
+      toolbar.add(displayBPIbtn);
+      
+      toolbar.setFloatable(false);
+      toolbar.setRollover(true);
+      return toolbar;
+   }
+
+   
    /**
     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
     * content of this method is always regenerated by the Form Editor.
@@ -284,7 +300,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
    @Override
    public void displayChromatogram(Chromatogram chromato) {
       this.currentChromatogram = chromato;
-      XYSeries series = new XYSeries("Chromato");
+      XYSeries series = new XYSeries(chromato.rawFile.getName());
       for (int k = 0; k < chromato.intensities.length; k++) {
          series.add(chromato.time[k], chromato.intensities[k]);
       }
@@ -305,7 +321,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
    }
 
    public void addChromatogram(Chromatogram chromato) {
-      XYSeries series = new XYSeries("Chromato");
+      XYSeries series = new XYSeries(chromato.rawFile.getName());
       for (int k = 0; k < chromato.intensities.length; k++) {
          series.add(chromato.time[k], chromato.intensities[k]);
       }
@@ -319,7 +335,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
       logger.info("Display Scan " + index);
       if ((currentScan == null) || (index != currentScan.getIndex())) {
          currentScan = getCurrentRawfile().getScan(index);
-         XYSeries series = new XYSeries("Scan");
+         XYSeries series = new XYSeries(currentScan.getTitle());
          double[] masses = currentScan.getMasses();
          float[] intensities = currentScan.getIntensities();
          for (int k = 0; k < currentScan.getMasses().length; k++) {
@@ -374,6 +390,10 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
    public Chromatogram getCurrentChromatogram() {
       return currentChromatogram;
    }
+   
+   abstract void displayTIC();
+   
+   abstract void displayBPI();
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JPanel chromatogramContainerPanel;
