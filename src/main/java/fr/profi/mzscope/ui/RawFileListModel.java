@@ -6,7 +6,6 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.model.IRawFile;
-import fr.profi.mzscope.mzdb.MzdbRawFile;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.AbstractListModel;
