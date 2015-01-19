@@ -50,7 +50,6 @@ public class RawFilesPanel extends javax.swing.JPanel  {
       jPopupMenu1 = new javax.swing.JPopupMenu();
       viewRawFileMI = new javax.swing.JMenuItem();
       openedRawFilesLabel = new javax.swing.JLabel();
-      jPanel1 = new javax.swing.JPanel();
       jScrollPane2 = new javax.swing.JScrollPane();
       rawFilesList1 = new javax.swing.JList();
 
@@ -62,7 +61,7 @@ public class RawFilesPanel extends javax.swing.JPanel  {
       });
       jPopupMenu1.add(viewRawFileMI);
 
-      openedRawFilesLabel.setText("Opened Raw files");
+      openedRawFilesLabel.setText("Raw files");
 
       rawFilesList1.setModel(new RawFileListModel()
       );
@@ -78,45 +77,31 @@ public class RawFilesPanel extends javax.swing.JPanel  {
       });
       jScrollPane2.setViewportView(rawFilesList1);
 
-      javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-      jPanel1.setLayout(jPanel1Layout);
-      jPanel1Layout.setHorizontalGroup(
-         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 182, Short.MAX_VALUE)
-         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 182, Short.MAX_VALUE))
-      );
-      jPanel1Layout.setVerticalGroup(
-         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGap(0, 194, Short.MAX_VALUE)
-         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-               .addGap(0, 0, Short.MAX_VALUE)
-               .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)))
-      );
-
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
       this.setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
-            .addGap(6, 6, 6)
+            .addGap(5, 5, 5)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                  .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                  .addComponent(jScrollPane2)
+                  .addGap(5, 5, 5))
                .addGroup(layout.createSequentialGroup()
-                  .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                  .addGap(6, 6, 6))))
+                  .addComponent(openedRawFilesLabel)
+                  .addContainerGap(156, Short.MAX_VALUE))))
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(layout.createSequentialGroup()
-            .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addGap(0, 0, 0)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGap(5, 5, 5)
+            .addComponent(openedRawFilesLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGap(5, 5, 5)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
             .addGap(5, 5, 5))
       );
+
+      openedRawFilesLabel.getAccessibleContext().setAccessibleName("Raw files");
    }// </editor-fold>//GEN-END:initComponents
 
     private void viewRawFileMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewRawFileMIActionPerformed
@@ -147,7 +132,6 @@ public class RawFilesPanel extends javax.swing.JPanel  {
 
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
-   private javax.swing.JPanel jPanel1;
    private javax.swing.JPopupMenu jPopupMenu1;
    private javax.swing.JScrollPane jScrollPane2;
    private javax.swing.JLabel openedRawFilesLabel;

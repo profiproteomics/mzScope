@@ -44,8 +44,6 @@ public class FeaturesPanel extends javax.swing.JPanel {
       jScrollPane1 = new javax.swing.JScrollPane();
       featureTable = new org.jdesktop.swingx.JXTable();
 
-      jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
       featureTable.setModel(featureTableModel);
       featureTable.setEditable(false);
       featureTable.setShowGrid(true);
@@ -60,7 +58,7 @@ public class FeaturesPanel extends javax.swing.JPanel {
       this.setLayout(layout);
       layout.setHorizontalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
       );
       layout.setVerticalGroup(
          layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
