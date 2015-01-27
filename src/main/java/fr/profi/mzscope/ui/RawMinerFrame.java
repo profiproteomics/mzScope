@@ -9,6 +9,8 @@ import com.google.common.base.Strings;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.ExtractionParams;
+import fr.profi.mzscope.ui.dialog.ExtractionParamsDialog;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -67,6 +69,7 @@ public class RawMinerFrame extends javax.swing.JFrame {
       exitMI = new javax.swing.JMenuItem();
       ProcessMenu = new javax.swing.JMenu();
       extractFeaturesMI = new javax.swing.JMenuItem();
+      detectPeakelsMI = new javax.swing.JMenuItem();
       exportChromatogram = new javax.swing.JMenuItem();
 
       fileChooser.setDialogTitle("Open Raw file");
@@ -162,6 +165,14 @@ public class RawMinerFrame extends javax.swing.JFrame {
       });
       ProcessMenu.add(extractFeaturesMI);
 
+      detectPeakelsMI.setText("Detect Peakels");
+      detectPeakelsMI.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            detectPeakelsMIActionPerformed(evt);
+         }
+      });
+      ProcessMenu.add(detectPeakelsMI);
+
       exportChromatogram.setText("Export chromatogram");
       exportChromatogram.addActionListener(new java.awt.event.ActionListener() {
          public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -245,28 +256,41 @@ public class RawMinerFrame extends javax.swing.JFrame {
 
         
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
-       if ((selectedRawFilePanel != null) && (viewersTabPane.getSelectedIndex() >= 0)) {
-          final String tabName = viewersTabPane.getTitleAt(viewersTabPane.getSelectedIndex());
-          final IRawFile rawFile = selectedRawFilePanel.getCurrentRawfile();
-          extractFeaturesMI.setEnabled(false);
-          SwingWorker worker = new SwingWorker<List<Feature>, Void>() {
-             @Override
-             protected List<Feature> doInBackground() throws Exception {
-                return rawFile.extractFeatures();
-             }
+       ExtractionParamsDialog dialog = new ExtractionParamsDialog(this, true);
+       dialog.showExtractionParamsDialog();
+       if (dialog.getExtractionParams() != null) {
+         extractFeatures(IRawFile.ExtractionType.EXTRACT_MS2_FEATURES, dialog.getExtractionParams());
+       }
+    }
 
-             @Override
-             protected void done() {
-                logger.info("extraction done");
+   private void extractFeatures(final IRawFile.ExtractionType type, final ExtractionParams params) {
+      if ((selectedRawFilePanel != null) && (viewersTabPane.getSelectedIndex() >= 0)) {
+         final String tabName = viewersTabPane.getTitleAt(viewersTabPane.getSelectedIndex());
+         final IRawFile rawFile = selectedRawFilePanel.getCurrentRawfile();
+         extractFeaturesMI.setEnabled(false);
+         detectPeakelsMI.setEnabled(false);
+         final long start = System.currentTimeMillis();
+         SwingWorker worker = new SwingWorker<List<Feature>, Void>() {
+            @Override
+            protected List<Feature> doInBackground() throws Exception {
+               return rawFile.extractFeatures(type, params);
+            }
+            
+            @Override
+            protected void done() {
                 try {
-                   for (int i = 0; i < featuresTabPane.getComponentCount(); i++) {
-                      if (featuresTabPane.getTitleAt(i).equals(tabName)) {
-                         FeaturesPanel featurePanel = (FeaturesPanel) featuresTabPane.getComponentAt(i);
-                         featurePanel.setFeatures(get());
-                         break;
+                  List<Feature> features = get();
+                  logger.info("{} features/peakels extracted in {}", features.size(), (System.currentTimeMillis() - start)/1000.0);
+              
+                  for (int i = 0; i < featuresTabPane.getComponentCount(); i++) {
+                     if (featuresTabPane.getTitleAt(i).equals(tabName)) {
+                        FeaturesPanel featurePanel = (FeaturesPanel) featuresTabPane.getComponentAt(i);
+                        featurePanel.setFeatures(features);
+                        break;
                       }
                    }
-                   extractFeaturesMI.setEnabled(false);
+                   extractFeaturesMI.setEnabled(true);
+                   detectPeakelsMI.setEnabled(true);
                 } catch (Exception e) {
                    logger.error("Error while reading chromatogram");
                 }
@@ -305,6 +329,14 @@ public class RawMinerFrame extends javax.swing.JFrame {
       selectedRawFilePanel = (IRawFilePlot) viewersTabPane.getSelectedComponent();
       extractXICPanel.setCurrentRawFilePlot(selectedRawFilePanel);
    }//GEN-LAST:event_viewersTabPaneStateChanged
+
+   private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
+      ExtractionParamsDialog dialog = new ExtractionParamsDialog(this, true);
+       dialog.showExtractionParamsDialog();
+       if (dialog.getExtractionParams() != null) {
+         extractFeatures(IRawFile.ExtractionType.DETECT_PEAKELS, dialog.getExtractionParams());
+       }
+   }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
    /**
     * @param args the command line arguments
@@ -345,6 +377,7 @@ public class RawMinerFrame extends javax.swing.JFrame {
    private javax.swing.JMenu FileMenu;
    private javax.swing.JMenu ProcessMenu;
    private javax.swing.JMenuItem closeAllMI;
+   private javax.swing.JMenuItem detectPeakelsMI;
    private javax.swing.JMenuItem exitMI;
    private javax.swing.JMenuItem exportChromatogram;
    private javax.swing.JMenuItem extractFeaturesMI;
