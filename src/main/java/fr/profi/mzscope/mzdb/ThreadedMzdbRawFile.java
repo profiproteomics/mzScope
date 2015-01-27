@@ -7,6 +7,7 @@ package fr.profi.mzscope.mzdb;
 
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.model.Scan;
 import java.io.File;
@@ -15,7 +16,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,12 +113,12 @@ public class ThreadedMzdbRawFile implements IRawFile {
       return null;
    }
 
-   public List<Feature> extractFeatures() {
+   public List<Feature> extractFeatures(final ExtractionType type, final ExtractionParams params) {
      try {
          logger.info("extract feature starting");
          Future<List<Feature>> future = service.submit(new Callable<List<Feature>>() {
             public List<Feature> call() {
-               return mzdbRawFile.extractFeatures();
+               return mzdbRawFile.extractFeatures(type, params);
             }
          });
          logger.info("waiting for feature extraction ... ");
