@@ -1,10 +1,8 @@
 package fr.profi.mzscope.mzdb;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import com.almworks.sqlite4java.SQLiteException;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
@@ -85,16 +83,10 @@ public class Main {
          System.out.println("Chromato length: " + chromato.length);
 
 
-      } catch (FileNotFoundException e) {
+      } catch (Exception e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
-      } catch (ClassNotFoundException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      } catch (SQLiteException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
+      } 
 
    }
 }
