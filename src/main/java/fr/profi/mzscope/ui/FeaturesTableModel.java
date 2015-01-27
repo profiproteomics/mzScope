@@ -17,10 +17,8 @@ import javax.swing.table.AbstractTableModel;
  */
 public class FeaturesTableModel extends AbstractTableModel {
     
-    private static final int MZ_COL = 0;
-    private static final int ET_COL = 1;
-    private static final int AREA_COL = 2;
-    
+   public static enum Columns { MZ_COL, ET_COL, DURATION_COL, APEX_INT_COL, AREA_COL, SCAN_COUNT_COL };
+
     private List<Feature> features = new ArrayList<Feature>();
 
     public void setFeatures(List<Feature> features) {
@@ -33,34 +31,43 @@ public class FeaturesTableModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return 3;
+        return Columns.values().length;
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        switch(columnIndex) {
+        switch(Columns.values()[columnIndex]) {
             case MZ_COL: return features.get(rowIndex).getMz();
             case ET_COL: return features.get(rowIndex).getElutionTime()/60.0;
+            case DURATION_COL: return features.get(rowIndex).getBasePeakel().calcDuration()/60.0;
+            case APEX_INT_COL: return features.get(rowIndex).getBasePeakel().getApexIntensity();
             case AREA_COL: return features.get(rowIndex).getArea();
+            case SCAN_COUNT_COL: return features.get(rowIndex).getMs1Count();
         }
         return null;
     }
 
     @Override
     public String getColumnName(int column) {
-        switch(column) {
+        switch(Columns.values()[column]) {
             case MZ_COL: return "m/z";
             case ET_COL: return "elution";
+            case DURATION_COL: return "duration";
+            case APEX_INT_COL: return "apex Int.";
             case AREA_COL: return "area";
+            case SCAN_COUNT_COL: return "MS count";
         }
         return "";
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-         switch(columnIndex) {
+         switch(Columns.values()[columnIndex]) {
             case MZ_COL: return Double.class;
             case ET_COL: return Float.class;
+            case DURATION_COL: return Float.class;
+            case APEX_INT_COL: return Float.class;
             case AREA_COL: return Float.class;
+            case SCAN_COUNT_COL: return Integer.class;
         }
         return Object.class;
     }
