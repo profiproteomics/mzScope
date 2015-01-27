@@ -22,7 +22,6 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.Arrays;
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
@@ -39,6 +38,7 @@ import org.jfree.chart.plot.Marker;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.PlotRenderingInfo;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.AbstractXYItemRenderer;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
 abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements IRawFilePlot, KeyEventDispatcher {
 
    final private static Logger logger = LoggerFactory.getLogger(AbstractRawFilePanel.class);
-   final private static DecimalFormat xFormatter = new DecimalFormat("0.000");
+   final private static DecimalFormat xFormatter = new DecimalFormat("0.0000");
    final private static DecimalFormat yFormatter = new DecimalFormat("0.###E0");
    final private static Font tickLabelFont = new Font("SansSerif", java.awt.Font.PLAIN, 10);
    final private static Font titleFont = new Font("SansSerif", java.awt.Font.PLAIN, 12);
@@ -98,14 +98,13 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
                int result = Arrays.binarySearch(currentChromatogram.time, domain);
                if (~result < currentChromatogram.time.length) {
                   xyplot.clearAnnotations();
-                  double x = xyplot.getDataset().getXValue(0, ~result);
-                  double y = xyplot.getDataset().getYValue(0, ~result);
+                  double x = currentChromatogram.time[~result]; 
+                  double y = currentChromatogram.intensities[~result]; 
                   final Rectangle2D area = chromatogramPanel.getChartRenderingInfo().getPlotInfo().getDataArea();
-
                   RectangleEdge rangeEdge = Plot.resolveRangeAxisLocation(xyplot.getRangeAxisLocation(), PlotOrientation.VERTICAL);
                   double pY = xyplot.getRangeAxis().valueToJava2D(y, area, rangeEdge);
                   double angle = (pY < 60.0) ? -5.0 * Math.PI / 4.0 : -Math.PI / 2.0;
-                  xyplot.addAnnotation(new XYPointerAnnotation(xFormatter.format(xyplot.getDataset().getXValue(0, ~result)), x, y, angle));
+                  xyplot.addAnnotation(new XYPointerAnnotation(xFormatter.format(x), x, y, angle));
                }
             }
          }
@@ -160,7 +159,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
                double domain = xyplot.getDomainAxis().java2DToValue(deviceX, spectrumPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
                double[] domainValues = ((currentScan.getPeaksMz() == null) ? currentScan.getMasses() : currentScan.getPeaksMz());
                float[] rangeValues = ((currentScan.getPeaksIntensities() == null) ? currentScan.getIntensities() : currentScan.getPeaksIntensities());
-               int result = Arrays.binarySearch(domainValues, (float) domain);
+               int result = Arrays.binarySearch(domainValues, domain);
                if (~result < domainValues.length) {
                   xyplot.clearAnnotations();
                   StringBuilder builder = new StringBuilder();
@@ -311,7 +310,6 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
       builder.append(xFormatter.format(chromato.minMz)).append("-").append(xFormatter.format(chromato.maxMz));
       chromatogramPanel.getChart().setTitle(new TextTitle(builder.toString(), titleFont));
 
-      chromatogramPanel.restoreAutoRangeBounds();
       XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
       xyplot.clearDomainMarkers();
       xyplot.setDataset(dataset);
@@ -332,7 +330,6 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
    @Override
    public void displayScan(int index) {
-      logger.info("Display Scan " + index);
       if ((currentScan == null) || (index != currentScan.getIndex())) {
          currentScan = getCurrentRawfile().getScan(index);
          XYSeries series = new XYSeries(currentScan.getTitle());
@@ -377,6 +374,8 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
                displayChromatogram(get());
                displayScan(f.getBasePeakel().getApexScanId());
                Marker marker = new IntervalMarker(f.getBasePeakel().getFirstElutionTime() / 60.0, f.getBasePeakel().getLastElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1), Color.RED, new BasicStroke(1), 0.3f);
+               chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+               marker = new ValueMarker(f.getElutionTime()/60.0);
                chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
             } catch (Exception e) {
                logger.error("Error while reading chromatogram");
