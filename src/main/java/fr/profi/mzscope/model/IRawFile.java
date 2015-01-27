@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface IRawFile {
 
+   public enum ExtractionType { EXTRACT_MS2_FEATURES, DETECT_PEAKELS};
+   
    public String getName();
 
    public Chromatogram getXIC(double minMz, double maxMz, float minRT, float maxRT);
@@ -24,7 +26,7 @@ public interface IRawFile {
 
    public Chromatogram getBPI();
 
-   public List<Feature> extractFeatures();
+   public List<Feature> extractFeatures(ExtractionType type, ExtractionParams params);
    
    public Scan getScan(int scanIndex);
    

@@ -7,8 +7,8 @@ package fr.profi.mzscope.mzml;
 
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
-import fr.profi.mzscope.mzml.Scan;
 import java.io.File;
 import java.util.List;
 import org.slf4j.Logger;
@@ -66,11 +66,7 @@ public class MzMLRawFile implements IRawFile {
         return getXIC(minMz, maxMz);
     }
 
-   
-   public List<Feature> extractFeatures() {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-   }
-
+  
    public fr.profi.mzscope.model.Scan getScan(int scanIndex) {
       return toModelScan(scans.get(scanIndex));
    }
@@ -98,6 +94,11 @@ public class MzMLRawFile implements IRawFile {
          masses[k] = (double)mzmlScan.getMasses()[k];
       }
       return new fr.profi.mzscope.model.Scan(mzmlScan.getIndex(), mzmlScan.getRetentionTime(), masses, mzmlScan.getIntensities(), 1);
+   }
+
+   @Override
+   public List<Feature> extractFeatures(ExtractionType type, ExtractionParams params) {
+      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
 
 }
