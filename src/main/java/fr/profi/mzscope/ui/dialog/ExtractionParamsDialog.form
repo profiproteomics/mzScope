@@ -127,6 +127,9 @@
           <Connection component="mzBoundsCB" name="selected" type="property"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="minMzTFFocusGained"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
@@ -140,6 +143,9 @@
           <Connection component="mzBoundsCB" name="selected" type="property"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="maxMzTFFocusGained"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="okBtn">
       <Properties>

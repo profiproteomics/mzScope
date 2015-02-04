@@ -257,6 +257,7 @@ public class RawMinerFrame extends javax.swing.JFrame {
         
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
        ExtractionParamsDialog dialog = new ExtractionParamsDialog(this, true);
+       dialog.setLocationRelativeTo(this);
        dialog.showExtractionParamsDialog();
        if (dialog.getExtractionParams() != null) {
          extractFeatures(IRawFile.ExtractionType.EXTRACT_MS2_FEATURES, dialog.getExtractionParams());
@@ -332,6 +333,7 @@ public class RawMinerFrame extends javax.swing.JFrame {
 
    private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
       ExtractionParamsDialog dialog = new ExtractionParamsDialog(this, true);
+       dialog.setLocationRelativeTo(this);
        dialog.showExtractionParamsDialog();
        if (dialog.getExtractionParams() != null) {
          extractFeatures(IRawFile.ExtractionType.DETECT_PEAKELS, dialog.getExtractionParams());

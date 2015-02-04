@@ -8,6 +8,7 @@ package fr.profi.mzscope.ui;
 import fr.profi.mzscope.util.KeyEventDispatcherDecorator;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.MzScopePreferences;
 import fr.profi.mzscope.model.Scan;
 import fr.profi.mzscope.util.CyclicColorPalette;
 import java.awt.BasicStroke;
@@ -260,9 +261,9 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
       if ((event.getTrigger().getClickCount() == 2)) {
          XYPlot xyplot = event.getChart().getXYPlot();
          double domain = xyplot.getDomainAxis().java2DToValue(event.getTrigger().getX(), spectrumPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
-         //TODO : choose extraction ppm value (10 ppm)
-         double maxMz = domain + domain * 10.0 / 1e6;
-         double minMz = domain - domain * 10.0 / 1e6;
+         float ppmTol = MzScopePreferences.getInstance().getMzPPMTolerance();
+         double maxMz = domain + domain * ppmTol / 1e6;
+         double minMz = domain - domain * ppmTol / 1e6;
          if ((event.getTrigger().getModifiers() & KeyEvent.ALT_MASK) != 0) {
             SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
                @Override
@@ -358,7 +359,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
    @Override
    public void displayFeature(final Feature f) {
-      double ppm = 10.0f;
+      double ppm = MzScopePreferences.getInstance().getMzPPMTolerance();
       final double maxMz = f.getMz() + f.getMz() * ppm / 1e6;
       final double minMz = f.getMz() - f.getMz() * ppm / 1e6;
 

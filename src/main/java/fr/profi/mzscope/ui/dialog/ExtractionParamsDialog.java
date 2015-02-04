@@ -7,6 +7,7 @@
 package fr.profi.mzscope.ui.dialog;
 
 import fr.profi.mzscope.model.ExtractionParams;
+import fr.profi.mzscope.model.MzScopePreferences;
 
 /**
  *
@@ -22,6 +23,8 @@ public class ExtractionParamsDialog extends javax.swing.JDialog {
    public ExtractionParamsDialog(java.awt.Frame parent, boolean modal) {
       super(parent, modal);
       initComponents();
+      toleranceTF.setText(Float.toString(MzScopePreferences.getInstance().getMzPPMTolerance()));
+      getRootPane().setDefaultButton(okBtn);
    }
 
    public ExtractionParams getExtractionParams() {
@@ -70,11 +73,21 @@ public class ExtractionParamsDialog extends javax.swing.JDialog {
 
       minMzTF.setText("0.0");
       minMzTF.setEnabled(mzBoundsCB.isSelected());
+      minMzTF.addFocusListener(new java.awt.event.FocusAdapter() {
+         public void focusGained(java.awt.event.FocusEvent evt) {
+            minMzTFFocusGained(evt);
+         }
+      });
 
       jLabel3.setText("maximum m/z:");
 
       maxMzTF.setText("0.0");
       maxMzTF.setEnabled(mzBoundsCB.isSelected());
+      maxMzTF.addFocusListener(new java.awt.event.FocusAdapter() {
+         public void focusGained(java.awt.event.FocusEvent evt) {
+            maxMzTFFocusGained(evt);
+         }
+      });
 
       okBtn.setText("Ok");
       okBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -163,8 +176,17 @@ public class ExtractionParamsDialog extends javax.swing.JDialog {
 
    private void mzBoundsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mzBoundsCBActionPerformed
       minMzTF.setEnabled(mzBoundsCB.isSelected());
+      minMzTF.requestFocusInWindow();
       maxMzTF.setEnabled(mzBoundsCB.isSelected());      
    }//GEN-LAST:event_mzBoundsCBActionPerformed
+
+   private void minMzTFFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_minMzTFFocusGained
+      minMzTF.selectAll();
+   }//GEN-LAST:event_minMzTFFocusGained
+
+   private void maxMzTFFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_maxMzTFFocusGained
+     maxMzTF.selectAll();
+   }//GEN-LAST:event_maxMzTFFocusGained
 
    /**
     * @param args the command line arguments

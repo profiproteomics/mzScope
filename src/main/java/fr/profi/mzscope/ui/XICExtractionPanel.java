@@ -6,6 +6,7 @@
 
 package fr.profi.mzscope.ui;
 
+import fr.profi.mzscope.model.MzScopePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ public class XICExtractionPanel extends javax.swing.JPanel {
     */
    public XICExtractionPanel() {
       initComponents();
+      toleranceTF.setText(Float.toString( MzScopePreferences.getInstance().getMzPPMTolerance()));
    }
 
    public void setCurrentRawFilePlot(IRawFilePlot rawfilePlot) {
@@ -55,6 +57,11 @@ public class XICExtractionPanel extends javax.swing.JPanel {
       jLabel2.setText("Tol (ppm):");
 
       toleranceTF.setText("10.0");
+      toleranceTF.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            toleranceTFActionPerformed(evt);
+         }
+      });
 
       jCheckBox1.setText("display overlay");
       jCheckBox1.setEnabled(false);
@@ -73,9 +80,11 @@ public class XICExtractionPanel extends javax.swing.JPanel {
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                   .addComponent(jLabel2)
                   .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                  .addComponent(toleranceTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-               .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGap(0, 23, Short.MAX_VALUE))
+                  .addComponent(toleranceTF, javax.swing.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+               .addGroup(jPanel1Layout.createSequentialGroup()
+                  .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
+                  .addGap(0, 0, Short.MAX_VALUE)))
+            .addGap(10, 10, 10))
       );
       jPanel1Layout.setVerticalGroup(
          jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -123,7 +132,8 @@ public class XICExtractionPanel extends javax.swing.JPanel {
       String[] masses = text.split("-");
       minMz = Double.parseDouble(masses[0]);
       if (masses.length == 1) {
-         double ppm = Double.parseDouble(toleranceTF.getText().trim());
+         float ppm = Float.parseFloat(toleranceTF.getText().trim());
+         MzScopePreferences.getInstance().setMzPPMTolerance(ppm);
          maxMz = minMz + minMz * ppm / 1e6;
          minMz -= minMz * ppm / 1e6;
       } else {
@@ -133,6 +143,11 @@ public class XICExtractionPanel extends javax.swing.JPanel {
          rawFilePlot.extractChromatogram(minMz, maxMz);
       }
    }//GEN-LAST:event_massRangeTFActionPerformed
+
+   private void toleranceTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toleranceTFActionPerformed
+      float ppm = Float.parseFloat(toleranceTF.getText().trim());
+      MzScopePreferences.getInstance().setMzPPMTolerance(ppm);
+   }//GEN-LAST:event_toleranceTFActionPerformed
 
    
    // Variables declaration - do not modify//GEN-BEGIN:variables
