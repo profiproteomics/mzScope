@@ -6,8 +6,6 @@
 package fr.profi.mzscope.mzdb;
 
 import com.almworks.sqlite4java.SQLiteException;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
 import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Floats;
 import fr.profi.mzdb.FeatureDetectorConfig;
@@ -20,6 +18,7 @@ import fr.profi.mzdb.model.Feature;
 import fr.profi.mzdb.model.Peak;
 import fr.profi.mzdb.model.Peakel;
 import fr.profi.mzdb.model.PutativeFeature;
+import fr.profi.mzdb.model.RunSlice;
 import fr.profi.mzdb.model.ScanData;
 import fr.profi.mzdb.model.ScanHeader;
 import fr.profi.mzscope.model.Chromatogram;
@@ -27,6 +26,7 @@ import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.Scan;
 import fr.profi.mzscope.model.IRawFile;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.StreamCorruptedException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import scala.collection.JavaConverters;
  */
 public class MzdbRawFile implements IRawFile {
 
-   private static Logger logger = LoggerFactory.getLogger(MzdbRawFile.class);
+   private static final Logger logger = LoggerFactory.getLogger(MzdbRawFile.class);
    final private static DecimalFormat massFormatter = new DecimalFormat("0.####");
    final private static DecimalFormat timeFormatter = new DecimalFormat("0.00");
 
@@ -66,7 +66,7 @@ public class MzdbRawFile implements IRawFile {
    protected void init() {
       try {
          reader = new MzDbReader(mzDbFile, true);
-      } catch (Exception e) {
+      } catch (ClassNotFoundException | FileNotFoundException | SQLiteException e) {
          logger.error("cannot read file " + mzDbFile.getAbsolutePath(), e);
       }
    }
@@ -222,36 +222,48 @@ public class MzdbRawFile implements IRawFile {
    public List<Feature> extractFeatures(ExtractionType type, ExtractionParams params) {
       switch (type) {
          case EXTRACT_MS2_FEATURES:
-            return extractFeatures();
+            return extractFeatures(params.mzTolPPM);
          case DETECT_PEAKELS:
             return detectPeakels(params.mzTolPPM, params.minMz, params.maxMz);
       }
       return null;
    }
 
-   private List<Feature> detectPeakels(float mzTolPPM, double minMz, double maxMz) {
-      List<Feature> result = new ArrayList<>();
-      // Instantiates a Run Slice Data provider
-      FeatureDetectorConfig detectorConfig = new FeatureDetectorConfig(1, mzTolPPM, 5);
-      MzDbFeatureDetector detector = new MzDbFeatureDetector(reader, detectorConfig);
-      Peakel[] peakels = detector.detectPeakels(minMz, maxMz);
-      for (Peakel peakel : peakels) {
-         ArrayList<Peakel> l = new ArrayList<>();
-         l.add(peakel);
-         Peakel[] a = {peakel};
-         //creates a Feature associated to this peakel
-         Feature feature = new Feature(peakel.getMz(), 0, JavaConverters.asScalaBufferConverter(l).asScala(), false);
-         result.add(feature);
-      }
-      return result;
-   }
+    private List<Feature> detectPeakels(float mzTolPPM, double minMz, double maxMz) {
+        List<Feature> result = new ArrayList<>();
+        // Instantiates a Run Slice Data provider
+        int msLevel = 1;
+        FeatureDetectorConfig detectorConfig = new FeatureDetectorConfig(msLevel, mzTolPPM, 5);
+        MzDbFeatureDetector detector = new MzDbFeatureDetector(reader, detectorConfig);
+        try {
+            Iterator<RunSlice> runSlices;
+            if (minMz == 0 && maxMz == 0){
+                runSlices = getMzDbReader().getLcMsRunSliceIterator();
+            }else {
+                runSlices = getMzDbReader().getLcMsRunSliceIterator(minMz, maxMz);
+            }
+            Peakel[] peakels = detector.detectPeakels(runSlices);
+            for (Peakel peakel : peakels) {
+                ArrayList<Peakel> l = new ArrayList<>();
+                l.add(peakel);
+                Peakel[] a = {peakel};
+                //creates a Feature associated to this peakel
+                Feature feature = new Feature(peakel.getMz(), 0, JavaConverters.asScalaBufferConverter(l).asScala(), false);
+                result.add(feature);
+            }
+        } catch (SQLiteException | StreamCorruptedException ex) {
+            logger.error("Error while getting LcMs RunSlice Iterator: "+ ex);
+        }
 
-   private List<Feature> extractFeatures() {
+        return result;
+    }
+
+   private List<Feature> extractFeatures(float tolPPM) {
       List<Feature> result = null;
       try {
          logger.info("retrieve scan headers...");
          ScanHeader[] ms2ScanHeaders = reader.getMs2ScanHeaders();
-
+         
          List<PutativeFeature> pfs = new ArrayList<PutativeFeature>();
          logger.info("building putative features list from MS2 scan events...");
          for (ScanHeader scanH : ms2ScanHeaders) {
@@ -264,7 +276,7 @@ public class MzdbRawFile implements IRawFile {
             ));
 
          }
-         result = extractFeatures(pfs, 5.0f);
+         result = extractFeatures(pfs, tolPPM);
       } catch (SQLiteException ex) {
          logger.error("error while extracting features", ex);
       }
@@ -275,7 +287,7 @@ public class MzdbRawFile implements IRawFile {
       List<Feature> result = null;
       try {
          // Instantiates a Run Slice Data provider
-         RunSliceDataProvider rsdProv = new RunSliceDataProvider(reader.getRunSliceIterator(1));
+         RunSliceDataProvider rsdProv = new RunSliceDataProvider(reader.getRunSliceIterator(1)); // TODO getLcmsRunSliceIte...
          FeatureExtractorConfig extractorConfig = new FeatureExtractorConfig(tolPPM, 5, 1, 3, 1200.0f, 0.05f, Option.empty(), 90, Option.empty());
          MzDbFeatureExtractor extractor = new MzDbFeatureExtractor(reader, 5, 5, extractorConfig);
          // Extract features
