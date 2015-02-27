@@ -63,7 +63,7 @@ public class MzdbRawFile implements IRawFile {
       return reader;
    }
 
-   protected void init() {
+   private void init() {
       try {
          reader = new MzDbReader(mzDbFile, true);
       } catch (ClassNotFoundException | FileNotFoundException | SQLiteException e) {
@@ -129,6 +129,7 @@ public class MzdbRawFile implements IRawFile {
       });
       return headers;
    }
+   @Override
    public Chromatogram getBPI() {
       logger.info("mzdb extract BPI Chromatogram");
       Chromatogram chromatogram = null;
@@ -165,7 +166,7 @@ public class MzdbRawFile implements IRawFile {
          builder.append(massFormatter.format(minMz)).append("-").append(massFormatter.format(maxMz));
          chromatogram.title = builder.toString();
 
-      } catch (Exception e) {
+      } catch (SQLiteException | StreamCorruptedException e) {
          logger.error("Error during chromatogram extraction", e);
       }
       return chromatogram;
@@ -185,7 +186,7 @@ public class MzdbRawFile implements IRawFile {
          builder.append(massFormatter.format(min)).append("-").append(massFormatter.format(max));
          chromatogram.title = builder.toString();
 
-      } catch (Exception e) {
+      } catch (SQLiteException | StreamCorruptedException e) {
          logger.error("Error during chromatogram extraction", e);
       }
       return chromatogram;

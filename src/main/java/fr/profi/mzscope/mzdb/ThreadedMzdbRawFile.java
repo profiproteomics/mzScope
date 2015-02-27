@@ -13,6 +13,7 @@ import fr.profi.mzscope.model.Scan;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -37,15 +38,16 @@ public class ThreadedMzdbRawFile implements IRawFile {
       init();
    }
 
-   protected void init() {
+   private void init() {
       try {
          Future future = service.submit(new Runnable() {
+            @Override
             public void run() {
                mzdbRawFile = new MzdbRawFile(file);
             }
          });
          future.get();
-      } catch (Exception ex) {
+      } catch (InterruptedException | ExecutionException ex) {
          logger.error("mzdbRawFile initialisation failed", ex);
       } 
    }
@@ -61,69 +63,79 @@ public class ThreadedMzdbRawFile implements IRawFile {
        return file.getName();
    }
    
+   @Override
    public int getPreviousScanId(final int scanIndex, final int msLevel) {
       try {
          return service.submit(new Callable<Integer>() {
+            @Override
             public Integer call() {
                return mzdbRawFile.getPreviousScanId(scanIndex, msLevel);
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getPreviousScanId call fail", ex);
       } 
       return -1;
    }
 
+   @Override
    public int getNextScanId(final int scanIndex, final int msLevel) {
       try {
          return service.submit(new Callable<Integer>() {
+            @Override
             public Integer call() {
                return mzdbRawFile.getNextScanId(scanIndex, msLevel);
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getNextScanId call fail", ex);
       } 
       return -1;
    }
 
+   @Override
    public int getScanId(final double retentionTime) {
       try {
          return service.submit(new Callable<Integer>() {
+            @Override
             public Integer call() {
                return mzdbRawFile.getScanId(retentionTime);
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
           logger.error("getScanId call fail", ex);
       } 
       return -1;
    }
 
+   @Override
    public Scan getScan(final int scanIndex) {
       try {
          return service.submit(new Callable<Scan>() {
+            @Override
             public Scan call() {
                return mzdbRawFile.getScan(scanIndex);
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getScan call fail", ex);
       } 
       return null;
    }
 
+   @Override
    public List<Feature> extractFeatures(final ExtractionType type, final ExtractionParams params) {
      try {
          logger.info("extract feature starting");
          Future<List<Feature>> future = service.submit(new Callable<List<Feature>>() {
+            @Override
             public List<Feature> call() {
                return mzdbRawFile.extractFeatures(type, params);
             }
          });
          logger.info("waiting for feature extraction ... ");
          return future.get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("extractFeatures call fail", ex);
       } 
       return null;
@@ -140,12 +152,13 @@ public class ThreadedMzdbRawFile implements IRawFile {
                return chromatogram;
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getXIC call fail", ex);
       } 
       return null;
    }
    
+   @Override
    public Chromatogram getBPI() {
       try {
          return service.submit(new Callable<Chromatogram>() {
@@ -156,7 +169,7 @@ public class ThreadedMzdbRawFile implements IRawFile {
                return chromatogram;
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getBPI call fail", ex);
       } 
       return null;
@@ -173,22 +186,24 @@ public class ThreadedMzdbRawFile implements IRawFile {
                return chromatogram;
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getXIC call fail", ex);
       } 
       return null;
    }
    
+   @Override
     public Chromatogram getTIC() {
       try {
          return service.submit(new Callable<Chromatogram>() {
+            @Override
             public Chromatogram call() {
                Chromatogram chromatogram =  mzdbRawFile.getTIC();
                 chromatogram.rawFile = ThreadedMzdbRawFile.this;
                return chromatogram;
             }
          }).get();
-      } catch (Exception ex ) {
+      } catch (InterruptedException | ExecutionException ex ) {
          logger.error("getTIC call fail", ex);
       } 
       return null;
