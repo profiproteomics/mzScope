@@ -19,12 +19,18 @@ public class ExtractionParamsDialog extends javax.swing.JDialog {
 
    /**
     * Creates new form ExtractionParamsDialog
+     * @param parent
+     * @param modal
     */
    public ExtractionParamsDialog(java.awt.Frame parent, boolean modal) {
       super(parent, modal);
       initComponents();
       toleranceTF.setText(Float.toString(MzScopePreferences.getInstance().getMzPPMTolerance()));
       getRootPane().setDefaultButton(okBtn);
+   }
+   
+   public void setExtractionParamsTitle(String title) {
+       this.setTitle(title);
    }
 
    public ExtractionParams getExtractionParams() {
@@ -219,6 +225,7 @@ public class ExtractionParamsDialog extends javax.swing.JDialog {
       java.awt.EventQueue.invokeLater(new Runnable() {
          public void run() {
             ExtractionParamsDialog dialog = new ExtractionParamsDialog(new javax.swing.JFrame(), true);
+            dialog.setExtractionParamsTitle("Extraction Parameters");
             dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                @Override
                public void windowClosing(java.awt.event.WindowEvent e) {
