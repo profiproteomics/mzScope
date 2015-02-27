@@ -32,6 +32,7 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
       return rawfile;
    }
 
+   @Override
    public void displayTIC() {
       final IRawFile rawFile = this.rawfile;
       logger.info("Display single TIC chromatogram");

@@ -26,7 +26,10 @@ public class RawFileListModel extends  AbstractListModel<Object> {
 
     @Override
     public Object getElementAt(int index) {
-        return rawFiles.get(index);
+        if (index >=0 && index < getSize()) {
+            return rawFiles.get(index);
+        }
+        return null;
     }
 
     @Override
@@ -41,5 +44,10 @@ public class RawFileListModel extends  AbstractListModel<Object> {
             return true;
         }
         return false;
+    }
+    
+    public void removeAllFiles() {
+        rawFiles = new ArrayList<>();
+        fireContentsChanged(this, 0, getSize()-1);
     }
 }
