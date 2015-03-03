@@ -436,22 +436,30 @@ public class MzScopePanel extends JPanel implements RawFileListener {
         // raw file panel
         List<AbstractRawFilePanel> tabPanels = mapRawFilePanelRawFile.get(rawfile);
         if (tabPanels != null) {
-            mapRawFilePanelRawFile.remove(rawfile);
             for (AbstractRawFilePanel tabPanel : tabPanels) {
                 viewersTabPane.remove(tabPanel);
-                /*if (tabPanel instanceof MultiRawFilePanel) {
+                if (tabPanel instanceof MultiRawFilePanel) {
                     // search for other rawfiles
                     List<IRawFile> list = getRawFileListForRawFilePanel(tabPanel);
                     for (IRawFile rawFile : list) {
-                        mapRawFilePanelRawFile.remove(rawFile,tabPanel );
+                        if (rawFile != rawfile) {
+                            removeRawFilePanel(rawFile,tabPanel );
+                        }
                     }
-                }else{ // SingleRawFilePanel
-                    mapRawFilePanelRawFile.remove(rawfile, tabPanel);
-                }*/
+                }
             }
+            mapRawFilePanelRawFile.remove(rawfile);
         }
         //raw FilePanel
         rawFilePanel.removeFile(rawfile);
+    }
+    
+    private void removeRawFilePanel(IRawFile rawFile, AbstractRawFilePanel panel) {
+        List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawFile);
+        if (list.contains(panel)) {
+            list.remove(panel);
+            mapRawFilePanelRawFile.put(rawFile, list);
+        }
     }
     
     private List<IRawFile> getRawFileListForRawFilePanel(AbstractRawFilePanel panel) {
