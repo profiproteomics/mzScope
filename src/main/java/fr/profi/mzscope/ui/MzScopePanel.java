@@ -217,10 +217,12 @@ public class MzScopePanel extends JPanel implements RawFileListener {
 
     private void addRawTab(String s, Component c) {
         addTab(viewersTabPane, s, c);
+        viewersTabPane.setSelectedComponent(c);
     } 
     
     private void addFeatureTab(String s, Component c) {
         addTab(featuresTabPane, s, c);
+        featuresTabPane.setSelectedComponent(c);
     } 
     
     private void addTab(JTabbedPane tabPane, String s, Component c) {
@@ -233,22 +235,42 @@ public class MzScopePanel extends JPanel implements RawFileListener {
         if (rawfile == null) {
             return;
         }
-        AbstractRawFilePanel plotPanel = new SingleRawFilePanel(rawfile);
-        //viewersTabPane.add(rawfile.getName(), plotPanel);
-        addRawTab(rawfile.getName(), plotPanel);
-        if (mapRawFilePanelRawFile.get(rawfile) == null) {
-            List<AbstractRawFilePanel> list = new ArrayList();
-            list.add(plotPanel);
-            mapRawFilePanelRawFile.put(rawfile, list);
-        }else{
-            List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
-            list.add(plotPanel);
-            mapRawFilePanelRawFile.put(rawfile, list);
+        // rawFilePanel: check if already exists
+        boolean rawFilePanelExists = false;
+        AbstractRawFilePanel plotPanel = null;
+        List<AbstractRawFilePanel> listTabs = mapRawFilePanelRawFile.get(rawfile);
+        if (listTabs != null && !listTabs.isEmpty()){
+            for (AbstractRawFilePanel panel : listTabs) {
+                if (panel instanceof SingleRawFilePanel) { // should be unique!
+                    viewersTabPane.setSelectedComponent(panel);
+                    plotPanel = panel;
+                    rawFilePanelExists = true;
+                }
+            }
         }
-        FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
-        //this.featuresTabPane.add(rawfile.getName(), featuresPanel);
-        addFeatureTab(rawfile.getName(), featuresPanel);
-        mapFeaturePanelRawFile.put(rawfile, featuresPanel);
+        if (!rawFilePanelExists) {
+            plotPanel = new SingleRawFilePanel(rawfile);
+            //viewersTabPane.add(rawfile.getName(), plotPanel);
+            addRawTab(rawfile.getName(), plotPanel);
+            if (mapRawFilePanelRawFile.get(rawfile) == null) {
+                List<AbstractRawFilePanel> list = new ArrayList();
+                list.add(plotPanel);
+                mapRawFilePanelRawFile.put(rawfile, list);
+            }else{
+                List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
+                list.add(plotPanel);
+                mapRawFilePanelRawFile.put(rawfile, list);
+            }
+        }
+        //features panel: check if already exists
+        FeaturesPanel panel = mapFeaturePanelRawFile.get(rawfile);
+        if (panel != null) {
+            featuresTabPane.setSelectedComponent(panel);
+        }else{
+            FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
+            addFeatureTab(rawfile.getName(), featuresPanel);
+            mapFeaturePanelRawFile.put(rawfile, featuresPanel);
+        }
     }
 
     protected void displayRawAction(List<IRawFile> rawfiles) {
