@@ -243,7 +243,7 @@ public class MzScopePanel extends JPanel implements RawFileListener {
         }else{
             List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
             list.add(plotPanel);
-            mapRawFilePanelRawFile.replace(rawfile, list);
+            mapRawFilePanelRawFile.put(rawfile, list);
         }
         FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
         //this.featuresTabPane.add(rawfile.getName(), featuresPanel);
@@ -283,7 +283,7 @@ public class MzScopePanel extends JPanel implements RawFileListener {
             }else{
                 List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawFile);
                 list.add(plotPanel);
-                mapRawFilePanelRawFile.replace(rawFile, list);
+                mapRawFilePanelRawFile.put(rawFile, list);
             }
         }
     }
@@ -436,9 +436,10 @@ public class MzScopePanel extends JPanel implements RawFileListener {
         // raw file panel
         List<AbstractRawFilePanel> tabPanels = mapRawFilePanelRawFile.get(rawfile);
         if (tabPanels != null) {
+            mapRawFilePanelRawFile.remove(rawfile);
             for (AbstractRawFilePanel tabPanel : tabPanels) {
                 viewersTabPane.remove(tabPanel);
-                if (tabPanel instanceof MultiRawFilePanel) {
+                /*if (tabPanel instanceof MultiRawFilePanel) {
                     // search for other rawfiles
                     List<IRawFile> list = getRawFileListForRawFilePanel(tabPanel);
                     for (IRawFile rawFile : list) {
@@ -446,7 +447,7 @@ public class MzScopePanel extends JPanel implements RawFileListener {
                     }
                 }else{ // SingleRawFilePanel
                     mapRawFilePanelRawFile.remove(rawfile, tabPanel);
-                }
+                }*/
             }
         }
         //raw FilePanel
