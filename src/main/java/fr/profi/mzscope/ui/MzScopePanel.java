@@ -382,7 +382,7 @@ public class MzScopePanel extends JPanel implements RawFileListener {
     public void closeAllRaw() {
         String[] options = {"Yes","No"};
         int reply = JOptionPane.showOptionDialog(parentFrame, "All files will be closed, do you want to continue?", "Close all files", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, "Yes");
-        if (reply != JOptionPane.YES_OPTION) {
+        if (reply == JOptionPane.YES_OPTION) {
             viewersTabPane.removeAll();
             featuresTabPane.removeAll();
             rawFilePanel.removeAllFiles();
