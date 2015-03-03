@@ -50,4 +50,13 @@ public class RawFileListModel extends  AbstractListModel<Object> {
         rawFiles = new ArrayList<>();
         fireContentsChanged(this, 0, getSize()-1);
     }
+    
+    public boolean removeFile(IRawFile f) {
+        if (rawFiles.contains(f)) {
+            rawFiles.remove(f);
+            fireContentsChanged(this, 0, getSize()-1);
+            return true;
+        }
+        return false;
+    }
 }

@@ -269,6 +269,10 @@ public class RawFilesPanel extends JPanel {
 
     }
 
+    public void removeFile(IRawFile file) {
+        rawFilesListModel.removeFile(file);
+    }
+    
     public void removeAllFiles() {
         rawFilesListModel.removeAllFiles();
     }
