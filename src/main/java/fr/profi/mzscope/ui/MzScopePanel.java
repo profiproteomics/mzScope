@@ -47,7 +47,7 @@ public class MzScopePanel extends JPanel implements RawFileListener {
     private JSplitPane mainRightSplitPane = null;
     private JSplitPane extractionSplitPane = null;
     private JFileChooser fileChooser = null;
-    private JTabbedPane viewersTabPane = null;
+    private JTabbedPane viewersTabPane = null;  
     private JTabbedPane featuresTabPane = null;
     private RawFilesPanel rawFilePanel = null;
     private ObjectInspectorPanel propertySheetPanel = null;
