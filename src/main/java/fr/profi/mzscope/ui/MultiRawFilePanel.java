@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -62,6 +63,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
         return currentChromatogram.rawFile;
     }
 
+    @Override
     protected void scanMouseClicked(ChartMouseEvent event) {
         if ((event.getTrigger().getClickCount() == 2)) {
             XYPlot xyplot = event.getChart().getXYPlot();
@@ -83,7 +85,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
             protected Integer doInBackground() throws Exception {
 
                 for (IRawFile rawFile : rawfiles) {
-                    Chromatogram c = rawFile.getXIC(minMz, maxMz);;
+                    Chromatogram c = rawFile.getXIC(minMz, maxMz);
                     count++;
                     publish(c);
                 }
@@ -106,7 +108,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
             protected void done() {
                 try {
                     logger.info("{} TIC chromatogram extracted", get());
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     logger.error("Error while reading chromatogram");
                 }
             }
@@ -129,6 +131,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
        return plotColor ;
     }
 
+    @Override
     protected void displayTIC() {
         final List<IRawFile> rawFiles = new ArrayList<>(rawfiles);
         logger.info("Display {} TIC chromatograms", rawFiles.size());
@@ -168,7 +171,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
             protected void done() {
                 try {
                     logger.info("{} TIC chromatogram extracted", get());
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     logger.error("Error while reading chromatogram");
                 }
             }
@@ -177,6 +180,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
         worker.execute();
     }
 
+    @Override
     protected void displayBPI() {
         final List<IRawFile> rawFiles = new ArrayList<>(rawfiles);
         logger.info("Display {} BPI chromatogram", rawFiles.size());
@@ -214,7 +218,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
             protected void done() {
                 try {
                     logger.info("{} BPI chromatogram extracted", get());
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     logger.error("Error while reading chromatogram");
                 }
             }
