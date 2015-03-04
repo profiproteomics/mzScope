@@ -8,6 +8,7 @@ package fr.profi.mzscope.ui;
 import fr.profi.mzscope.util.KeyEventDispatcherDecorator;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
+import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.model.MzScopePreferences;
 import fr.profi.mzscope.model.Scan;
 import fr.profi.mzscope.ui.event.ScanHeaderListener;
@@ -75,6 +76,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
     protected JToolBar toolbar;
     protected Chromatogram currentChromatogram;
     protected Scan currentScan;
+    protected Float currentScanTime = null;
 
     private final XYItemRenderer stickRenderer = new XYItemStickRenderer();
     private final XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
@@ -315,7 +317,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
     }
 
     @Override
-    public void displayChromatogram(Chromatogram chromato) {
+    public Color displayChromatogram(Chromatogram chromato) {
         this.currentChromatogram = chromato;
         XYSeries series = new XYSeries(chromato.rawFile.getName());
         for (int k = 0; k < chromato.intensities.length; k++) {
@@ -333,24 +335,32 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         xyplot.setDataset(dataset);
         xyplot.getRangeAxis().setUpperMargin(0.3);
         XYItemRenderer renderer = xyplot.getRenderer();
-        renderer.setSeriesPaint(0, CyclicColorPalette.getColor(1));
+        Color plotColor =  CyclicColorPalette.getColor(1);
+        renderer.setSeriesPaint(0, plotColor);
+        return plotColor;
     }
 
     @Override
-    public void addChromatogram(Chromatogram chromato) {
+    public Color addChromatogram(Chromatogram chromato) {
         XYSeries series = new XYSeries(chromato.rawFile.getName());
         for (int k = 0; k < chromato.intensities.length; k++) {
             series.add(chromato.time[k], chromato.intensities[k]);
         }
         XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
         ((XYSeriesCollection) xyplot.getDataset()).addSeries(series);
-        xyplot.getRenderer().setSeriesPaint(xyplot.getDataset().getSeriesCount() - 1, CyclicColorPalette.getColor(xyplot.getDataset().getSeriesCount()));
+        Color plotColor = CyclicColorPalette.getColor(xyplot.getDataset().getSeriesCount());
+        xyplot.getRenderer().setSeriesPaint(xyplot.getDataset().getSeriesCount() - 1, plotColor);
+        return plotColor;
     }
 
+    public abstract Color getPlotColor(IRawFile rawFile);
+    
     @Override
     public void displayScan(int index) {
         if ((currentScan == null) || (index != currentScan.getIndex())) {
             currentScan = getCurrentRawfile().getScan(index);
+            Color plotColor = getPlotColor(getCurrentRawfile());
+            currentScanTime = currentScan.getRetentionTime();
             XYSeries series = new XYSeries(currentScan.getTitle());
             double[] masses = currentScan.getMasses();
             float[] intensities = currentScan.getIntensities();
@@ -367,10 +377,10 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
             XYPlot xyplot = spectrumPanel.getChart().getXYPlot();
             xyplot.setDataset(dataset);
             if (currentScan.getDataType() == Scan.ScanType.CENTROID) {
-                stickRenderer.setSeriesPaint(0, CyclicColorPalette.getColor(1));
+                stickRenderer.setSeriesPaint(0, plotColor);
                 xyplot.setRenderer(stickRenderer);
             } else {
-                lineRenderer.setSeriesPaint(0, CyclicColorPalette.getColor(1));
+                lineRenderer.setSeriesPaint(0, plotColor);
                 xyplot.setRenderer(lineRenderer);
             }
             xyplot.getRangeAxis().setUpperMargin(0.3);

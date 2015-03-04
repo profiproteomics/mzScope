@@ -7,6 +7,8 @@ package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.util.CyclicColorPalette;
+import java.awt.Color;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,4 +76,9 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
       };
       worker.execute();
    }
+
+    @Override
+    public Color getPlotColor(IRawFile rawFile) {
+        return CyclicColorPalette.getColor(1);
+    }
 }

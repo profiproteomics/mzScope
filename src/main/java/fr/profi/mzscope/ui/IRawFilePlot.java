@@ -9,6 +9,7 @@ package fr.profi.mzscope.ui;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
+import java.awt.Color;
 
 /**
  *
@@ -16,8 +17,18 @@ import fr.profi.mzscope.model.IRawFile;
  */
 public interface IRawFilePlot {
    
-   void displayChromatogram(Chromatogram chromato);
-   void addChromatogram(Chromatogram chromato);
+   /**
+    * display the chromatogram and return the plot color
+    * @param chromato
+    * @return 
+    */ 
+   public Color displayChromatogram(Chromatogram chromato);
+   /**
+    * add the chromatogram and return the plot color
+    * @param chromato
+    * @return 
+    */ 
+   public Color addChromatogram(Chromatogram chromato);
    
    void extractChromatogram(double minMz, double maxMz);
 
