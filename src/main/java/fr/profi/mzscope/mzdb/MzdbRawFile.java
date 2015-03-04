@@ -365,10 +365,16 @@ public class MzdbRawFile implements IRawFile {
          if (scan.getMsLevel() == 2) {
             builder.append(massFormatter.format(rawScan.getHeader().getPrecursorMz())).append(" (");
             builder.append(rawScan.getHeader().getPrecursorCharge()).append("+) - ");
+            scan.setPrecursorMz(rawScan.getHeader().getPrecursorMz());
+            scan.setPrecursorCharge(rawScan.getHeader().getPrecursorCharge());
+         }else{
+            scan.setPrecursorMz(null);
+            scan.setPrecursorCharge(null);
          }
          builder.append(", sc=").append(scanIndex).append(", rt=").append(timeFormatter.format(rawScan.getHeader().getElutionTime() / 60.0));
          builder.append(", ms").append(scan.getMsLevel());
-         scan.setTitle(builder.toString());
+         //scan.setTitle(builder.toString());
+         scan.setTitle("");
          scan.setPeaksMz(mzList);
          scan.setPeaksIntensities(intensityList);
          //logger.debug("mzdb Scan length {} rebuilded in Scan length {} ", mzList.length, xAxisData.size());

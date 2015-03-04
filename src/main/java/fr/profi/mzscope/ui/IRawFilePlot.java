@@ -9,7 +9,6 @@ package fr.profi.mzscope.ui;
 import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
-import java.util.List;
 
 /**
  *

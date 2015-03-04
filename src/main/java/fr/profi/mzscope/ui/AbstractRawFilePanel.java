@@ -10,6 +10,7 @@ import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.MzScopePreferences;
 import fr.profi.mzscope.model.Scan;
+import fr.profi.mzscope.ui.event.ScanHeaderListener;
 import fr.profi.mzscope.util.CyclicColorPalette;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -22,7 +23,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
@@ -58,7 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author CB205360
  */
-abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements IRawFilePlot, KeyEventDispatcher {
+abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements IRawFilePlot, KeyEventDispatcher, ScanHeaderListener {
 
     final private static Logger logger = LoggerFactory.getLogger(AbstractRawFilePanel.class);
     final private static DecimalFormat xFormatter = new DecimalFormat("0.0000");
@@ -68,12 +71,15 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
     protected ChartPanel chromatogramPanel;
     protected ChartPanel spectrumPanel;
+    private HeaderSpectrumPanel headerSpectrumPanel;
     protected JToolBar toolbar;
     protected Chromatogram currentChromatogram;
     protected Scan currentScan;
 
     private final XYItemRenderer stickRenderer = new XYItemStickRenderer();
     private final XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
+    
+    private boolean keepMsLevel = true;
 
     /**
      * Creates new form IRawFilePlotPanel
@@ -153,6 +159,10 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         xyplot.setBackgroundPaint(CyclicColorPalette.GRAY_BACKGROUND);
         xyplot.setRangeGridlinePaint(CyclicColorPalette.GRAY_GRID);
         spectrumPanel = new ChartPanel(scanChart);
+        List<Integer> emptyListScanIndex = new ArrayList<>();
+        emptyListScanIndex.add(0);
+        headerSpectrumPanel = new HeaderSpectrumPanel(null, emptyListScanIndex);
+        headerSpectrumPanel.addScanHeaderListener(this);
         spectrumPanel.setMouseWheelEnabled(true);
 
         spectrumPanel.addChartMouseListener(new ChartMouseListener() {
@@ -193,6 +203,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         });
 
         spectrumContainerPanel.removeAll();
+        spectrumContainerPanel.add(headerSpectrumPanel, BorderLayout.NORTH);
         spectrumContainerPanel.add(spectrumPanel, BorderLayout.CENTER);
     }
 
@@ -350,6 +361,9 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
             XYSeriesCollection dataset = new XYSeriesCollection();
             dataset.addSeries(series);
             spectrumPanel.getChart().setTitle(new TextTitle(currentScan.getTitle(), titleFont));
+            headerSpectrumPanel.setMzdbFileName(getCurrentRawfile().getName());
+            updateScanIndexList();
+            headerSpectrumPanel.setScan(currentScan);
             XYPlot xyplot = spectrumPanel.getChart().getXYPlot();
             xyplot.setDataset(dataset);
             if (currentScan.getDataType() == Scan.ScanType.CENTROID) {
@@ -443,6 +457,43 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         return false;
     }
 
+    @Override
+    public void updateScanIndex(Integer scanIndex) {
+        displayScan(scanIndex);
+    }
+
+    @Override
+    public void updateRetentionTime(float retentionTime) {
+        int scanIdx = getCurrentRawfile().getScanId(retentionTime);
+        displayScan(scanIdx);
+    }
+
+    @Override
+    public void keepMsLevel(boolean keepMsLevel) {
+        this.keepMsLevel = keepMsLevel;
+        updateScanIndexList();
+    }
+    
+    private void updateScanIndexList() {
+        List<Integer> listScanIndex = new ArrayList();
+        if (keepMsLevel) {
+            listScanIndex.add(getCurrentRawfile().getPreviousScanId(currentScan.getIndex(), currentScan.getMsLevel()));
+        }else{
+            listScanIndex.add(currentScan.getIndex()-1);
+        }
+        listScanIndex.add(currentScan.getIndex());
+        if (keepMsLevel) {
+            listScanIndex.add(getCurrentRawfile().getNextScanId(currentScan.getIndex(), currentScan.getMsLevel()));
+        }else{
+            listScanIndex.add(currentScan.getIndex()+1);
+        }
+        headerSpectrumPanel.setScanIndexList(listScanIndex);
+    }
+
+    
+    
+    
+    
     private class XYItemStickRenderer extends AbstractXYItemRenderer {
 
         public XYItemStickRenderer() {

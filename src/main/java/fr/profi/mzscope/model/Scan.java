@@ -13,6 +13,10 @@ public class Scan {
    private double[] peaksMz = null;
    private float[] peaksIntensities = null;
    
+   // msLevel2 only
+   private Double precursorMz;
+   private Integer precursorCharge;
+   
    public Scan(Integer index, float rt, double[] masses, float[] intensities, int msLevel) {
       this(index, rt, masses, intensities, msLevel, (msLevel == 2) ? ScanType.CENTROID : ScanType.PROFILE);
    }
@@ -90,6 +94,22 @@ public class Scan {
    public ScanType getDataType() {
       return dataType;
    }
+
+    public Double getPrecursorMz() {
+        return precursorMz;
+    }
+
+    public void setPrecursorMz(Double precursorMz) {
+        this.precursorMz = precursorMz;
+    }
+
+    public Integer getPrecursorCharge() {
+        return precursorCharge;
+    }
+
+    public void setPrecursorCharge(Integer precursorCharge) {
+        this.precursorCharge = precursorCharge;
+    }
 
 
 }
