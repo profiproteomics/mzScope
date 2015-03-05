@@ -1,16 +1,25 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzdb.model.Feature;
+import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.ui.event.DisplayFeatureListener;
 import fr.profi.mzscope.util.NumberFormatter;
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.RowSorterEvent;
 import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableColumnModel;
@@ -25,24 +34,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author CB205360
  */
-public class FeaturesPanel extends JPanel implements RowSorterListener {
+public class FeaturesPanel extends JPanel implements RowSorterListener, MouseListener {
 
     final private static Logger logger = LoggerFactory.getLogger(FeaturesPanel.class);
 
-    private IRawFilePlot rawFilePanel;
+    private IRawFile rawFile;
     private List<Feature> features = new ArrayList<Feature>();
     private int modelSelectedIdxBeforeSort = -1;
 
     private JXTable featureTable;
     private FeaturesTableModel featureTableModel;
     private JScrollPane jScrollPane;
+    
+    //events
+    private EventListenerList displayFeatureListenerList = new EventListenerList();
 
     public FeaturesPanel() {
         initComponents();
     }
 
-    public FeaturesPanel(IRawFilePlot rawFilePanel) {
-        this.rawFilePanel = rawFilePanel;
+    public FeaturesPanel(IRawFile rawFile) {
+        this.rawFile = rawFile;
         initComponents();
         
         TableColumnModel columnModel = featureTable.getColumnModel();
@@ -84,6 +96,29 @@ public class FeaturesPanel extends JPanel implements RowSorterListener {
         featureTable.getRowSorter().addRowSorterListener(this);
         
         jScrollPane.setViewportView(featureTable);
+        
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem menuItemViewRawFile = new JMenuItem("Display in the raw file");
+        menuItemViewRawFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Feature f = features.get(featureTable.convertRowIndexToModel(featureTable.getSelectedRow()));
+                fireDisplayFeature(f, rawFile);
+            }
+        });
+        JMenuItem menuItemViewSelectedRawFile = new JMenuItem("Display in the selected raw file");
+        menuItemViewSelectedRawFile.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Feature f = features.get(featureTable.convertRowIndexToModel(featureTable.getSelectedRow()));
+                fireDisplayFeatureInCurrentRawFile(f);
+            }
+        });
+ 
+        popupMenu.add(menuItemViewRawFile);
+        popupMenu.add(menuItemViewSelectedRawFile);
+        featureTable.setComponentPopupMenu(popupMenu);
+        
         this.add(jScrollPane, BorderLayout.CENTER);
     }
 
@@ -93,10 +128,10 @@ public class FeaturesPanel extends JPanel implements RowSorterListener {
     }
 
     private void featureTableMouseClicked(MouseEvent evt) {
-        if ((features != null) && (!features.isEmpty()) && (rawFilePanel != null)
+        if ((features != null) && (!features.isEmpty()) && (rawFile != null)
                 && (evt.getClickCount() == 2) && (featureTable.getSelectedRow() != -1)) {
             Feature f = features.get(featureTable.convertRowIndexToModel(featureTable.getSelectedRow()));
-            rawFilePanel.displayFeature(f);
+            fireDisplayFeature(f, rawFile);
         }
     }
 
@@ -110,6 +145,64 @@ public class FeaturesPanel extends JPanel implements RowSorterListener {
         } else if (modelSelectedIdxBeforeSort != -1) {
             int idx = featureTable.convertRowIndexToView(modelSelectedIdxBeforeSort);
             featureTable.scrollRectToVisible(new Rectangle(featureTable.getCellRect(idx, 0, true)));
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        // selects the row at which point the mouse is clicked
+        Point point = e.getPoint();
+        int currentRow = featureTable.rowAtPoint(point);
+        featureTable.setRowSelectionInterval(currentRow, currentRow);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        
+    }
+    
+    /**
+     * event register
+     * @param listener 
+     */
+    public void addDisplayFeatureListener(DisplayFeatureListener listener) {
+        displayFeatureListenerList.add(DisplayFeatureListener.class, listener);
+    }
+
+    public void removeDisplayFeatureListener(DisplayFeatureListener listener) {
+        displayFeatureListenerList.remove(DisplayFeatureListener.class, listener);
+    }
+    
+    private void fireDisplayFeature(Feature f, IRawFile rawFile) {
+        Object[] listeners = displayFeatureListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == DisplayFeatureListener.class) {
+                ((DisplayFeatureListener) listeners[i + 1]).displayFeatureInRawFile(f, rawFile);
+            }
+        }
+    }
+
+    private void fireDisplayFeatureInCurrentRawFile(Feature f) {
+        Object[] listeners = displayFeatureListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == DisplayFeatureListener.class) {
+                ((DisplayFeatureListener) listeners[i + 1]).displayFeatureInCurrentRawFile(f);
+            }
         }
     }
 }

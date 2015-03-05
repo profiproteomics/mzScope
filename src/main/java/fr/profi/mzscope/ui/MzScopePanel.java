@@ -6,6 +6,7 @@ import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.ui.dialog.ExtractionParamsDialog;
+import fr.profi.mzscope.ui.event.DisplayFeatureListener;
 import fr.profi.mzscope.ui.event.RawFileListener;
 import fr.profi.mzscope.ui.event.ExtractFeatureListener;
 import java.awt.BorderLayout;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author MB243701
  */
-public class MzScopePanel extends JPanel implements RawFileListener {
+public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeatureListener {
     private final static Logger logger = LoggerFactory.getLogger(MzScopePanel.class);
     
     private Frame parentFrame = null;
@@ -267,7 +268,8 @@ public class MzScopePanel extends JPanel implements RawFileListener {
         if (panel != null) {
             featuresTabPane.setSelectedComponent(panel);
         }else{
-            FeaturesPanel featuresPanel = new FeaturesPanel(plotPanel);
+            FeaturesPanel featuresPanel = new FeaturesPanel(rawfile);
+            featuresPanel.addDisplayFeatureListener(this);
             addFeatureTab(rawfile.getName(), featuresPanel);
             mapFeaturePanelRawFile.put(rawfile, featuresPanel);
         }
@@ -551,6 +553,27 @@ public class MzScopePanel extends JPanel implements RawFileListener {
     @Override
     public void exportChromatogram(List<IRawFile> rawfiles) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void displayFeatureInRawFile(Feature f, IRawFile rawFile) {
+        List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawFile);
+        if (list != null) {
+            for (AbstractRawFilePanel panel : list) {
+                if (panel instanceof SingleRawFilePanel) {
+                    panel.displayFeature(f);
+                    viewersTabPane.setSelectedComponent(panel);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void displayFeatureInCurrentRawFile(Feature f) {
+        AbstractRawFilePanel panel = (AbstractRawFilePanel)viewersTabPane.getSelectedComponent();
+        if (panel != null) {
+            panel.displayFeature(f);
+        }
     }
 
     

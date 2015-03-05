@@ -5,8 +5,11 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.model.MzScopePreferences;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +27,9 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.Marker;
+import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.plot.XYPlot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,6 +184,68 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
         };
 
         worker.execute();
+    }
+    
+    // override display feature to display all xic
+    @Override
+    public void displayFeature(final Feature f) {
+        double ppm = MzScopePreferences.getInstance().getMzPPMTolerance();
+        final double maxMz = f.getMz() + f.getMz() * ppm / 1e6;
+        final double minMz = f.getMz() - f.getMz() * ppm / 1e6;
+
+        final List<IRawFile> rawFiles = new ArrayList<>(rawfiles);
+        SwingWorker worker = new SwingWorker<Integer, Chromatogram>() {
+            int count = 0;
+            boolean isFirstProcessCall = true;
+
+                
+            @Override
+            protected Integer doInBackground() throws Exception {
+                //return getCurrentRawfile().getXIC(minMz, maxMz);
+                for (IRawFile rawFile : rawFiles) {
+                    Chromatogram c = rawFile.getXIC(minMz, maxMz);
+                    count++;
+                    publish(c);
+                }
+                return count;
+            }
+            
+            @Override
+            protected void process(List<Chromatogram> chunks) {
+                int k = 0;
+                if (isFirstProcessCall) {
+                    logger.info("display first chromato");
+                    isFirstProcessCall = false;
+                    displayChromatogram(chunks.get(0));
+                    k = 1;
+                    displayScan(f.getBasePeakel().getApexScanId());
+                    Marker marker = new IntervalMarker(f.getBasePeakel().getFirstElutionTime() / 60.0, f.getBasePeakel().getLastElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1), Color.RED, new BasicStroke(1), 0.3f);
+                    chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+                    marker = new ValueMarker(f.getElutionTime() / 60.0);
+                    chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+                }
+                for (; k < chunks.size(); k++) {
+                    logger.info("add additionnal chromato");
+                    addChromatogram(chunks.get(k));
+                    displayScan(f.getBasePeakel().getApexScanId());
+                    Marker marker = new IntervalMarker(f.getBasePeakel().getFirstElutionTime() / 60.0, f.getBasePeakel().getLastElutionTime() / 60.0, Color.ORANGE, new BasicStroke(1), Color.RED, new BasicStroke(1), 0.3f);
+                    chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+                    marker = new ValueMarker(f.getElutionTime() / 60.0);
+                    chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+                }
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    logger.info("{} Display Feature", get());
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Error while displaying feature");
+                }
+            }
+        };
+        worker.execute();
+
     }
 
     @Override
