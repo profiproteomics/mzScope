@@ -12,7 +12,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ * table model for features / peaks
  * @author CB205360
  */
 public class FeaturesTableModel extends AbstractTableModel {
@@ -26,14 +26,17 @@ public class FeaturesTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+   @Override
     public int getRowCount() {
         return features.size();
     }
 
+   @Override
     public int getColumnCount() {
         return Columns.values().length;
     }
 
+   @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         switch(Columns.values()[columnIndex]) {
             case MZ_COL: return features.get(rowIndex).getMz();
