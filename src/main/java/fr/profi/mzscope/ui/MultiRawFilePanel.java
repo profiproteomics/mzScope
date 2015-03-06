@@ -125,6 +125,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
     
     @Override
     public Color displayChromatogram(Chromatogram chromato) {
+       setMsMsEventButtonEnabled(true);
        Color plotColor = super.displayChromatogram(chromato);
        mapColorForRawFile.put(chromato.rawFile, plotColor);
        return plotColor ;
@@ -171,6 +172,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
                     logger.info("add additionnal chromato");
                     addChromatogram(chunks.get(k));
                 }
+                setMsMsEventButtonEnabled(false);
             }
 
             @Override
@@ -280,6 +282,7 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
                     logger.info("add additionnal chromato");
                     addChromatogram(chunks.get(k));
                 }
+                setMsMsEventButtonEnabled(false);
             }
 
             @Override
@@ -320,6 +323,10 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
                     if(currentScanTime != null) {
                         int scanIdx = rawFile.getScanId(currentScanTime);
                         displayScan(scanIdx);
+                    }
+                    if (listMsMsMarkers != null && !listMsMsMarkers.isEmpty()) {
+                        hideMSMSEvents();
+                        showMSMSEvents();
                     }
                 }
             }

@@ -101,4 +101,9 @@ public class MzMLRawFile implements IRawFile {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
 
+    @Override
+    public List<Float> getMsMsEvent(double minMz, double maxMz) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

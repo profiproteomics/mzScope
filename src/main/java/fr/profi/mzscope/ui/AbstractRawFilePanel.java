@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import org.jfree.chart.ChartFactory;
@@ -80,8 +82,11 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
     private final XYItemRenderer stickRenderer = new XYItemStickRenderer();
     private final XYItemRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
-    
+
     private boolean keepMsLevel = true;
+
+    protected List<Marker> listMsMsMarkers;
+    protected JButton displayMS2btn;
 
     /**
      * Creates new form IRawFilePlotPanel
@@ -91,6 +96,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
     }
 
     private void init() {
+        listMsMsMarkers = new ArrayList();
         initComponents();
         initChartPanels();
         KeyEventDispatcherDecorator.addKeyEventListener(this);
@@ -232,9 +238,46 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         });
         toolbar.add(displayBPIbtn);
 
+        final JPopupMenu popupMenuMs2 = new JPopupMenu();
+        JMenuItem showMsMs = new JMenuItem("Show MS/MS Events");
+        ActionListener showMsMsEventAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                showMSMSEvents();
+            }
+        };
+        showMsMs.addActionListener(showMsMsEventAction);
+        popupMenuMs2.add(showMsMs);
+        JMenuItem hideMsMs = new JMenuItem("Hide All MS/MS Events");
+        ActionListener hideMsMsEventAction = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                hideMSMSEvents();
+            }
+        };
+        hideMsMs.addActionListener(hideMsMsEventAction);
+        popupMenuMs2.add(hideMsMs);
+        displayMS2btn = new JButton("MS/MS");
+        displayMS2btn.setToolTipText("Show/Hide MS/MS Events");
+        displayMS2btn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                popupMenuMs2.show(displayMS2btn, 0, displayMS2btn.getHeight());
+            }
+        });
+        toolbar.add(displayMS2btn);
+        setMsMsEventButtonEnabled(false);
+
         toolbar.setFloatable(false);
         toolbar.setRollover(true);
         return toolbar;
+    }
+    
+    protected void setMsMsEventButtonEnabled(boolean b) {
+        this.displayMS2btn.setEnabled(b);
+        if (!b) {
+            hideMSMSEvents();
+        }
     }
 
     /**
@@ -308,6 +351,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
             protected void done() {
                 try {
                     displayChromatogram(get());
+                    setMsMsEventButtonEnabled(true);
                 } catch (InterruptedException | ExecutionException e) {
                     logger.error("Error while extraction chromatogram", e);
                 }
@@ -318,6 +362,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
     @Override
     public Color displayChromatogram(Chromatogram chromato) {
+        setMsMsEventButtonEnabled(true);
         this.currentChromatogram = chromato;
         XYSeries series = new XYSeries(chromato.rawFile.getName());
         for (int k = 0; k < chromato.intensities.length; k++) {
@@ -335,7 +380,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         xyplot.setDataset(dataset);
         xyplot.getRangeAxis().setUpperMargin(0.3);
         XYItemRenderer renderer = xyplot.getRenderer();
-        Color plotColor =  CyclicColorPalette.getColor(1);
+        Color plotColor = CyclicColorPalette.getColor(1);
         renderer.setSeriesPaint(0, plotColor);
         return plotColor;
     }
@@ -354,37 +399,39 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
     }
 
     public abstract Color getPlotColor(IRawFile rawFile);
-    
+
     @Override
     public void displayScan(int index) {
         if ((currentScan == null) || (index != currentScan.getIndex())) {
             currentScan = getCurrentRawfile().getScan(index);
-            Color plotColor = getPlotColor(getCurrentRawfile());
-            currentScanTime = currentScan.getRetentionTime();
-            XYSeries series = new XYSeries(currentScan.getTitle());
-            double[] masses = currentScan.getMasses();
-            float[] intensities = currentScan.getIntensities();
-            for (int k = 0; k < currentScan.getMasses().length; k++) {
-                series.add(masses[k], intensities[k]);
-            }
+            if (currentScan != null) {
+                Color plotColor = getPlotColor(getCurrentRawfile());
+                currentScanTime = currentScan.getRetentionTime();
+                XYSeries series = new XYSeries(currentScan.getTitle());
+                double[] masses = currentScan.getMasses();
+                float[] intensities = currentScan.getIntensities();
+                for (int k = 0; k < currentScan.getMasses().length; k++) {
+                    series.add(masses[k], intensities[k]);
+                }
 
-            XYSeriesCollection dataset = new XYSeriesCollection();
-            dataset.addSeries(series);
-            spectrumPanel.getChart().setTitle(new TextTitle(currentScan.getTitle(), titleFont));
-            headerSpectrumPanel.setMzdbFileName(getCurrentRawfile().getName());
-            updateScanIndexList();
-            headerSpectrumPanel.setScan(currentScan);
-            XYPlot xyplot = spectrumPanel.getChart().getXYPlot();
-            xyplot.setDataset(dataset);
-            if (currentScan.getDataType() == Scan.ScanType.CENTROID) {
-                stickRenderer.setSeriesPaint(0, plotColor);
-                xyplot.setRenderer(stickRenderer);
-            } else {
-                lineRenderer.setSeriesPaint(0, plotColor);
-                xyplot.setRenderer(lineRenderer);
+                XYSeriesCollection dataset = new XYSeriesCollection();
+                dataset.addSeries(series);
+                spectrumPanel.getChart().setTitle(new TextTitle(currentScan.getTitle(), titleFont));
+                headerSpectrumPanel.setMzdbFileName(getCurrentRawfile().getName());
+                updateScanIndexList();
+                headerSpectrumPanel.setScan(currentScan);
+                XYPlot xyplot = spectrumPanel.getChart().getXYPlot();
+                xyplot.setDataset(dataset);
+                if (currentScan.getDataType() == Scan.ScanType.CENTROID) {
+                    stickRenderer.setSeriesPaint(0, plotColor);
+                    xyplot.setRenderer(stickRenderer);
+                } else {
+                    lineRenderer.setSeriesPaint(0, plotColor);
+                    xyplot.setRenderer(lineRenderer);
+                }
+                xyplot.getRangeAxis().setUpperMargin(0.3);
+                chromatogramPanel.getChart().getXYPlot().setDomainCrosshairValue(currentScan.getRetentionTime() / 60.0);
             }
-            xyplot.getRangeAxis().setUpperMargin(0.3);
-            chromatogramPanel.getChart().getXYPlot().setDomainCrosshairValue(currentScan.getRetentionTime() / 60.0);
         }
     }
 
@@ -432,6 +479,47 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
    private javax.swing.JSplitPane jSplitPane1;
    private javax.swing.JPanel spectrumContainerPanel;
    // End of variables declaration//GEN-END:variables
+
+    public void showMSMSEvents() {
+        //ValueAxis axis = chromatogramPanel.getChart().getXYPlot().getDomainAxis();
+        //final double min = axis.getRange().getLowerBound();
+        //final double max = axis.getRange().getUpperBound();
+        if (currentChromatogram == null) {
+            return;
+        }
+        final double minMz = currentChromatogram.minMz;
+        final double maxMz = currentChromatogram.maxMz;
+
+        SwingWorker worker = new SwingWorker<List<Float>, Void>() {
+            @Override
+            protected List<Float> doInBackground() throws Exception {
+                return getCurrentRawfile().getMsMsEvent(minMz, maxMz);
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    List<Float> listMsMsTime = get();
+                    for (Float time : listMsMsTime) {
+                        Marker marker = new ValueMarker(time / 60.0);
+                        marker.setPaint(CyclicColorPalette.getColor(8));
+                        listMsMsMarkers.add(marker);
+                        chromatogramPanel.getChart().getXYPlot().addDomainMarker(marker);
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Error while reading chromatogram");
+                }
+            }
+        };
+        worker.execute();
+    }
+
+    public void hideMSMSEvents() {
+        for (Marker marker : listMsMsMarkers) {
+            chromatogramPanel.getChart().getXYPlot().removeDomainMarker(marker);
+        }
+        listMsMsMarkers = new ArrayList();
+    }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
@@ -483,27 +571,23 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         this.keepMsLevel = keepMsLevel;
         updateScanIndexList();
     }
-    
+
     private void updateScanIndexList() {
         List<Integer> listScanIndex = new ArrayList();
         if (keepMsLevel) {
             listScanIndex.add(getCurrentRawfile().getPreviousScanId(currentScan.getIndex(), currentScan.getMsLevel()));
-        }else{
-            listScanIndex.add(currentScan.getIndex()-1);
+        } else {
+            listScanIndex.add(currentScan.getIndex() - 1);
         }
         listScanIndex.add(currentScan.getIndex());
         if (keepMsLevel) {
             listScanIndex.add(getCurrentRawfile().getNextScanId(currentScan.getIndex(), currentScan.getMsLevel()));
-        }else{
-            listScanIndex.add(currentScan.getIndex()+1);
+        } else {
+            listScanIndex.add(currentScan.getIndex() + 1);
         }
         headerSpectrumPanel.setScanIndexList(listScanIndex);
     }
 
-    
-    
-    
-    
     private class XYItemStickRenderer extends AbstractXYItemRenderer {
 
         public XYItemStickRenderer() {

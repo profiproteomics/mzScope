@@ -6,10 +6,12 @@
 package fr.profi.mzscope.mzdb;
 
 import fr.profi.mzdb.model.Feature;
+import fr.profi.mzdb.model.ScanHeader;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.model.Scan;
+import fr.profi.mzscope.util.ScanUtils;
 import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -32,6 +34,8 @@ public class ThreadedMzdbRawFile implements IRawFile {
    private final File file;
    private MzdbRawFile mzdbRawFile;
    
+   private ScanHeader[] ms2ScanHeaders = null;
+   
    public ThreadedMzdbRawFile(File file) {
       this.file = file;
       this.service = Executors.newSingleThreadExecutor();
@@ -50,6 +54,10 @@ public class ThreadedMzdbRawFile implements IRawFile {
       } catch (InterruptedException | ExecutionException ex) {
          logger.error("mzdbRawFile initialisation failed", ex);
       } 
+   }
+   
+   private void sortScanHeader(ScanHeader[] scans) {
+       ms2ScanHeaders = ScanUtils.sortScanHeader(scans);
    }
 
     @Override
@@ -208,5 +216,10 @@ public class ThreadedMzdbRawFile implements IRawFile {
       } 
       return null;
    }
+
+    @Override
+    public List<Float> getMsMsEvent(double minMz, double maxMz) {
+        return mzdbRawFile.getMsMsEvent(minMz, maxMz);
+    }
 
 }

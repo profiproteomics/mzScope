@@ -36,4 +36,12 @@ public interface IRawFile {
    
    public int getPreviousScanId(int scanIndex, int msLevel);
    
+   /**
+    * return the list of MS/MS events times (sec) for the specified mass range
+    * @param minMz
+    * @param maxMz
+    * @return 
+    */
+   public List<Float> getMsMsEvent(double minMz, double maxMz);
+   
 }

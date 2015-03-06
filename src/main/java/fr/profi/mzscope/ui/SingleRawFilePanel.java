@@ -9,6 +9,7 @@ import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.util.CyclicColorPalette;
 import java.awt.Color;
+import java.util.concurrent.ExecutionException;
 import javax.swing.SwingWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,8 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
          protected void done() {
             try {
                displayChromatogram(get());
-            } catch (Exception e) {
+               setMsMsEventButtonEnabled(false);
+            } catch (InterruptedException | ExecutionException e) {
                logger.error("Error while reading chromatogram");
             }
          }
@@ -56,6 +58,7 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
       worker.execute();
    }
 
+   @Override
    public void displayBPI() {
       final IRawFile rawFile = this.rawfile;
       logger.info("Display single BPI chromatogram");
@@ -69,7 +72,8 @@ public class SingleRawFilePanel extends AbstractRawFilePanel {
          protected void done() {
             try {
                displayChromatogram(get());
-            } catch (Exception e) {
+               setMsMsEventButtonEnabled(false);
+            } catch (InterruptedException | ExecutionException e) {
                logger.error("Error while reading chromatogram");
             }
          }

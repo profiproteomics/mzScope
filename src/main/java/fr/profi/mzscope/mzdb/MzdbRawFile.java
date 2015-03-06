@@ -25,6 +25,7 @@ import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.Scan;
 import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.util.ScanUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.StreamCorruptedException;
@@ -53,6 +54,8 @@ public class MzdbRawFile implements IRawFile {
    private final File mzDbFile;
    private MzDbReader reader;
    private Map<Integer, ScanHeader> scanHeadersById = null;
+   private ScanHeader[] ms2ScanHeaders = null;
+   private double[] ms2ScanHeaderByMz = null;
 
    public MzdbRawFile(File file) {
       mzDbFile = file;
@@ -69,6 +72,16 @@ public class MzdbRawFile implements IRawFile {
       } catch (ClassNotFoundException | FileNotFoundException | SQLiteException e) {
          logger.error("cannot read file " + mzDbFile.getAbsolutePath(), e);
       }
+   }
+   
+   private void sortScanHeader(ScanHeader[] scans) {
+       ms2ScanHeaders = ScanUtils.sortScanHeader(scans);
+       ms2ScanHeaderByMz = new double[ms2ScanHeaders.length];
+       int i=0;
+       for (ScanHeader scan : ms2ScanHeaders) {
+           ms2ScanHeaderByMz[i] = scan.getPrecursorMz();
+           i++;
+       }
    }
 
    @Override
@@ -430,4 +443,35 @@ public class MzdbRawFile implements IRawFile {
          System.out.println("" + m + "\t" + getGaussianPoint(m, 502, 100, 1));
       }
    }
+
+    @Override
+    public List<Float> getMsMsEvent(double minMz, double maxMz) {
+        Long startTime = System.currentTimeMillis();
+        logger.debug("retrieve MS/MS events");
+        List<Float> listMsMsEventTime = new ArrayList();
+        if (ms2ScanHeaders == null) {
+            try {
+                logger.debug("retrieve Ms2 ScanHeader");
+                sortScanHeader(reader.getMs2ScanHeaders());
+            } catch (SQLiteException ex) {
+                logger.error("Exception while retrieving ScanHeader "+ex);
+            }
+        }
+        if (ms2ScanHeaders != null) {
+            logger.debug("retrieve Ms2 ScanHeader in ["+minMz+", "+maxMz+"] ");
+            int minId = ~Arrays.binarySearch(ms2ScanHeaderByMz, minMz);
+            int maxId = ~Arrays.binarySearch(ms2ScanHeaderByMz, maxMz);
+            if (minId != -1 && maxId != -1) {
+                for (int i = minId; i <= maxId; i++) {
+                    ScanHeader scanHeader = ms2ScanHeaders[i];
+                    double mz = scanHeader.getPrecursorMz();
+                    if (mz >= minMz && mz <= maxMz) {
+                        listMsMsEventTime.add(scanHeader.getElutionTime());
+                    }
+                }
+            }
+        }
+        logger.debug("retrieve MS/MS events finished in "+(System.currentTimeMillis() - startTime)+"+ ms");
+        return listMsMsEventTime;
+    }
 }
