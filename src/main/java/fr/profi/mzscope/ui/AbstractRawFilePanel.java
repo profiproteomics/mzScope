@@ -387,7 +387,7 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
     @Override
     public Color addChromatogram(Chromatogram chromato) {
-        XYSeries series = new XYSeries(chromato.rawFile.getName());
+        XYSeries series = new XYSeries(chromato.rawFile.getName()+"-"+chromato.minMz);
         for (int k = 0; k < chromato.intensities.length; k++) {
             series.add(chromato.time[k], chromato.intensities[k]);
         }
