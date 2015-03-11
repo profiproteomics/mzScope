@@ -74,9 +74,9 @@ public class MultiRawFilePanel extends AbstractRawFilePanel {
         if ((event.getTrigger().getClickCount() == 2)) {
             XYPlot xyplot = event.getChart().getXYPlot();
             double domain = xyplot.getDomainAxis().java2DToValue(event.getTrigger().getX(), spectrumPanel.getScreenDataArea(), xyplot.getDomainAxisEdge());
-            //TODO : choose extraction ppm value (10 ppm)
-            double maxMz = domain + domain * 10.0 / 1e6;
-            double minMz = domain - domain * 10.0 / 1e6;
+            float ppmTol = MzScopePreferences.getInstance().getMzPPMTolerance();
+            double maxMz = domain + domain * ppmTol / 1e6;
+            double minMz = domain - domain * ppmTol / 1e6;
             extractChromatogram(minMz, maxMz);
         }
     }

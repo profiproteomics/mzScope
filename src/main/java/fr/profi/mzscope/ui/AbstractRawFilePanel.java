@@ -13,6 +13,7 @@ import fr.profi.mzscope.model.MzScopePreferences;
 import fr.profi.mzscope.model.Scan;
 import fr.profi.mzscope.ui.event.ScanHeaderListener;
 import fr.profi.mzscope.util.CyclicColorPalette;
+import fr.profi.mzscope.util.MzScopeConstants;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -87,6 +88,8 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
 
     protected List<Marker> listMsMsMarkers;
     protected JButton displayMS2btn;
+    
+    protected int xicModeDisplay = MzScopeConstants.MODE_DISPLAY_XIC_REPLACE;
 
     /**
      * Creates new form IRawFilePlotPanel
@@ -327,19 +330,18 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
             double maxMz = domain + domain * ppmTol / 1e6;
             double minMz = domain - domain * ppmTol / 1e6;
             if ((event.getTrigger().getModifiers() & KeyEvent.ALT_MASK) != 0) {
-                SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
-                    @Override
-                    protected void done() {
-                        try {
-                            addChromatogram(get());
-                        } catch (InterruptedException | ExecutionException e) {
-                            logger.error("Error while extraction chromatogram", e);
-                        }
-                    }
-                };
-                worker.execute();
+                addChromatogram(minMz, maxMz);
             } else {
-                extractChromatogram(minMz, maxMz);
+                switch (xicModeDisplay) {
+                    case MzScopeConstants.MODE_DISPLAY_XIC_REPLACE: {
+                        extractChromatogram(minMz, maxMz);
+                        break;
+                    }
+                    case MzScopeConstants.MODE_DISPLAY_XIC_OVERLAY: {
+                         addChromatogram(minMz, maxMz);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -385,6 +387,21 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
         return plotColor;
     }
 
+    public void addChromatogram(double minMz, double maxMz) {
+        SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
+            @Override
+            protected void done() {
+                try {
+                    addChromatogram(get());
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Error while extraction chromatogram", e);
+                }
+            }
+        };
+        worker.execute();
+    }
+    
+    
     @Override
     public Color addChromatogram(Chromatogram chromato) {
         XYSeries series = new XYSeries(chromato.rawFile.getName()+"-"+chromato.minMz);
@@ -621,5 +638,9 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
                 //updateCrosshairValues(crosshairState, x, y, domainAxisIndex, rangeAxisIndex, transX, transY, orientation);
             }
         }
+    }
+    
+    public void updateXicModeDisplay(int mode){
+        xicModeDisplay = mode;
     }
 }

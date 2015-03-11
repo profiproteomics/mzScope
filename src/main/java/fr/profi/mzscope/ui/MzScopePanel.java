@@ -7,8 +7,10 @@ import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
 import fr.profi.mzscope.ui.dialog.ExtractionParamsDialog;
 import fr.profi.mzscope.ui.event.DisplayFeatureListener;
-import fr.profi.mzscope.ui.event.RawFileListener;
 import fr.profi.mzscope.ui.event.ExtractFeatureListener;
+import fr.profi.mzscope.ui.event.RawFileListener;
+import fr.profi.mzscope.ui.event.ExtractionListener;
+import fr.profi.mzscope.util.MzScopeConstants;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
@@ -39,7 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author MB243701
  */
-public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeatureListener {
+public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeatureListener, ExtractionListener {
     private final static Logger logger = LoggerFactory.getLogger(MzScopePanel.class);
     
     private Frame parentFrame = null;
@@ -62,6 +64,10 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
     
     private Map<IRawFile, FeaturesPanel> mapFeaturePanelRawFile;
     private Map<IRawFile, List<AbstractRawFilePanel>> mapRawFilePanelRawFile;
+    private List<AbstractRawFilePanel> listRawFilePanel;
+    
+    private int extractionMode  =MzScopeConstants.MODE_DISPLAY_XIC_REPLACE;
+
 
     public MzScopePanel(Frame parentFrame) {
         this.parentFrame = parentFrame;
@@ -160,7 +166,6 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
 
     private void viewersTabPaneStateChanged(ChangeEvent evt) {
         this.selectedRawFilePanel = (IRawFilePlot) viewersTabPane.getSelectedComponent();
-        this.extractXICPanel.setCurrentRawFilePlot(selectedRawFilePanel);
     }
 
     private ObjectInspectorPanel getPropertySheetPanel() {
@@ -173,6 +178,8 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
     private XICExtractionPanel getExtractXICPanel() {
         if (this.extractXICPanel == null) {
             this.extractXICPanel = new XICExtractionPanel();
+            this.extractXICPanel.setName("extractionPanel");
+            this.extractXICPanel.addExtractionListener(this);
         }
         return this.extractXICPanel;
     }
@@ -251,6 +258,7 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
         }
         if (!rawFilePanelExists) {
             plotPanel = new SingleRawFilePanel(rawfile);
+            plotPanel.updateXicModeDisplay(extractionMode);
             //viewersTabPane.add(rawfile.getName(), plotPanel);
             addRawTab(rawfile.getName(), plotPanel);
             if (mapRawFilePanelRawFile.get(rawfile) == null) {
@@ -297,6 +305,7 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
             name = rawfiles.get(0).getName();
         }
         AbstractRawFilePanel plotPanel = new MultiRawFilePanel(rawfiles);
+        plotPanel.updateXicModeDisplay(extractionMode);
         //viewersTabPane.add(name, plotPanel);
         addRawTab(name, plotPanel);
         for (IRawFile rawFile : rawfiles) {
@@ -573,6 +582,36 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
         AbstractRawFilePanel panel = (AbstractRawFilePanel)viewersTabPane.getSelectedComponent();
         if (panel != null) {
             panel.displayFeature(f);
+        }
+    }
+
+    @Override
+    public void extractChromatogram(double minMz, double maxMz, int extractionMode) {
+        final AbstractRawFilePanel panel = (AbstractRawFilePanel)viewersTabPane.getSelectedComponent();
+        if (panel != null) {
+            switch(extractionMode){
+                case MzScopeConstants.MODE_DISPLAY_XIC_REPLACE:{
+                    panel.extractChromatogram(minMz, maxMz);
+                    break;
+                }
+                case MzScopeConstants.MODE_DISPLAY_XIC_OVERLAY:{
+                    panel.addChromatogram(minMz, maxMz);
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void updateXicModeDisplay(int extractionMode) {
+        this.extractionMode = extractionMode;
+        Component[] listC = viewersTabPane.getComponents();
+        for (Component panel : listC) {
+            if (panel instanceof SingleRawFilePanel){
+                ((SingleRawFilePanel)panel).updateXicModeDisplay(extractionMode);
+            }else if (panel instanceof MultiRawFilePanel){
+                ((MultiRawFilePanel)panel).updateXicModeDisplay(extractionMode);
+            }
         }
     }
 
