@@ -34,6 +34,8 @@ import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.EventListener;
+import javax.swing.event.EventListenerList;
 
 /**
  * Component to be used as tabComponent; Contains a JLabel to show the text and
@@ -41,26 +43,20 @@ import java.awt.event.*;
  */
 public class ButtonTabComponent extends JPanel {
 
-    private final JTabbedPane pane;
+    //events
+    private EventListenerList closeListenerList = new EventListenerList();
 
-    public ButtonTabComponent(final JTabbedPane pane) {
+    public ButtonTabComponent(String text) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        if (pane == null) {
-            throw new NullPointerException("TabbedPane is null");
-        }
-        this.pane = pane;
         setOpaque(false);
+        final String tabTile = text;
 
         //make JLabel read titles from JTabbedPane
         JLabel label = new JLabel() {
             @Override
             public String getText() {
-                int i = pane.indexOfTabComponent(ButtonTabComponent.this);
-                if (i != -1) {
-                    return pane.getTitleAt(i);
-                }
-                return null;
+                return tabTile;
             }
         };
 
@@ -74,9 +70,32 @@ public class ButtonTabComponent extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
 
+    /**
+     * event register
+     *
+     * @param listener
+     */
+    public void addCloseTabListener(CloseTabListener listener) {
+        closeListenerList.add(CloseTabListener.class, listener);
+    }
+
+    public void removeCloseTabListener(CloseTabListener listener) {
+        closeListenerList.remove(CloseTabListener.class, listener);
+    }
+
+    private void fireCloseTab() {
+        Object[] listeners = closeListenerList.getListenerList();
+        for (int i = 0; i < listeners.length; i = i + 2) {
+            if (listeners[i] == CloseTabListener.class) {
+                ((CloseTabListener) listeners[i + 1]).closeTab(this);
+            }
+        }
+    }
+
     private class TabButton extends JButton implements ActionListener {
 
         private BasicStroke stroke = new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+
         public TabButton() {
             init();
         }
@@ -103,10 +122,7 @@ public class ButtonTabComponent extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
-            if (i != -1) {
-                pane.remove(i);
-            }
+            fireCloseTab();
         }
 
         //we don't want to update UI for this button
@@ -145,6 +161,7 @@ public class ButtonTabComponent extends JPanel {
             }
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
             Component component = e.getComponent();
             if (component instanceof AbstractButton) {
@@ -153,4 +170,9 @@ public class ButtonTabComponent extends JPanel {
             }
         }
     };
+
+    public interface CloseTabListener extends EventListener {
+
+        public void closeTab(ButtonTabComponent buttonTabComponent);
+    }
 }
