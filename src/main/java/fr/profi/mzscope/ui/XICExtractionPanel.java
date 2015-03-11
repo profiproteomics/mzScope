@@ -10,11 +10,9 @@ import fr.profi.mzscope.ui.event.ExtractionListener;
 import fr.profi.mzscope.util.MzScopeConstants;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -42,7 +40,6 @@ public class XICExtractionPanel extends JPanel {
 
     private final static String ACTION_COMMAND_REPLACE_MODE = "replace";
     private final static String ACTION_COMMAND_OVERLAY_MODE = "overlay";
-    private final static String ACTION_COMMAND_SUM_MODE = "sum";
 
     private int modeDisplay = 0;
 
