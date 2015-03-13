@@ -16,13 +16,19 @@ public interface IMzScope {
      * open the specified file, and extract at the moz specified value
      * @param file
      * @param moz 
+     * @param elutionTime 
+     * @param firstScanTime 
+     * @param lastScanTime 
      */
-    public abstract void openRawAndExtract(File file, double moz);
+    public abstract void openRawAndExtract(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime);
     
     /**
      * extract chromatrogram on an existing file at the specified moz
      * @param file
      * @param moz 
+     * @param elutionTime 
+     * @param firstScanTime 
+     * @param lastScanTime 
      */
-    public abstract void extractRawFile(File file, double moz);
+    public abstract void extractRawFile(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime);
 }

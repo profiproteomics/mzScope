@@ -38,4 +38,6 @@ public interface IRawFilePlot {
    IRawFile getCurrentRawfile();
 
    Chromatogram getCurrentChromatogram();
+   
+   public void extractChromatogramWithFeature(double minMz, double maxMz, double elutionTime, double firstScanTime, double lastScanTime);
 }

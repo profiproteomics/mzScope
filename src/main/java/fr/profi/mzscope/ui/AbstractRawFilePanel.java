@@ -643,4 +643,26 @@ abstract public class AbstractRawFilePanel extends javax.swing.JPanel implements
     public void updateXicModeDisplay(int mode){
         xicModeDisplay = mode;
     }
+    
+    @Override
+    public void extractChromatogramWithFeature(double minMz, double maxMz, final double elutionTime, final double firstScanTime, final double lastScanTime) {
+        SwingWorker worker = new AbstractXICExtractionWorker(getCurrentRawfile(), minMz, maxMz) {
+            @Override
+            protected void done() {
+                try {
+                    displayChromatogram(get());
+                    setMsMsEventButtonEnabled(true);
+                    XYPlot xyplot = chromatogramPanel.getChart().getXYPlot();
+                    xyplot.clearDomainMarkers();
+                    Marker marker = new IntervalMarker(firstScanTime / 60.0, lastScanTime / 60.0, Color.ORANGE, new BasicStroke(1), Color.RED, new BasicStroke(1), 0.3f);
+                    xyplot.addDomainMarker(marker);
+                    marker = new ValueMarker(elutionTime / 60.0);
+                    xyplot.addDomainMarker(marker);
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Error while extraction chromatogram", e);
+                }
+            }
+        };
+        worker.execute();
+    }
 }

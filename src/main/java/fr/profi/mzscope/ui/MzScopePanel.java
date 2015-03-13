@@ -216,7 +216,7 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
         this.rawFilePanel.addFile(rawfile);
     }
 
-    public void openRawAndExtract(File file, double moz) {
+    public void openRawAndExtract(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime) {
         IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
         this.rawFilePanel.addFile(rawfile);
         displayRawAction(rawfile);
@@ -227,13 +227,13 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
         List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
         for (AbstractRawFilePanel p : list) {
             if (p instanceof SingleRawFilePanel) {
-                p.extractChromatogram(minMz, maxMz);
+                p.extractChromatogramWithFeature(minMz, maxMz, elutionTime, firstScanTime, lastScanTime);
                 break;
             }
         }
     }
 
-    public void extractRawFile(File file, double moz) {
+    public void extractRawFile(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime) {
         IRawFile rawfile = RawFileManager.getInstance().getFile(file.getName());
         if (rawfile != null) {
             float ppm = MzScopePreferences.getInstance().getMzPPMTolerance();
@@ -243,7 +243,7 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
             List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
             for (AbstractRawFilePanel p : list) {
                 if (p instanceof SingleRawFilePanel) {
-                    p.extractChromatogram(minMz, maxMz);
+                    p.extractChromatogramWithFeature(minMz, maxMz, elutionTime, firstScanTime, lastScanTime);
                     break;
                 }
             }

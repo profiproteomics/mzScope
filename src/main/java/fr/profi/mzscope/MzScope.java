@@ -36,14 +36,26 @@ public class MzScope implements IMzScope{
      * open the specified file, and extract at the moz specified value
      * @param file
      * @param moz 
+     * @param elutionTime 
+     * @param firstScanTime 
+     * @param lastScanTime 
      */
     @Override
-    public void openRawAndExtract(File file, double moz) {
-        mzScopePanel.openRawAndExtract(file, moz);
+    public void openRawAndExtract(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime) {
+        mzScopePanel.openRawAndExtract(file, moz, elutionTime, firstScanTime, lastScanTime);
     }
 
+    
+    /**
+     * extract chromatrogram on an existing file at the specified moz
+     * @param file
+     * @param moz 
+     * @param elutionTime 
+     * @param firstScanTime 
+     * @param lastScanTime 
+     */
     @Override
-    public void extractRawFile(File file, double moz) {
-        mzScopePanel.extractRawFile(file, moz);
+    public void extractRawFile(File file, double moz, double elutionTime, double firstScanTime, double lastScanTime) {
+        mzScopePanel.extractRawFile(file, moz, elutionTime,  firstScanTime, lastScanTime);
     }
 }
