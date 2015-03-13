@@ -5,6 +5,7 @@ import fr.profi.mzdb.model.Feature;
 import fr.profi.mzscope.model.Chromatogram;
 import fr.profi.mzscope.model.ExtractionParams;
 import fr.profi.mzscope.model.IRawFile;
+import fr.profi.mzscope.model.MzScopePreferences;
 import fr.profi.mzscope.ui.dialog.ExtractionParamsDialog;
 import fr.profi.mzscope.ui.event.DisplayFeatureListener;
 import fr.profi.mzscope.ui.event.ExtractFeatureListener;
@@ -213,6 +214,23 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
     public void openRaw(File file) {
         IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
         this.rawFilePanel.addFile(rawfile);
+    }
+    
+    public void openRawAndExtract(File file, double moz) {
+        IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
+        this.rawFilePanel.addFile(rawfile);
+        displayRawAction(rawfile);
+        float ppm = MzScopePreferences.getInstance().getMzPPMTolerance();
+        double minMz = moz;
+        double maxMz = minMz + minMz * ppm / 1e6;
+        minMz -= minMz * ppm / 1e6;
+        List<AbstractRawFilePanel> list = mapRawFilePanelRawFile.get(rawfile);
+        for (AbstractRawFilePanel p : list) {
+            if (p instanceof SingleRawFilePanel) {
+                p.extractChromatogram(minMz, maxMz);
+                break;
+            }
+        }
     }
 
     public void openRaw(List<File> files) {
@@ -622,7 +640,7 @@ public class MzScopePanel extends JPanel implements RawFileListener, DisplayFeat
             panel.displayFeature(f);
         }
     }
-
+    
     @Override
     public void extractChromatogram(double minMz, double maxMz, int extractionMode) {
         final AbstractRawFilePanel panel = (AbstractRawFilePanel) viewersTabPane.getSelectedComponent();
