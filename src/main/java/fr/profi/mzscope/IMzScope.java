@@ -18,4 +18,11 @@ public interface IMzScope {
      * @param moz 
      */
     public abstract void openRawAndExtract(File file, double moz);
+    
+    /**
+     * extract chromatrogram on an existing file at the specified moz
+     * @param file
+     * @param moz 
+     */
+    public abstract void extractRawFile(File file, double moz);
 }

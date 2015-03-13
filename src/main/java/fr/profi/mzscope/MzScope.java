@@ -41,4 +41,9 @@ public class MzScope implements IMzScope{
     public void openRawAndExtract(File file, double moz) {
         mzScopePanel.openRawAndExtract(file, moz);
     }
+
+    @Override
+    public void extractRawFile(File file, double moz) {
+        mzScopePanel.extractRawFile(file, moz);
+    }
 }
