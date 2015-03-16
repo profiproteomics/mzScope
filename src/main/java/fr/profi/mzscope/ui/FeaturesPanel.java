@@ -102,6 +102,9 @@ public class FeaturesPanel extends JPanel implements RowSorterListener, MouseLis
         menuItemViewRawFile.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (featureTable.getSelectedRow() == -1) {
+                    return;
+                }
                 Feature f = features.get(featureTable.convertRowIndexToModel(featureTable.getSelectedRow()));
                 fireDisplayFeature(f, rawFile);
             }
@@ -123,6 +126,7 @@ public class FeaturesPanel extends JPanel implements RowSorterListener, MouseLis
     }
 
     public void setFeatures(List<Feature> features) {
+        modelSelectedIdxBeforeSort = -1;
         featureTableModel.setFeatures(features);
         this.features = features;
     }
