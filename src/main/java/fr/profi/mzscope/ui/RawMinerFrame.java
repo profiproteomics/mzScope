@@ -5,7 +5,9 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.profi.mzscope.ui.event.ExtractFeatureListener;
+import fr.proline.mzscope.ui.MzScopePanel;
+import fr.proline.mzscope.ui.MzdbFilter;
+import fr.proline.mzscope.ui.event.ExtractFeatureListener;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.prefs.Preferences;

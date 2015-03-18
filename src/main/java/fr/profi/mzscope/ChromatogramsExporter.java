@@ -6,9 +6,9 @@
 package fr.profi.mzscope;
 
 import com.thoughtworks.xstream.XStream;
-import fr.profi.mzscope.model.Chromatogram;
-import fr.profi.mzscope.model.IRawFile;
-import fr.profi.mzscope.ui.RawFileManager;
+import fr.proline.mzscope.model.Chromatogram;
+import fr.proline.mzscope.model.IRawFile;
+import fr.proline.mzscope.ui.RawFileManager;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
