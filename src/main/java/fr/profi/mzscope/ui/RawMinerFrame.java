@@ -5,13 +5,9 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.proline.mzscope.ui.MzScopePanel;
 import fr.proline.mzscope.ui.MzdbFilter;
-import fr.proline.mzscope.ui.event.ExtractFeatureListener;
 import java.awt.BorderLayout;
-import java.io.File;
-import java.util.prefs.Preferences;
-import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,12 +15,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author CB205360
  */
-public class RawMinerFrame extends javax.swing.JFrame implements ExtractFeatureListener{
+public class RawMinerFrame extends JFrame {
 
    final private static Logger logger = LoggerFactory.getLogger(RawMinerFrame.class);
-   final private static String LAST_DIR = "Last directory";
    
-   private final MzScopePanel mzscopePanel;
+   private final RawMinerPanel rawMinerPanel;
 
    /**
     * Creates new form RawMinerFrame
@@ -32,9 +27,8 @@ public class RawMinerFrame extends javax.swing.JFrame implements ExtractFeatureL
    public RawMinerFrame() {
       initComponents();
       //rawFilesPanel1.setParentFrame(this);
-      mzscopePanel = new MzScopePanel(this);
-      mzscopePanel.addExtractFeatureListener(this);
-      mainPanel.add(mzscopePanel, BorderLayout.CENTER);
+      rawMinerPanel = new RawMinerPanel(this);
+      mainPanel.add(rawMinerPanel, BorderLayout.CENTER);
       setSize(700,500);
    }
 
@@ -152,39 +146,24 @@ public class RawMinerFrame extends javax.swing.JFrame implements ExtractFeatureL
     }//GEN-LAST:event_exitMIActionPerformed
 
     private void openRawMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openRawMIActionPerformed
-       Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-       String directory = prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath());
-       fileChooser.setCurrentDirectory(new File(directory));
-       fileChooser.setMultiSelectionEnabled(true);
-       int returnVal = fileChooser.showOpenDialog(this);
-       if (returnVal == JFileChooser.APPROVE_OPTION) {
-          File[] files = fileChooser.getSelectedFiles();
-          for (File file : files) {
-             prefs.put(LAST_DIR, file.getParentFile().getAbsolutePath());
-             mzscopePanel.openRaw(file);
-             //IRawFile rawfile = RawFileManager.getInstance().addRawFile(file);
-             //rawFilesPanel1.addFile(rawfile);
-          }
-       } else {
-          System.out.println("File access cancelled by user.");
-       }
+       rawMinerPanel.openRawMI();
     }//GEN-LAST:event_openRawMIActionPerformed
 
         
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
-       mzscopePanel.extractFeaturesMI();
+       rawMinerPanel.extractFeaturesMI();
     }//GEN-LAST:event_extractFeaturesMIActionPerformed
 
    private void exportChromatogramActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportChromatogramActionPerformed
-      mzscopePanel.exportChromatogram();
+      rawMinerPanel.exportChromatogram();
    }//GEN-LAST:event_exportChromatogramActionPerformed
 
    private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
-      mzscopePanel.detectPeakelsMI();
+      rawMinerPanel.detectPeakelsMI();
    }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
     private void closeAllMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMIActionPerformed
-        mzscopePanel.closeAllRaw();
+        rawMinerPanel.closeAllRaw();
     }//GEN-LAST:event_closeAllMIActionPerformed
 
    /**
@@ -203,19 +182,16 @@ public class RawMinerFrame extends javax.swing.JFrame implements ExtractFeatureL
                javax.swing.UIManager.setLookAndFeel(info.getClassName());
             }
          }
-      } catch (ClassNotFoundException ex) {
-         java.util.logging.Logger.getLogger(RawMinerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-      } catch (InstantiationException ex) {
-         java.util.logging.Logger.getLogger(RawMinerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-      } catch (IllegalAccessException ex) {
-         java.util.logging.Logger.getLogger(RawMinerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-      } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
          java.util.logging.Logger.getLogger(RawMinerFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
       }
+       //</editor-fold>
+       
       //</editor-fold>
 
       /* Create and display the form */
       java.awt.EventQueue.invokeLater(new Runnable() {
+         @Override
          public void run() {
             new RawMinerFrame().setVisible(true);
          }
@@ -238,11 +214,13 @@ public class RawMinerFrame extends javax.swing.JFrame implements ExtractFeatureL
     private javax.swing.JMenuItem openRawMI;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void extractFeatureListener(boolean extractFeatures, boolean detectPeakels) {
+
+    public void setExtractFeaturesMIEnabled(boolean extractFeatures){
         extractFeaturesMI.setEnabled(extractFeatures);
+    }
+    
+    public void setDetectPeakelsMIEnabled(boolean detectPeakels){
         detectPeakelsMI.setEnabled(detectPeakels);
     }
-
 }
 
