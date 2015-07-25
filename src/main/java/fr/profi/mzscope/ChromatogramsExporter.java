@@ -8,6 +8,7 @@ package fr.profi.mzscope;
 import com.thoughtworks.xstream.XStream;
 import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IRawFile;
+import fr.proline.mzscope.model.Ms1ExtractionRequest;
 import fr.proline.mzscope.ui.RawFileManager;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,11 +47,10 @@ public class ChromatogramsExporter {
                 BufferedWriter output = null;
                 String chromatoFile = "";
                 try {
-                    Chromatogram currentChromatogram = null;
-                    if(nextIon.startRT == 0.0 && nextIon.stopRT ==0.0)
-                        currentChromatogram = nextRawFile.getXIC(nextIon.getMinMz() , nextIon.getMaxMz());
-                    else
-                        currentChromatogram = nextRawFile.getXIC(nextIon.getMinMz(), nextIon.getMaxMz(), nextIon.getStartRT()*60, nextIon.getStopRT()*60);
+                    Ms1ExtractionRequest.Builder builder = Ms1ExtractionRequest.builder().setMinMz(nextIon.getMinMz()).setMaxMz(nextIon.getMaxMz());
+                    if((nextIon.startRT > 0.0) && (nextIon.stopRT > 0.0))
+                       builder.setElutionTimeLowerBound(nextIon.startRT*60.0f).setElutionTimeUpperBound(nextIon.stopRT*60.0f);
+                     Chromatogram currentChromatogram = nextRawFile.getXIC(builder.build());
                     StringBuilder stb = new StringBuilder();
                     stb.append(m_outputDir).append('/');
                     stb.append("extracted_xic_").append(nextRawFile.getName()).append(df.format(currentChromatogram.minMz).replace(',', '.')).append(".tsv");
