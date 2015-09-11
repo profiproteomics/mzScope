@@ -91,7 +91,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          explorerSplitPane.setDividerLocation(200);
          explorerSplitPane.setOneTouchExpandable(true);
          explorerSplitPane.setTopComponent(getRawFilesPanel());
-         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel());
+         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel(ExtractionResultsPanel.TOOLBAR_ALIGN_HORIZONTAL));
       }
       return explorerSplitPane;
    }
@@ -105,7 +105,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
 
    protected MzScopePanel getMzScopePanel() {
       if (this.mzScopePanel == null) {
-         mzScopePanel = new MzScopePanel(parentFrame);
+         mzScopePanel = new MzScopePanel(parentFrame, false);
          mzScopePanel.addExtractionListener(this);
       }
       return mzScopePanel;
