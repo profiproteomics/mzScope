@@ -56,6 +56,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    private JMenuItem viewRawFileMI;
    private ActionListener viewRawFileAction;
    private JMenuItem viewAllRawFilesMI;
+   private JMenuItem viewLCMSMap;
 
    public RawMinerPanel(RawMinerFrame parentFrame) {
       super();
@@ -255,6 +256,18 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          }
       });
       popupMenu.add(detectPeakelsMI);
+      
+      // view LCMS Map
+      viewLCMSMap = new JMenuItem();
+      viewLCMSMap.setText("View LCMS Map...");
+      viewLCMSMap.addActionListener(new ActionListener() {
+
+          @Override
+          public void actionPerformed(ActionEvent ae) {
+              mzScopePanel.displayLCMSMap(getRawFilesPanel().getSelectedValues().get(0));
+          }
+      });
+      popupMenu.add(viewLCMSMap);
 
    }
 
@@ -267,6 +280,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       viewAllRawFilesMI.setEnabled(true);
       extractFeaturesMI.setEnabled(nbS > 0);
       detectPeakelsMI.setEnabled((nbS > 0));
+      viewLCMSMap.setEnabled(nbS == 1);
    }
 
    @Override
