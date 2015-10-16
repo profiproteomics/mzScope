@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
  * @author CB205360
  */
 public class RawMinerFrame extends JFrame {
-
+    public final static String version = "0.1";
+    
    final private static Logger logger = LoggerFactory.getLogger(RawMinerFrame.class);
    
    private final RawMinerPanel rawMinerPanel;
@@ -26,6 +27,7 @@ public class RawMinerFrame extends JFrame {
     */
    public RawMinerFrame() {
       initComponents();
+      setTitle("mzScope "+version);
       //rawFilesPanel1.setParentFrame(this);
       rawMinerPanel = new RawMinerPanel(this);
       mainPanel.add(rawMinerPanel, BorderLayout.CENTER);
