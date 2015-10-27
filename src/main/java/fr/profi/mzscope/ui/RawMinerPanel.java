@@ -8,10 +8,12 @@ package fr.profi.mzscope.ui;
 import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.ui.ExtractionResultsPanel;
+import fr.proline.mzscope.ui.IExtractionResults;
 import fr.proline.mzscope.ui.MzScopePanel;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.mzscope.ui.RawFileManager;
 import fr.proline.mzscope.ui.RawFilesPanel;
+import fr.proline.mzscope.ui.TabbedMultiRawFilePanel;
 import fr.proline.mzscope.ui.event.ExtractionEvent;
 import fr.proline.mzscope.ui.event.ExtractionStateListener;
 import fr.proline.mzscope.utils.IPopupMenuDelegate;
@@ -23,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -93,7 +96,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          explorerSplitPane.setDividerLocation(200);
          explorerSplitPane.setOneTouchExpandable(true);
          explorerSplitPane.setTopComponent(getRawFilesPanel());
-         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel(ExtractionResultsPanel.TOOLBAR_ALIGN_HORIZONTAL));
+         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel(getMzScopePanel(), ExtractionResultsPanel.TOOLBAR_ALIGN_HORIZONTAL));
       }
       return explorerSplitPane;
    }
@@ -301,6 +304,5 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    public ActionListener getDefaultAction() {
       return viewRawFileAction;
    }
-   
-   
+
 }
