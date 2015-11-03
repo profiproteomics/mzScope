@@ -38,7 +38,7 @@ public class ChromatogramsExporter {
          m_outputDir= outputDir;
      }
 
-     public boolean extractChormatoForAllFiles(){
+     public boolean extractChromatoForAllFiles(){
         DecimalFormat df = new DecimalFormat("#.00");
         List<IRawFile> allFiles = RawFileManager.getInstance().getAllFiles();
         int nbrError = 0;
@@ -153,7 +153,7 @@ public class ChromatogramsExporter {
 //            }
            
             ChromatogramsExporter chExporter = new ChromatogramsExporter(ionsToXtract,outputDir);
-            chExporter.extractChormatoForAllFiles();
+            chExporter.extractChromatoForAllFiles();
             System.exit(0);
           } catch (Exception e) {
              // TODO Auto-generated catch block
