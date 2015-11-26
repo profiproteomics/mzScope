@@ -1,0 +1,120 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package fr.profi.mzscope;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
+import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.apache.commons.math3.util.Precision;
+import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ *
+ * @author CB205360
+ */
+public class Aligner {
+
+    final private static Logger logger = LoggerFactory.getLogger(Aligner.class);
+
+    final private List<IonEntry> entries;
+    private final Map<String, List<IonEntry>> entriesBySequence = new HashMap<>();
+    private double[] x;
+    private double[] y;
+    private UnivariateFunction interpolationFunction; 
+   private SimpleRegression regression;
+            
+    public Aligner(List<IonEntry> entries) {
+       this.entries = entries;
+       for (IonEntry e : entries) {
+          if (!entriesBySequence.containsKey(e.getModification_sequence())) {
+             entriesBySequence.put(e.getModification_sequence(), new ArrayList<IonEntry>(10));
+          }
+          entriesBySequence.get(e.getModification_sequence()).add(e);
+       }
+    }
+    
+    public void addCalibrationIon(CalibrationIon ion) {
+       if (ion.getRT_observed() == null)
+          return;
+       if (!entriesBySequence.containsKey(ion.getModification_sequence())) {
+          logger.info("Sequence "+ion.getModification_sequence()+" not found in the library");
+          return;
+       }
+       List<IonEntry> matchingSequenceEntries = entriesBySequence.get(ion.getModification_sequence());
+       for (IonEntry me : matchingSequenceEntries) {
+          if (Precision.equals(me.getQ1(), ion.getQ1(), 1e-3) && Precision.equals(me.getQ3(), ion.getQ3(), 1e-3)) {
+             me.setRT_observed(ion.getRT_observed());
+          }
+       }
+    }
+    
+    public void align() {
+       List<IonEntry> controlPoints = new ArrayList<>();
+       List<Double> xValues = new ArrayList<>();
+       List<Double> yValues = new ArrayList<>();
+       
+       for (IonEntry e : entries) {
+          if (e.getRT_observed() != null) {
+             controlPoints.add(e);
+          }
+       }
+       
+       Collections.sort(controlPoints, new Comparator<IonEntry>() {
+          @Override
+          public int compare(IonEntry o1, IonEntry o2) {
+             return Double.compare(o1.getRT_detected(), o2.getRT_detected());
+          }
+       });
+       
+//       regression = new SimpleRegression();
+//       for (IonEntry e : controlPoints) {
+//          regression.addData(e.getRT_detected(), e.getRT_observed());
+//       }
+      
+       xValues.add(0.0);
+       yValues.add(0.0);
+       
+       for (IonEntry e : controlPoints) {
+             xValues.add(e.getRT_detected());
+             yValues.add(e.getRT_observed());
+
+       }
+       UnivariateInterpolator interpolator = new SplineInterpolator();
+       x = ArrayUtils.toPrimitive(xValues.toArray(new Double[xValues.size()]));
+       y = ArrayUtils.toPrimitive(yValues.toArray(new Double[yValues.size()]));
+       interpolationFunction = interpolator.interpolate(x, y);
+    }
+    
+    public List<IonEntry> predictRT() {
+       for (IonEntry e: entries) {
+          try {
+             double y = interpolationFunction.value(e.getiRT());
+             e.setRT_observed(e.getRT_detected());
+             e.setRT_detected(y);
+          } catch (Exception ex) {
+             logger.error("RT interpolation fail", ex);
+          }
+//          e.setRT_predicted(regression.predict(e.getRT_detected()));
+       }
+       return entries;
+    }
+    
+     public List<IonEntry> getEntries() {
+        return entries;
+     }
+}
