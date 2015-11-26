@@ -7,6 +7,7 @@ package fr.profi.mzscope.ui;
 
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import java.awt.BorderLayout;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RawMinerFrame extends JFrame {
     public final static String version = "0.1";
-    
    final private static Logger logger = LoggerFactory.getLogger(RawMinerFrame.class);
    
    private final RawMinerPanel rawMinerPanel;
@@ -56,6 +56,8 @@ public class RawMinerFrame extends JFrame {
       detectPeakelsMI = new javax.swing.JMenuItem();
       detectFeatureMI = new javax.swing.JMenuItem();
       exportChromatogram = new javax.swing.JMenuItem();
+      ToolsMenu = new javax.swing.JMenu();
+      loadLibraryMI = new javax.swing.JMenuItem();
 
       fileChooser.setDialogTitle("Open Raw file");
       fileChooser.addChoosableFileFilter(new MzdbFilter());
@@ -136,6 +138,18 @@ public class RawMinerFrame extends JFrame {
 
       menuBar.add(ProcessMenu);
 
+      ToolsMenu.setText("Tools");
+
+      loadLibraryMI.setText("Ion Library Aligner ...");
+      loadLibraryMI.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            loadLibraryMIActionPerformed(evt);
+         }
+      });
+      ToolsMenu.add(loadLibraryMI);
+
+      menuBar.add(ToolsMenu);
+
       setJMenuBar(menuBar);
 
       javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -181,6 +195,14 @@ public class RawMinerFrame extends JFrame {
       rawMinerPanel.getMzScopePanel().detectFeatures();
    }//GEN-LAST:event_detectFeatureMIActionPerformed
 
+   private void loadLibraryMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadLibraryMIActionPerformed
+      JDialog dialog = new JDialog(this, "Ion Library Alignment");
+      dialog.setContentPane(new IonLibraryAlignementPanel());
+      dialog.pack();
+      dialog.setModal(true);
+      dialog.setVisible(true);
+   }//GEN-LAST:event_loadLibraryMIActionPerformed
+
    /**
     * @param args the command line arguments
     */
@@ -216,6 +238,7 @@ public class RawMinerFrame extends JFrame {
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JMenu FileMenu;
    private javax.swing.JMenu ProcessMenu;
+   private javax.swing.JMenu ToolsMenu;
    private javax.swing.JMenuItem closeAllMI;
    private javax.swing.JMenuItem detectFeatureMI;
    private javax.swing.JMenuItem detectPeakelsMI;
@@ -225,6 +248,7 @@ public class RawMinerFrame extends JFrame {
    private javax.swing.JFileChooser fileChooser;
    private javax.swing.JPopupMenu.Separator jSeparator1;
    private javax.swing.JPopupMenu.Separator jSeparator2;
+   private javax.swing.JMenuItem loadLibraryMI;
    private javax.swing.JPanel mainPanel;
    private javax.swing.JMenuBar menuBar;
    private javax.swing.JMenuItem openRawMI;
