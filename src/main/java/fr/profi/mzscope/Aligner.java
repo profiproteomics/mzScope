@@ -19,7 +19,6 @@ import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.commons.math3.util.Precision;
-import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +32,7 @@ public class Aligner {
 
     final private List<IonEntry> entries;
     private final Map<String, List<IonEntry>> entriesBySequence = new HashMap<>();
+    final private List<IonEntry> nonRedondantEntries;    
     private double[] x;
     private double[] y;
     private UnivariateFunction interpolationFunction; 
@@ -40,27 +40,37 @@ public class Aligner {
             
     public Aligner(List<IonEntry> entries) {
        this.entries = entries;
+       this.nonRedondantEntries = new ArrayList<>();
+       
        for (IonEntry e : entries) {
           if (!entriesBySequence.containsKey(e.getModification_sequence())) {
              entriesBySequence.put(e.getModification_sequence(), new ArrayList<IonEntry>(10));
+             nonRedondantEntries.add(e);
           }
           entriesBySequence.get(e.getModification_sequence()).add(e);
        }
     }
     
-    public void addCalibrationIon(CalibrationIon ion) {
+    public boolean addCalibrationIon(CalibrationIon ion) {
        if (ion.getRT_observed() == null)
-          return;
+          return false;
        if (!entriesBySequence.containsKey(ion.getModification_sequence())) {
           logger.info("Sequence "+ion.getModification_sequence()+" not found in the library");
-          return;
+          return false;
        }
        List<IonEntry> matchingSequenceEntries = entriesBySequence.get(ion.getModification_sequence());
        for (IonEntry me : matchingSequenceEntries) {
           if (Precision.equals(me.getQ1(), ion.getQ1(), 1e-3) && Precision.equals(me.getQ3(), ion.getQ3(), 1e-3)) {
              me.setRT_observed(ion.getRT_observed());
+             // we select only one entry by modification_sequence in the constructor. This selected entry can be different
+             // than the one matched here. Add the matched entry in the nonRedondantEntries list.
+             if (!nonRedondantEntries.contains(me)) {
+                nonRedondantEntries.add(me);
+             }
+             return true;
           }
        }
+      return false;
     }
     
     public void align() {
@@ -90,11 +100,12 @@ public class Aligner {
        yValues.add(0.0);
        
        for (IonEntry e : controlPoints) {
-             xValues.add(e.getRT_detected());
+             xValues.add(e.getiRT());
              yValues.add(e.getRT_observed());
 
        }
-       UnivariateInterpolator interpolator = new SplineInterpolator();
+       UnivariateInterpolator interpolator = new LinearInterpolator();
+//       UnivariateInterpolator interpolator = new SplineInterpolator();
        x = ArrayUtils.toPrimitive(xValues.toArray(new Double[xValues.size()]));
        y = ArrayUtils.toPrimitive(yValues.toArray(new Double[yValues.size()]));
        interpolationFunction = interpolator.interpolate(x, y);
@@ -104,17 +115,31 @@ public class Aligner {
        for (IonEntry e: entries) {
           try {
              double y = interpolationFunction.value(e.getiRT());
-             e.setRT_observed(e.getRT_detected());
-             e.setRT_detected(y);
+             e.setRT_predicted(y);
           } catch (Exception ex) {
              logger.error("RT interpolation fail", ex);
           }
-//          e.setRT_predicted(regression.predict(e.getRT_detected()));
        }
        return entries;
     }
+
+    public List<IonEntry> applyPredictedRT() {
+       for (IonEntry e: entries) {
+             e.setRT_detected(e.getRT_predicted());
+       }
+       return entries;
+    }
+
     
      public List<IonEntry> getEntries() {
         return entries;
      }
+
+     /**
+      * Returns a non redondant list of entries. Only one fragment per modification_sequence
+      * @return 
+      */
+   public List<IonEntry> getNonRedondantEntries() {
+      return nonRedondantEntries;
+   }
 }

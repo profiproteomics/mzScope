@@ -18,6 +18,7 @@ import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.graphics.BaseGraphicsPanel;
 import fr.proline.studio.table.CompoundTableModel;
+import fr.proline.studio.table.DecoratedMarkerTable;
 import fr.proline.studio.table.DecoratedTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
+import javax.swing.event.TableModelListener;
 import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +79,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       jPanel3 = new javax.swing.JPanel();
       saveLibraryBtn = new javax.swing.JButton();
       alignBtn = new javax.swing.JButton();
+      applyBtn = new javax.swing.JButton();
       jPanel4 = new javax.swing.JPanel();
       tableScrollPane = new javax.swing.JScrollPane();
       tableToolbar = new javax.swing.JToolBar();
@@ -173,21 +176,31 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
       });
 
+      org.openide.awt.Mnemonics.setLocalizedText(applyBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.applyBtn.text")); // NOI18N
+      applyBtn.addActionListener(new java.awt.event.ActionListener() {
+         public void actionPerformed(java.awt.event.ActionEvent evt) {
+            applyBtnActionPerformed(evt);
+         }
+      });
+
       javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
       jPanel3.setLayout(jPanel3Layout);
       jPanel3Layout.setHorizontalGroup(
          jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-            .addGap(0, 373, Short.MAX_VALUE)
+            .addGap(0, 312, Short.MAX_VALUE)
             .addComponent(alignBtn)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(applyBtn)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(saveLibraryBtn))
       );
       jPanel3Layout.setVerticalGroup(
          jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
             .addComponent(saveLibraryBtn)
-            .addComponent(alignBtn))
+            .addComponent(alignBtn)
+            .addComponent(applyBtn))
       );
 
       tableToolbar.setFloatable(false);
@@ -322,11 +335,14 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
                IonEntry row = it.next();
                entries.add(row);
             }
-            libraryPathTF.setText(file.getAbsolutePath());
-            libraryEntriesJL.setText("(" + entries.size() + " entries found)");
-            ((BeanTableModel<IonEntry>) tableModel.getBaseModel()).setData(entries);
-            graphicsPanel.setData(tableModel, null);
             aligner = new Aligner(entries);
+            List<IonEntry> nrEntries = aligner.getNonRedondantEntries();
+            libraryPathTF.setText(file.getAbsolutePath());
+            libraryEntriesJL.setText("(" + entries.size() + " entries found, "+nrEntries.size()+" non redondant)");
+            
+            ((BeanTableModel<IonEntry>) tableModel.getBaseModel()).setData(nrEntries);
+            graphicsPanel.setData(tableModel, null);
+            
             prefs.put(LAST_DIR, file.getParent());
          } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
@@ -368,12 +384,15 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
                CalibrationIon row = it.next();
                entries.add(row);
             }
-
-            referencePathTF.setText(file.getAbsolutePath());
-            referenceEntriesJL.setText("(" + entries.size() + " entries found)");
+            int matchesCount = 0;
             for (CalibrationIon c : entries) {
-               aligner.addCalibrationIon(c);
+               if (aligner.addCalibrationIon(c)) 
+                  matchesCount++;
             }
+            
+            referencePathTF.setText(file.getAbsolutePath());
+            referenceEntriesJL.setText("(" + entries.size() + " entries found, "+matchesCount+" matched in the library)");
+
             tableModel.fireTableDataChanged();
             graphicsPanel.setData(tableModel, null);
             prefs.put(LAST_DIR, file.getParent());
@@ -426,6 +445,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             CsvMapper mapper = new CsvMapper();
             mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
             mapper.writer(schema).writeValues(file).writeAll(aligner.getEntries().toArray(new IonEntry[0]));
+            writer.flush();
             writer.close();
          } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -433,8 +453,15 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       }
    }//GEN-LAST:event_saveLibraryBtnActionPerformed
 
+   private void applyBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyBtnActionPerformed
+      // apply predictedRT to observedRT
+      aligner.applyPredictedRT();
+      tableModel.fireTableDataChanged();
+      graphicsPanel.setData(tableModel, null);
+   }//GEN-LAST:event_applyBtnActionPerformed
+
    private void initCustomComponents() {
-      DecoratedTable table = new DecoratedTable() {
+      DecoratedMarkerTable table = new DecoratedMarkerTable() {
 
          @Override
          public TablePopupMenu initPopupMenu() {
@@ -444,9 +471,17 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          @Override
          public void prepostPopupMenu() {
          }
+         
+         @Override
+         public void addTableModelListener(TableModelListener l) {
+            getModel().addTableModelListener(l);
+         }
       };
       table.setModel(tableModel);
       tableScrollPane.setViewportView(table);
+      table.setFillsViewportHeight(true);
+      table.setViewport(tableScrollPane.getViewport());
+
       ExportButton exportButton = new ExportButton(tableModel, "Export", table);
       tableToolbar.add(exportButton);
       FilterButton filterButton = new FilterButton(tableModel) {
@@ -576,6 +611,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton alignBtn;
+   private javax.swing.JButton applyBtn;
    private javax.swing.JLabel jLabel1;
    private javax.swing.JLabel jLabel2;
    private javax.swing.JPanel jPanel1;
