@@ -17,9 +17,9 @@ import fr.profi.mzscope.IonEntry;
 import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.graphics.BaseGraphicsPanel;
+import fr.proline.studio.markerbar.MarkerContainerPanel;
 import fr.proline.studio.table.CompoundTableModel;
 import fr.proline.studio.table.DecoratedMarkerTable;
-import fr.proline.studio.table.DecoratedTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
 import java.io.BufferedReader;
@@ -31,8 +31,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
+import javax.swing.JScrollPane;
 import javax.swing.event.TableModelListener;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
+import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +70,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
    private void initComponents() {
 
+      tableToolbar = new javax.swing.JToolBar();
       jPanel1 = new javax.swing.JPanel();
       jLabel1 = new javax.swing.JLabel();
       libraryPathTF = new javax.swing.JTextField();
@@ -80,10 +86,13 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       saveLibraryBtn = new javax.swing.JButton();
       alignBtn = new javax.swing.JButton();
       applyBtn = new javax.swing.JButton();
-      jPanel4 = new javax.swing.JPanel();
-      tableScrollPane = new javax.swing.JScrollPane();
-      tableToolbar = new javax.swing.JToolBar();
+      interpolationCbx = new javax.swing.JComboBox();
+      tablePane = new javax.swing.JPanel();
       plotPanel = new javax.swing.JPanel();
+
+      tableToolbar.setFloatable(false);
+      tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
+      tableToolbar.setRollover(true);
 
       org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel1.text")); // NOI18N
 
@@ -183,12 +192,16 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
       });
 
+      interpolationCbx.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
       javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
       jPanel3.setLayout(jPanel3Layout);
       jPanel3Layout.setHorizontalGroup(
          jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-            .addGap(0, 312, Short.MAX_VALUE)
+            .addGap(0, 191, Short.MAX_VALUE)
+            .addComponent(interpolationCbx, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(alignBtn)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(applyBtn)
@@ -200,27 +213,11 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
             .addComponent(saveLibraryBtn)
             .addComponent(alignBtn)
-            .addComponent(applyBtn))
+            .addComponent(applyBtn)
+            .addComponent(interpolationCbx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
 
-      tableToolbar.setFloatable(false);
-      tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
-      tableToolbar.setRollover(true);
-
-      javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-      jPanel4.setLayout(jPanel4Layout);
-      jPanel4Layout.setHorizontalGroup(
-         jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-            .addComponent(tableToolbar, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(tableScrollPane))
-      );
-      jPanel4Layout.setVerticalGroup(
-         jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-         .addComponent(tableToolbar, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-         .addComponent(tableScrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
-      );
+      tablePane.setLayout(new java.awt.BorderLayout());
 
       javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
       jPanel2.setLayout(jPanel2Layout);
@@ -229,13 +226,13 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          .addGroup(jPanel2Layout.createSequentialGroup()
             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-               .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+               .addComponent(tablePane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addContainerGap())
       );
       jPanel2Layout.setVerticalGroup(
          jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(tablePane, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
@@ -280,7 +277,8 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    }// </editor-fold>//GEN-END:initComponents
 
    private void alignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignBtnActionPerformed
-      aligner.align();
+      UnivariateInterpolator interpolator = (UnivariateInterpolator)interpolationCbx.getSelectedItem();
+      aligner.align(interpolator);
       aligner.predictRT();
       tableModel.fireTableDataChanged();
       graphicsPanel.setData(tableModel, null);
@@ -461,6 +459,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    }//GEN-LAST:event_applyBtnActionPerformed
 
    private void initCustomComponents() {
+      JScrollPane tableScrollPane = new JScrollPane();
       DecoratedMarkerTable table = new DecoratedMarkerTable() {
 
          @Override
@@ -492,13 +491,30 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
 
       };
+      
+      
       tableToolbar.add(filterButton);
 
+      MarkerContainerPanel markerContainerPanel = new MarkerContainerPanel(tableScrollPane, table);
+      markerContainerPanel.setMaxLineNumber(100000);
+      tablePane.add(tableToolbar, BorderLayout.WEST);
+      tablePane.add(markerContainerPanel, BorderLayout.CENTER);
+      
       graphicsPanel = new BaseGraphicsPanel(false);
       graphicsPanel.setData(tableModel, null);
 
       plotPanel.setLayout(new BorderLayout());
       plotPanel.add(graphicsPanel, BorderLayout.CENTER);
+      
+      UnivariateInterpolator[] interpolationMethods = { new LinearInterpolator(){ 
+         public String toString() {
+            return "Linear";
+      }}, new SplineInterpolator() {
+         public String toString() {
+            return "Spline";
+      }}};
+      interpolationCbx.setModel(new DefaultComboBoxModel<UnivariateInterpolator>(interpolationMethods));
+      
    }
 
    public static void main(String[] args) {
@@ -612,12 +628,12 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton alignBtn;
    private javax.swing.JButton applyBtn;
+   private javax.swing.JComboBox interpolationCbx;
    private javax.swing.JLabel jLabel1;
    private javax.swing.JLabel jLabel2;
    private javax.swing.JPanel jPanel1;
    private javax.swing.JPanel jPanel2;
    private javax.swing.JPanel jPanel3;
-   private javax.swing.JPanel jPanel4;
    private javax.swing.JSplitPane jSplitPane1;
    private javax.swing.JLabel libraryEntriesJL;
    private javax.swing.JTextField libraryPathTF;
@@ -627,7 +643,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    private javax.swing.JLabel referenceEntriesJL;
    private javax.swing.JTextField referencePathTF;
    private javax.swing.JButton saveLibraryBtn;
-   private javax.swing.JScrollPane tableScrollPane;
+   private javax.swing.JPanel tablePane;
    private javax.swing.JToolBar tableToolbar;
    // End of variables declaration//GEN-END:variables
 }

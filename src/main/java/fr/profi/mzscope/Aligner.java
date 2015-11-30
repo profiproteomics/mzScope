@@ -73,7 +73,7 @@ public class Aligner {
       return false;
     }
     
-    public void align() {
+    public void align(UnivariateInterpolator interpolator) {
        List<IonEntry> controlPoints = new ArrayList<>();
        List<Double> xValues = new ArrayList<>();
        List<Double> yValues = new ArrayList<>();
@@ -104,8 +104,6 @@ public class Aligner {
              yValues.add(e.getRT_observed());
 
        }
-       UnivariateInterpolator interpolator = new LinearInterpolator();
-//       UnivariateInterpolator interpolator = new SplineInterpolator();
        x = ArrayUtils.toPrimitive(xValues.toArray(new Double[xValues.size()]));
        y = ArrayUtils.toPrimitive(yValues.toArray(new Double[yValues.size()]));
        interpolationFunction = interpolator.interpolate(x, y);
