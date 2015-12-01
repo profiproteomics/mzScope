@@ -114,6 +114,7 @@ public class Aligner {
           try {
              double y = interpolationFunction.value(e.getiRT());
              e.setRT_predicted(y);
+             e.setRT_delta(e.getiRT() - y);
           } catch (Exception ex) {
              logger.error("RT interpolation fail", ex);
           }

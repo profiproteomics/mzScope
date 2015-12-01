@@ -45,6 +45,7 @@ public class IonEntry {
    private String cterm;
    private Double RT_observed;
    private Double RT_predicted;
+   private Double RT_delta;
    
    public Double getQ1() {
       return q1;
@@ -244,6 +245,14 @@ public class IonEntry {
 
    public void setRT_observed(Double RT_observed) {
       this.RT_observed = RT_observed;
+   }
+   
+      public Double getRT_delta() {
+      return RT_delta;
+   }
+
+   public void setRT_delta(Double RT_delta) {
+      this.RT_delta = RT_delta;
    }
 
    public Double getRT_predicted() {

@@ -54,6 +54,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class), true);
    private Aligner aligner;
    private BaseGraphicsPanel graphicsPanel;
+   private MarkerContainerPanel markerContainerPanel;
 
    /**
     * Creates new form IonLibraryAlignementPanel
@@ -85,7 +86,6 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       jPanel3 = new javax.swing.JPanel();
       saveLibraryBtn = new javax.swing.JButton();
       alignBtn = new javax.swing.JButton();
-      applyBtn = new javax.swing.JButton();
       interpolationCbx = new javax.swing.JComboBox();
       tablePane = new javax.swing.JPanel();
       plotPanel = new javax.swing.JPanel();
@@ -185,13 +185,6 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
       });
 
-      org.openide.awt.Mnemonics.setLocalizedText(applyBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.applyBtn.text")); // NOI18N
-      applyBtn.addActionListener(new java.awt.event.ActionListener() {
-         public void actionPerformed(java.awt.event.ActionEvent evt) {
-            applyBtnActionPerformed(evt);
-         }
-      });
-
       interpolationCbx.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
       javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -199,12 +192,10 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       jPanel3Layout.setHorizontalGroup(
          jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-            .addGap(0, 191, Short.MAX_VALUE)
+            .addGap(0, 246, Short.MAX_VALUE)
             .addComponent(interpolationCbx, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(alignBtn)
-            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-            .addComponent(applyBtn)
             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
             .addComponent(saveLibraryBtn))
       );
@@ -213,7 +204,6 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
             .addComponent(saveLibraryBtn)
             .addComponent(alignBtn)
-            .addComponent(applyBtn)
             .addComponent(interpolationCbx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
       );
 
@@ -337,6 +327,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             List<IonEntry> nrEntries = aligner.getNonRedondantEntries();
             libraryPathTF.setText(file.getAbsolutePath());
             libraryEntriesJL.setText("(" + entries.size() + " entries found, "+nrEntries.size()+" non redondant)");
+            markerContainerPanel.setMaxLineNumber(nrEntries.size());
             
             ((BeanTableModel<IonEntry>) tableModel.getBaseModel()).setData(nrEntries);
             graphicsPanel.setData(tableModel, null);
@@ -364,6 +355,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       if (returnVal == JFileChooser.APPROVE_OPTION) {
          try {
             File file = fileChooser.getSelectedFile();
+            logger.info("Start loading ion library from "+file.getAbsolutePath());
             CsvSchema schema = CsvSchema.builder()
                     .addColumn("q1")
                     .addColumn("q3")
@@ -394,6 +386,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             tableModel.fireTableDataChanged();
             graphicsPanel.setData(tableModel, null);
             prefs.put(LAST_DIR, file.getParent());
+            logger.info("Ion Library loaded");
          } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
          }
@@ -414,6 +407,8 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          try {
             File file = fileChooser.getSelectedFile();
             FileWriter writer = new FileWriter(file);
+            logger.info("Start writing ion library to "+file.getAbsolutePath());
+            aligner.applyPredictedRT();
             CsvSchema schema = CsvSchema.builder()
                     .addColumn("q1")
                     .addColumn("q3")
@@ -445,18 +440,12 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             mapper.writer(schema).writeValues(file).writeAll(aligner.getEntries().toArray(new IonEntry[0]));
             writer.flush();
             writer.close();
+            logger.info("Library writed");
          } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
          }
       }
    }//GEN-LAST:event_saveLibraryBtnActionPerformed
-
-   private void applyBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyBtnActionPerformed
-      // apply predictedRT to observedRT
-      aligner.applyPredictedRT();
-      tableModel.fireTableDataChanged();
-      graphicsPanel.setData(tableModel, null);
-   }//GEN-LAST:event_applyBtnActionPerformed
 
    private void initCustomComponents() {
       JScrollPane tableScrollPane = new JScrollPane();
@@ -477,6 +466,15 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
       };
       table.setModel(tableModel);
+      table.getColumnExt("RT_detected").setVisible(false);      
+      table.getColumnExt("frg_nr").setVisible(false);
+      table.getColumnExt("frg_z").setVisible(false);
+      table.getColumnExt("n").setVisible(false);
+      table.getColumnExt("isotype").setVisible(false);
+      table.getColumnExt("rank").setVisible(false);
+      table.getColumnExt("score").setVisible(false);
+      table.getColumnExt("nterm").setVisible(false);
+      table.getColumnExt("cterm").setVisible(false);
       tableScrollPane.setViewportView(table);
       table.setFillsViewportHeight(true);
       table.setViewport(tableScrollPane.getViewport());
@@ -495,8 +493,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       
       tableToolbar.add(filterButton);
 
-      MarkerContainerPanel markerContainerPanel = new MarkerContainerPanel(tableScrollPane, table);
-      markerContainerPanel.setMaxLineNumber(100000);
+      markerContainerPanel = new MarkerContainerPanel(tableScrollPane, table);
       tablePane.add(tableToolbar, BorderLayout.WEST);
       tablePane.add(markerContainerPanel, BorderLayout.CENTER);
       
@@ -627,7 +624,6 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
 
    // Variables declaration - do not modify//GEN-BEGIN:variables
    private javax.swing.JButton alignBtn;
-   private javax.swing.JButton applyBtn;
    private javax.swing.JComboBox interpolationCbx;
    private javax.swing.JLabel jLabel1;
    private javax.swing.JLabel jLabel2;
