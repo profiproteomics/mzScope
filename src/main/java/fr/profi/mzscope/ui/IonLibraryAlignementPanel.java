@@ -35,6 +35,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.event.TableModelListener;
+import org.apache.commons.math3.analysis.interpolation.AkimaSplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
@@ -509,6 +510,9 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       }}, new SplineInterpolator() {
          public String toString() {
             return "Spline";
+      }}, new AkimaSplineInterpolator() {
+                public String toString() {
+            return "Akima";
       }}};
       interpolationCbx.setModel(new DefaultComboBoxModel<UnivariateInterpolator>(interpolationMethods));
       

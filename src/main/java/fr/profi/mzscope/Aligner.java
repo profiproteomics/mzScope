@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.commons.math3.util.Precision;
@@ -78,16 +76,21 @@ public class Aligner {
        List<Double> xValues = new ArrayList<>();
        List<Double> yValues = new ArrayList<>();
        
+       IonEntry lastPoint = entries.get(0);
+       
        for (IonEntry e : entries) {
           if (e.getRT_observed() != null) {
              controlPoints.add(e);
+          }
+          if (e.getiRT() > lastPoint.getiRT()) {
+             lastPoint = e;
           }
        }
        
        Collections.sort(controlPoints, new Comparator<IonEntry>() {
           @Override
           public int compare(IonEntry o1, IonEntry o2) {
-             return Double.compare(o1.getRT_detected(), o2.getRT_detected());
+             return Double.compare(o1.getiRT(), o2.getiRT());
           }
        });
        
@@ -95,15 +98,36 @@ public class Aligner {
 //       for (IonEntry e : controlPoints) {
 //          regression.addData(e.getRT_detected(), e.getRT_observed());
 //       }
-      
+
+       IonEntry e1 = controlPoints.get(0);
+       IonEntry e2 = controlPoints.get(1);
+       
+       double slope = 1.0f*(e2.getRT_observed() - e1.getRT_observed()) / (e2.getiRT() - e1.getiRT());
+       double intercept = e1.getRT_observed() - slope*e1.getiRT();
+       
        xValues.add(0.0);
-       yValues.add(0.0);
+       yValues.add(intercept);
+       logger.info("first control point added at ("+0.0+","+intercept+")");
        
        for (IonEntry e : controlPoints) {
              xValues.add(e.getiRT());
              yValues.add(e.getRT_observed());
 
        }
+       
+       
+       e1 = controlPoints.get(controlPoints.size()-2);
+       e2 = controlPoints.get(controlPoints.size()-1);
+       
+       slope = 1.0f*(e2.getRT_observed() - e1.getRT_observed()) / (e2.getiRT() - e1.getiRT());
+       intercept = e1.getRT_observed() - slope*e1.getiRT();
+       
+       xValues.add(lastPoint.getiRT());
+       yValues.add(slope*lastPoint.getiRT()+intercept);
+
+       logger.info("last control point added at ("+lastPoint.getiRT()+","+slope*lastPoint.getiRT()+intercept+")");
+
+              
        x = ArrayUtils.toPrimitive(xValues.toArray(new Double[xValues.size()]));
        y = ArrayUtils.toPrimitive(yValues.toArray(new Double[yValues.size()]));
        interpolationFunction = interpolator.interpolate(x, y);
@@ -114,7 +138,7 @@ public class Aligner {
           try {
              double y = interpolationFunction.value(e.getiRT());
              e.setRT_predicted(y);
-             e.setRT_delta(e.getiRT() - y);
+             e.setRT_delta(y - e.getiRT());
           } catch (Exception ex) {
              logger.error("RT interpolation fail", ex);
           }
