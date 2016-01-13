@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class IonLibraryAlignementPanel extends javax.swing.JPanel {
 
-   private final static String LAST_DIR = "Last directory";
+   private final static String LAST_DIR = "Last ion lib directory";
    final private static Logger logger = LoggerFactory.getLogger(IonLibraryAlignementPanel.class);
 
    private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class), true);
