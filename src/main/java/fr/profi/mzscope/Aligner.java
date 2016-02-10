@@ -9,9 +9,7 @@ package fr.profi.mzscope;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
@@ -28,42 +26,35 @@ public class Aligner {
 
     final private static Logger logger = LoggerFactory.getLogger(Aligner.class);
 
-    final private List<IonEntry> entries;
-    private final Map<String, List<IonEntry>> entriesBySequence = new HashMap<>();
-    final private List<IonEntry> nonRedondantEntries;    
+    private final IonLibrary library;
     private double[] x;
     private double[] y;
     private UnivariateFunction interpolationFunction; 
-   private SimpleRegression regression;
+    private SimpleRegression regression;
             
-    public Aligner(List<IonEntry> entries) {
-       this.entries = entries;
-       this.nonRedondantEntries = new ArrayList<>();
-       
-       for (IonEntry e : entries) {
-          if (!entriesBySequence.containsKey(e.getModification_sequence())) {
-             entriesBySequence.put(e.getModification_sequence(), new ArrayList<IonEntry>(10));
-             nonRedondantEntries.add(e);
-          }
-          entriesBySequence.get(e.getModification_sequence()).add(e);
-       }
+    public Aligner(IonLibrary library) {
+       this.library = library;
+    }
+    
+    public IonLibrary getLibrary() {
+        return library;
     }
     
     public boolean addCalibrationIon(CalibrationIon ion) {
        if (ion.getRT_observed() == null)
           return false;
-       if (!entriesBySequence.containsKey(ion.getModification_sequence())) {
+       List<IonEntry> matchingSequenceEntries = library.getIonEntryBySequence(ion.getModification_sequence());       
+       if (matchingSequenceEntries == null || matchingSequenceEntries.isEmpty()) {
           logger.info("Sequence "+ion.getModification_sequence()+" not found in the library");
           return false;
        }
-       List<IonEntry> matchingSequenceEntries = entriesBySequence.get(ion.getModification_sequence());
        for (IonEntry me : matchingSequenceEntries) {
           if (Precision.equals(me.getQ1(), ion.getQ1(), 1e-3) && Precision.equals(me.getQ3(), ion.getQ3(), 1e-3)) {
              me.setRT_observed(ion.getRT_observed());
              // we select only one entry by modification_sequence in the constructor. This selected entry can be different
              // than the one matched here. Add the matched entry in the nonRedondantEntries list.
-             if (!nonRedondantEntries.contains(me)) {
-                nonRedondantEntries.add(me);
+             if (!library.getNonRedondantEntries().contains(me)) {
+                library.getNonRedondantEntries().add(me);
              }
              return true;
           }
@@ -76,9 +67,9 @@ public class Aligner {
        List<Double> xValues = new ArrayList<>();
        List<Double> yValues = new ArrayList<>();
        
-       IonEntry lastPoint = entries.get(0);
+       IonEntry lastPoint = library.getEntries().get(0);
        
-       for (IonEntry e : entries) {
+       for (IonEntry e : library.getEntries()) {
           if (e.getRT_observed() != null) {
              controlPoints.add(e);
           }
@@ -94,11 +85,6 @@ public class Aligner {
           }
        });
        
-//       regression = new SimpleRegression();
-//       for (IonEntry e : controlPoints) {
-//          regression.addData(e.getRT_detected(), e.getRT_observed());
-//       }
-
        IonEntry e1 = controlPoints.get(0);
        IonEntry e2 = controlPoints.get(1);
        
@@ -134,7 +120,7 @@ public class Aligner {
     }
     
     public List<IonEntry> predictRT() {
-       for (IonEntry e: entries) {
+       for (IonEntry e: library.getEntries()) {
           try {
              double y = interpolationFunction.value(e.getiRT());
              e.setRT_predicted(y);
@@ -143,26 +129,14 @@ public class Aligner {
              logger.error("RT interpolation fail", ex);
           }
        }
-       return entries;
+       return library.getEntries();
     }
 
     public List<IonEntry> applyPredictedRT() {
-       for (IonEntry e: entries) {
+       for (IonEntry e: library.getEntries()) {
              e.setRT_detected(e.getRT_predicted());
        }
-       return entries;
+       return library.getEntries();
     }
-
     
-     public List<IonEntry> getEntries() {
-        return entries;
-     }
-
-     /**
-      * Returns a non redondant list of entries. Only one fragment per modification_sequence
-      * @return 
-      */
-   public List<IonEntry> getNonRedondantEntries() {
-      return nonRedondantEntries;
-   }
 }

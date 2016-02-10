@@ -8,7 +8,7 @@ package fr.profi.mzscope;
 import com.thoughtworks.xstream.XStream;
 import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IRawFile;
-import fr.proline.mzscope.model.Ms1ExtractionRequest;
+import fr.proline.mzscope.model.MsnExtractionRequest;
 import fr.proline.mzscope.ui.RawFileManager;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,7 +47,7 @@ public class ChromatogramsExporter {
                 BufferedWriter output = null;
                 String chromatoFile = "";
                 try {
-                    Ms1ExtractionRequest.Builder builder = Ms1ExtractionRequest.builder().setMinMz(nextIon.getMinMz()).setMaxMz(nextIon.getMaxMz());
+                    MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder().setMinMz(nextIon.getMinMz()).setMaxMz(nextIon.getMaxMz());
                     if((nextIon.startRT > 0.0) && (nextIon.stopRT > 0.0))
                        builder.setElutionTimeLowerBound(nextIon.startRT*60.0f).setElutionTimeUpperBound(nextIon.stopRT*60.0f);
                      Chromatogram currentChromatogram = nextRawFile.getXIC(builder.build());

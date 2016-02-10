@@ -61,7 +61,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="extractFeaturesMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Extract features"/>
+                <Property name="text" type="java.lang.String" value="Extract features from MS2"/>
                 <Property name="actionCommand" type="java.lang.String" value="extractMenuItem"/>
               </Properties>
               <Events>
@@ -104,7 +104,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="loadLibraryMI">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Ion Library Aligner ..."/>
+                <Property name="text" type="java.lang.String" value="Load Ion Library ..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadLibraryMIActionPerformed"/>

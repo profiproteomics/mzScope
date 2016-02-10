@@ -24,7 +24,7 @@ public class IonEntry {
    private Double RT_detected;
    private String protein_name;
    private String isotype;
-   private String relative_intensity;
+   private Double relative_intensity;
    private String stripped_sequence;
    private String modification_sequence;
    private String prec_z;
@@ -87,11 +87,11 @@ public class IonEntry {
       this.isotype = isotype;
    }
 
-   public String getRelative_intensity() {
+   public Double getRelative_intensity() {
       return relative_intensity;
    }
 
-   public void setRelative_intensity(String relative_intensity) {
+   public void setRelative_intensity(Double relative_intensity) {
       this.relative_intensity = relative_intensity;
    }
 

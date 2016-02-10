@@ -162,7 +162,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       try {
          DecimalFormat df = new DecimalFormat("#.00");
          Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-         Chromatogram currentChromatogram = mzScopePanel.getCurrentChromatogram();
+         Chromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
          StringBuilder stb = new StringBuilder();
          stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('/');
          stb.append("extracted_xic_").append(df.format(currentChromatogram.minMz)).append(".tsv");

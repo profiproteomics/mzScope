@@ -55,6 +55,10 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
       fireTableDataChanged();
    }
    
+   public List<T> getData() {
+      return entities;
+   }
+   
    @Override
    public int getRowCount() {
       return entities.size();
@@ -246,11 +250,6 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
    }
 
    @Override
-   public Object getValue(Class c, int row) {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-   }
-
-   @Override
    public void addSingleValue(Object v) {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
@@ -259,5 +258,15 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
    public Object getSingleValue(Class c) {
       throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
    }
+
+    @Override
+    public Object getRowValue(Class c, int row) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Object getColValue(Class c, int col) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
 }
