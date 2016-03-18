@@ -5,12 +5,12 @@
     <parent>
         <artifactId>ProFI-Pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
     </parent>
   
     <groupId>fr.profi</groupId>
     <artifactId>mzScope</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
@@ -21,7 +21,7 @@
     </properties>
     
     <scm>
-	  <connection>scm:svn:https://bioproj.extra.cea.fr/svn/proline/mzDB/mzScope/branches/0.1.0-RCandidates</connection>
+	  <connection>scm:svn:https://bioproj.extra.cea.fr/svn/proline/mzDB/mzScope/tags/0.1.0</connection>
 	</scm>
     
     <dependencies>
@@ -54,7 +54,7 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>ProlineStudio-mzScope</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
+            <version>0.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
