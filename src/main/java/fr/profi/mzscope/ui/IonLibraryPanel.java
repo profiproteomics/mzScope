@@ -8,7 +8,7 @@ package fr.profi.mzscope.ui;
 import fr.profi.mzscope.IonEntry;
 import fr.profi.mzscope.IonLibrary;
 import fr.proline.mzscope.model.MsnExtractionRequest;
-import fr.proline.mzscope.model.MzScopePreferences;
+import fr.proline.mzscope.ui.model.MzScopePreferences;
 import fr.proline.mzscope.ui.IMzScopeController;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.utils.MzScopeConstants;
