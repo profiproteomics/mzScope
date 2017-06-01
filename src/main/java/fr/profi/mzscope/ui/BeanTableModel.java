@@ -7,6 +7,7 @@
 package fr.profi.mzscope.ui;
 
 import fr.proline.studio.comparedata.ExtraDataType;
+import fr.proline.studio.export.ExportFontData;
 import fr.proline.studio.filter.DoubleFilter;
 import fr.proline.studio.filter.Filter;
 import fr.proline.studio.filter.IntegerFilter;
@@ -241,32 +242,37 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
 
    @Override
    public ArrayList<ExtraDataType> getExtraDataTypes() {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      return null;
    }
 
    @Override
    public Object getValue(Class c) {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      return null;
    }
 
    @Override
    public void addSingleValue(Object v) {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       
    }
 
    @Override
    public Object getSingleValue(Class c) {
-      throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+      return null;
    }
 
     @Override
     public Object getRowValue(Class c, int row) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
     public Object getColValue(Class c, int col) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
+    }
+
+    @Override
+    public ArrayList<ExportFontData> getExportFonts(int row, int col) {
+        return null;
     }
 
 }
