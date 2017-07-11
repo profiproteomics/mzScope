@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RawMinerFrame extends JFrame {
    
-   public final static String version = "0.1";
+   public final static String version = "0.4";
    
    private final static Logger logger = LoggerFactory.getLogger(RawMinerFrame.class);
    private final static String LAST_DIR = "Last ion lib directory";
