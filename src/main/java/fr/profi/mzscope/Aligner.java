@@ -31,7 +31,7 @@ public class Aligner {
     private double[] y;
     private UnivariateFunction interpolationFunction; 
     private SimpleRegression regression;
-            
+    
     public Aligner(IonLibrary library) {
        this.library = library;
     }

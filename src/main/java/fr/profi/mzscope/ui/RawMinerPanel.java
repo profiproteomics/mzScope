@@ -277,7 +277,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
 
           @Override
           public void actionPerformed(ActionEvent ae) {
-              mzScopePanel.export(getRawFilesPanel().getSelectedValues().get(0));
+              mzScopePanel.export(getRawFilesPanel().getSelectedValues());
           }
       });
       popupMenu.add(export);
@@ -294,7 +294,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       extractFeaturesMI.setEnabled(nbS > 0);
       detectPeakelsMI.setEnabled((nbS > 0));
       viewLCMSMap.setEnabled(nbS == 1);
-      export.setEnabled(nbS == 1);
+      export.setEnabled(nbS > 0);
    }
 
    @Override

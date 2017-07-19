@@ -5,8 +5,6 @@
  */
 package fr.profi.mzscope;
 
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
-import com.opencsv.bean.MappingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +15,6 @@ import org.slf4j.LoggerFactory;
 public class CalibrationIon {
 
    final private static Logger logger = LoggerFactory.getLogger(CalibrationIon.class);
-   private static MappingStrategy<CalibrationIon> strategy;
 
    private Double q1;
    private Double q3;
@@ -74,14 +71,4 @@ public class CalibrationIon {
       this.prec_z = prec_z;
    }
 
-    public static MappingStrategy<CalibrationIon> getMapping() {
-      if (strategy == null) {
-         HeaderColumnNameMappingStrategy strat = new HeaderColumnNameMappingStrategy<>();
-         strat.setType(CalibrationIon.class);
-         //String[] columns = new String[]{"Q3","RT_detected","protein_name","isotype","relative_intensity","stripped_sequence","modification_sequence","prec_z","frg_type","frg_z","frg_nr","iRT","uniprot_id","score","decoy","prec_y","confidence","shared","N","rank","mods","nterm","cterm"};
-         //strat.setColumnMapping(columns);
-         strategy = strat;
-      }
-      return strategy;
-   }
 }

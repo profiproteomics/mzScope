@@ -88,7 +88,19 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
 
    @Override
    public Class<?> getColumnClass(int columnIndex) {
-      return descriptors[columnIndex].getPropertyType();
+      Class<?> cl = descriptors[columnIndex].getPropertyType(); 
+      if (cl.isPrimitive()) {
+          switch(cl.getSimpleName()) {
+            case "double" : cl = Double.class;
+            break;
+            case "int" : cl = Integer.class;
+            break;
+            case "float" : cl = Float.class;
+            break;
+            case "boolean": cl = Boolean.class;
+         }
+      }
+      return cl;
    }
 
 

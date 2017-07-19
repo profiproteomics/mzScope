@@ -5,15 +5,23 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.profi.mzscope.InvalidMGFFormatException;
 import fr.profi.mzscope.IonLibrary;
+import fr.profi.mzscope.MGFReader;
+import fr.profi.mzscope.MSMSSpectrum;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
+import fr.proline.util.version.IVersion;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author CB205360
  */
 public class RawMinerFrame extends JFrame {
-   
-   public final static String version = "0.1";
-   
+      
    private final static Logger logger = LoggerFactory.getLogger(RawMinerFrame.class);
    private final static String LAST_DIR = "Last ion lib directory";
    
@@ -35,6 +41,15 @@ public class RawMinerFrame extends JFrame {
     */
    public RawMinerFrame() {
       initComponents();
+      ServiceLoader<IVersion> versionLoader = ServiceLoader.load(IVersion.class);
+      Iterator<IVersion> iter = versionLoader.iterator();
+      String version = "unknow version";
+      while(iter.hasNext()) {
+          IVersion v = iter.next();
+          if (v.getModuleName().equalsIgnoreCase("mzScope")) {
+            version = v.getVersion();
+          }
+      }
       setTitle("mzScope "+version);
       //rawFilesPanel1.setParentFrame(this);
       rawMinerPanel = new RawMinerPanel(this);
@@ -66,6 +81,7 @@ public class RawMinerFrame extends JFrame {
         exportChromatogram = new javax.swing.JMenuItem();
         ToolsMenu = new javax.swing.JMenu();
         loadLibraryMI = new javax.swing.JMenuItem();
+        loadMGFMI = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Open Raw file");
         fileChooser.addChoosableFileFilter(new MzdbFilter());
@@ -156,6 +172,14 @@ public class RawMinerFrame extends JFrame {
         });
         ToolsMenu.add(loadLibraryMI);
 
+        loadMGFMI.setText("Load MGF File ...");
+        loadMGFMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadMGFMIActionPerformed(evt);
+            }
+        });
+        ToolsMenu.add(loadMGFMI);
+
         menuBar.add(ToolsMenu);
 
         setJMenuBar(menuBar);
@@ -223,6 +247,27 @@ public class RawMinerFrame extends JFrame {
       
    }//GEN-LAST:event_loadLibraryMIActionPerformed
 
+    private void loadMGFMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMGFMIActionPerformed
+      Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.setDialogTitle("Open MGF file");
+      String directory = prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath());
+      fileChooser.setCurrentDirectory(new File(directory));
+      fileChooser.setMultiSelectionEnabled(true);
+      int returnVal = fileChooser.showOpenDialog(this);
+      if (returnVal == JFileChooser.APPROVE_OPTION) {
+          try {
+              File file = fileChooser.getSelectedFile();
+              MGFReader reader = new MGFReader();
+              List<MSMSSpectrum> peakList = reader.read(file);
+              rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("MGF file "+file.getName(), new MGFPanel(peakList, rawMinerPanel.getMzScopePanel()));
+              prefs.put(LAST_DIR, file.getParent());
+          } catch (InvalidMGFFormatException ex) {
+              Exceptions.printStackTrace(ex);
+          }
+      } 
+    }//GEN-LAST:event_loadMGFMIActionPerformed
+
    /**
     * @param args the command line arguments
     */
@@ -269,6 +314,7 @@ public class RawMinerFrame extends JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JMenuItem loadLibraryMI;
+    private javax.swing.JMenuItem loadMGFMI;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openRawMI;

@@ -6,6 +6,7 @@
 package fr.profi.mzscope;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
@@ -31,8 +32,8 @@ public class IonLibrary {
 
     final private static Logger logger = LoggerFactory.getLogger(IonLibrary.class);
     final private static CsvSchema schema = CsvSchema.builder()
-            .addColumn("q1")
-            .addColumn("q3")
+            .addColumn("Q1")
+            .addColumn("Q3")
             .addColumn("rt_detected", CsvSchema.ColumnType.NUMBER)
             .addColumn("protein_name")
             .addColumn("isotype")
@@ -67,6 +68,7 @@ public class IonLibrary {
         private Double q1;
         private Double relative_intensity;
         
+        
         public Peptide(String sequence, Double q1, Double intensity) {
             this.sequence = sequence;
             this.q1 = q1;
@@ -95,7 +97,19 @@ public class IonLibrary {
             FileInputStream fis = new FileInputStream(file);
             BufferedReader fReader = new BufferedReader(new InputStreamReader(fis));
             CsvMapper mapper = new CsvMapper();
-            MappingIterator<IonEntry> it = mapper.reader(schema).forType(IonEntry.class).readValues(fReader);
+            mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true); 
+//            CsvSchema bootstrapSchema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
+//            ObjectMapper mapper = new CsvMapper();
+//            MappingIterator<IonEntry> it2 = mapper2.enable(JsonGenerator.Feature.IGNORE_UNKNOWN).readerFor(IonEntry.class).with(bootstrapSchema).readValues(fReader);
+//            IonEntry e = it2.next();          
+//            schema.reordersColumns();
+
+            CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
+            MappingIterator<IonEntry> it = mapper.readerFor(IonEntry.class).with(schema).readValues(fReader);
+
+
+
+//            MappingIterator<IonEntry> it = mapper.reader(schema).forType(IonEntry.class).readValues(fReader//);
             while (it.hasNext()) {
                 IonEntry row = it.next();
                 entries.add(row);

@@ -5,8 +5,8 @@
  */
 package fr.profi.mzscope;
 
-import com.opencsv.bean.HeaderColumnNameMappingStrategy;
-import com.opencsv.bean.MappingStrategy;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,35 +14,52 @@ import org.slf4j.LoggerFactory;
  *
  * @author CB205360
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IonEntry {
 
    final private static Logger logger = LoggerFactory.getLogger(IonEntry.class);
-   private static MappingStrategy<IonEntry> strategy;
    
+   @JsonProperty("Q1")
    private Double q1;
+   @JsonProperty("Q3")
    private Double q3;
+   @JsonProperty("RT_detected")
    private Double RT_detected;
+   @JsonProperty("protein_name")
    private String protein_name;
    private String isotype;
+   @JsonProperty("relative_intensity")
    private Double relative_intensity;
+   @JsonProperty("stripped_sequence")
    private String stripped_sequence;
+   @JsonProperty("modification_sequence")
    private String modification_sequence;
+   @JsonProperty("prec_z")
    private String prec_z;
+   @JsonProperty("frg_type")
    private String frg_type;
+   @JsonProperty("frg_z")
    private String frg_z;
+   @JsonProperty("frg_nr")
    private String frg_nr;
+   @JsonProperty("iRT")
    private Double iRT;
+   @JsonProperty("uniprot_id")
    private String uniprot_id;
    private String score;
    private String decoy;
+   @JsonProperty("prec_y")
    private String prec_y;
    private String confidence;
    private String shared;
+   @JsonProperty("N")
    private String n;
    private String rank;
    private String mods;
    private String nterm;
    private String cterm;
+   @JsonProperty("RT Source")
+   private String RT_source;
    private Double RT_observed;
    private Double RT_predicted;
    private Double RT_delta;
@@ -263,14 +280,4 @@ public class IonEntry {
       this.RT_predicted = RT_predicted;
    }
 
-   public static MappingStrategy<IonEntry> getMapping() {
-      if (strategy == null) {
-         HeaderColumnNameMappingStrategy strat = new HeaderColumnNameMappingStrategy<>();
-         strat.setType(IonEntry.class);
-         //String[] columns = new String[]{"Q3","RT_detected","protein_name","isotype","relative_intensity","stripped_sequence","modification_sequence","prec_z","frg_type","frg_z","frg_nr","iRT","uniprot_id","score","decoy","prec_y","confidence","shared","N","rank","mods","nterm","cterm"};
-         //strat.setColumnMapping(columns);
-         strategy = strat;
-      }
-      return strategy;
-   }
 }
