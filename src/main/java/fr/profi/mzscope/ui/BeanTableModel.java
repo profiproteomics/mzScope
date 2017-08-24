@@ -227,15 +227,10 @@ public class BeanTableModel<T> extends AbstractTableModel implements GlobalTable
       return PlotType.SCATTER_PLOT;
    }
 
-   @Override
-   public int getBestXAxisColIndex(PlotType plotType) {
-      return 0;
-   }
-
-   @Override
-   public int getBestYAxisColIndex(PlotType plotType) {
-      return Math.min(1, descriptors.length - 1);
-   }
+    @Override
+    public int[] getBestColIndex(PlotType plotType) {
+        return null;
+    }
 
    @Override
    public String getExportRowCell(int row, int col) {
