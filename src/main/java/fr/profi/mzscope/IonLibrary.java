@@ -32,8 +32,8 @@ public class IonLibrary {
 
     final private static Logger logger = LoggerFactory.getLogger(IonLibrary.class);
     final private static CsvSchema schema = CsvSchema.builder()
-            .addColumn("Q1")
-            .addColumn("Q3")
+            .addColumn("q1")
+            .addColumn("q3")
             .addColumn("rt_detected", CsvSchema.ColumnType.NUMBER)
             .addColumn("protein_name")
             .addColumn("isotype")
@@ -106,7 +106,6 @@ public class IonLibrary {
 
             CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
             MappingIterator<IonEntry> it = mapper.readerFor(IonEntry.class).with(schema).readValues(fReader);
-
 
 
 //            MappingIterator<IonEntry> it = mapper.reader(schema).forType(IonEntry.class).readValues(fReader//);

@@ -19,46 +19,30 @@ public class IonEntry {
 
    final private static Logger logger = LoggerFactory.getLogger(IonEntry.class);
    
-   @JsonProperty("Q1")
    private Double q1;
-   @JsonProperty("Q3")
    private Double q3;
-   @JsonProperty("RT_detected")
    private Double RT_detected;
-   @JsonProperty("protein_name")
    private String protein_name;
    private String isotype;
-   @JsonProperty("relative_intensity")
    private Double relative_intensity;
-   @JsonProperty("stripped_sequence")
    private String stripped_sequence;
-   @JsonProperty("modification_sequence")
    private String modification_sequence;
-   @JsonProperty("prec_z")
    private String prec_z;
-   @JsonProperty("frg_type")
    private String frg_type;
-   @JsonProperty("frg_z")
    private String frg_z;
-   @JsonProperty("frg_nr")
    private String frg_nr;
-   @JsonProperty("iRT")
    private Double iRT;
-   @JsonProperty("uniprot_id")
    private String uniprot_id;
    private String score;
    private String decoy;
-   @JsonProperty("prec_y")
    private String prec_y;
    private String confidence;
    private String shared;
-   @JsonProperty("N")
    private String n;
    private String rank;
    private String mods;
    private String nterm;
    private String cterm;
-   @JsonProperty("RT Source")
    private String RT_source;
    private Double RT_observed;
    private Double RT_predicted;

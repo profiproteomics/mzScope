@@ -388,7 +388,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       
       UnivariateInterpolator[] interpolationMethods = { new LinearInterpolator(){ 
          public String toString() {
-            return "Linear";
+            return "Multi-Linear";
       }}, new SplineInterpolator() {
          public String toString() {
             return "Spline";

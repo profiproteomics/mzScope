@@ -269,6 +269,17 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
           }
       });
       popupMenu.add(viewLCMSMap);
+      
+      JMenuItem compareQCMI = new JMenuItem();
+      compareQCMI.setText("QC metrics");
+      compareQCMI.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent evt) {
+            mzScopePanel.displayMetricsComparison(getRawFilesPanel().getSelectedValues());
+         }
+      });
+      popupMenu.add(compareQCMI);
+      
       popupMenu.addSeparator();
       // export (as MGF or tsv)
       export = new JMenuItem();
@@ -281,6 +292,17 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
           }
       });
       popupMenu.add(export);
+      
+      popupMenu.addSeparator();
+      JMenuItem propertiesMI = new JMenuItem();
+      propertiesMI.setText("Properties");
+      propertiesMI.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent evt) {
+            mzScopePanel.displayProperties(getRawFilesPanel().getSelectedValues());
+         }
+      });
+      popupMenu.add(propertiesMI);
 
    }
 
