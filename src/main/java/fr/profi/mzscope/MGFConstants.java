@@ -3,10 +3,9 @@ package fr.profi.mzscope;
 public class MGFConstants {
   
   //Spectrum Annotation
-  public static String ANNOTATION_TITLE="TITLE";
   public static String ANNOTATION_SPECTRUM_ID="ID";
-  public static String ANNOTATION_SCANS="SCANS";
   public static String ANNOTATION_COMMENT="COMMENT";
+  public static String ANNOTATION_CHARGE_STATES="CHARGE_STATES";
   
   //MGF Format tags
   public static String START_QUERY = "BEGIN IONS";

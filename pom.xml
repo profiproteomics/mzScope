@@ -26,7 +26,11 @@
 	</scm>
     
     <dependencies>
-        
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         <!-- Logger -->
         <dependency>
             <groupId>org.slf4j</groupId>

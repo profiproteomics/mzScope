@@ -5,8 +5,6 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.profi.mzscope.IonEntry;
-import fr.profi.mzscope.IonLibrary;
 import fr.profi.mzscope.MSMSSpectrum;
 import fr.profi.mzscope.Peak;
 import fr.proline.mzscope.model.MsnExtractionRequest;
@@ -22,11 +20,13 @@ import fr.proline.studio.table.CompoundTableModel;
 import fr.proline.studio.table.DecoratedMarkerTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
-import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
+import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,17 +127,31 @@ public class MGFPanel extends javax.swing.JPanel {
         IRawFileViewer viewer = appController.getCurrentRawFileViewer();
         if (viewer.getCurrentRawfile().isDIAFile()) {
             DisplayMode mode = MzScopeConstants.DisplayMode.REPLACE;
+            
+            int selectedRow = spectrumTable.convertRowIndexToNonFilteredModel(spectrumTable.getSelectedRow());
+            if (selectedRow >= 0) {
+               MSMSSpectrum spectrum = ((BeanTableModel<MSMSSpectrum>) spectrumTableModel.getBaseModel()).getData().get(selectedRow);
+               MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+                    builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance()).setMz(spectrum.getPrecursorMz());
+                    viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
+                    mode = MzScopeConstants.DisplayMode.OVERLAY;
+                try {
+                    // Beurk : avoid replace/overlay bug
+                    Thread.currentThread().sleep(70);
+                } catch (InterruptedException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
             int[] selectedRows = peaksTable.getSelectedRows();
             List<Peak> entries = ((BeanTableModel<Peak>) peaksTableModel.getBaseModel()).getData();
             if (selectedRows.length > 0) {
                 for (int k = 0; k < selectedRows.length; k++) {
-                    logger.info("selected row = {} -> {}", selectedRows[k], peaksTable.convertRowIndexToNonFilteredModel(selectedRows[k]));
-                   
                     Peak peak = entries.get(peaksTable.convertRowIndexToNonFilteredModel(selectedRows[k]));
                     MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+                    builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance());
                     builder.setMz(peak.getSpectrum().getPrecursorMz()).setFragmentMz(peak.getMz()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
                     viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
-                    // then change to overlay mode for following extractions
+                    // then change to overlay mode for following extractions : TODO wrong : the extraction may terminate in a different order ! 
                     mode = MzScopeConstants.DisplayMode.OVERLAY;
                 }
             }
@@ -179,6 +193,9 @@ public class MGFPanel extends javax.swing.JPanel {
       
       tableToolbar.add(filterButton);
       peaksMarkerContainerPanel = new MarkerContainerPanel(peaksScrollPane, peaksTable);
+      JLabel label = new JLabel("Fragments");
+      label.setBorder(new EmptyBorder(3,10,5,10));
+      tablePane.add(label, BorderLayout.NORTH);
       tablePane.add(tableToolbar, BorderLayout.WEST);
       tablePane.add(peaksMarkerContainerPanel, BorderLayout.CENTER);
 
@@ -222,7 +239,7 @@ public class MGFPanel extends javax.swing.JPanel {
       spectrumTable.setFillsViewportHeight(true);
       spectrumTable.setViewport(spectrumScrollPane.getViewport());
       spectrumMarkerContainerPanel = new MarkerContainerPanel(spectrumScrollPane, spectrumTable);
-      libraryTabbedPane.add("Precursor", spectrumMarkerContainerPanel);
+      libraryTabbedPane.add("Precursor list", spectrumMarkerContainerPanel);
       
     }
 

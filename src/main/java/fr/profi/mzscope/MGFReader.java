@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +94,9 @@ public class MGFReader {
 		double parentRetTime = 0;
 		String title = null;
 		String scans = null;
+                String rawScans = null;
+                String charges = null;
+                
 		List<double[]> allPeaks = new ArrayList<double[]>();
 
 		String nextLine = reader.readLine();
@@ -140,7 +142,10 @@ public class MGFReader {
 
 				// ---- PARENT CHARGE TAG
 				if (MGFConstants.PARENT_CHARGE.equals(tag)) {
+                                    if (value != null) {
 					parentCharge = getCharge(value);
+                                        charges = value;
+                                    }
 				}// END PARENT CHARGE TAG
 
 				// ---- TITLE TAG
@@ -159,6 +164,12 @@ public class MGFReader {
 				if (MGFConstants.SCANS.equals(tag)) {
 					if (value != null) {
 						scans = value;
+					}
+				}// END RET_TIME TAG
+
+                                if (MGFConstants.RAWSCANS.equals(tag)) {
+					if (value != null) {
+						rawScans = value;
 					}
 				}// END RET_TIME TAG
 
@@ -199,11 +210,14 @@ public class MGFReader {
 		MSMSSpectrum spectra = new MSMSSpectrum(parentMass, parentIntensity, parentCharge, parentRetTime);
 		// logger.debug(" add Annotation title "+title);
 		if (title != null) {
-			spectra.setAnnotation(MGFConstants.ANNOTATION_TITLE, title);
+			spectra.setAnnotation(MGFConstants.TITLE, title);
 		}
 		if (scans != null)
 			spectra.setAnnotation(MGFConstants.SCANS, scans);
-
+                if (rawScans != null)
+			spectra.setAnnotation(MGFConstants.RAWSCANS, rawScans);
+                if (charges != null)
+			spectra.setAnnotation(MGFConstants.ANNOTATION_CHARGE_STATES, charges);
 		// logger.debug("Add peaks, nbr = "+allPeaks.size());
 		for (int nbrPeaks = 0; nbrPeaks < allPeaks.size(); nbrPeaks++) {
 			double[] aPeak = allPeaks.get(nbrPeaks);

@@ -7,8 +7,11 @@ package fr.profi.mzscope.ui;
 
 import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IRawFile;
+import fr.proline.mzscope.model.QCMetrics;
+import fr.profi.mzscope.MetricsCache;
 import fr.proline.mzscope.ui.ExtractionResultsPanel;
 import fr.proline.mzscope.ui.MzScopePanel;
+import fr.proline.mzscope.ui.QCMetricsPanel;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.mzscope.ui.RawFileManager;
 import fr.proline.mzscope.ui.RawFilesPanel;
@@ -22,8 +25,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
@@ -190,9 +195,9 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          public void actionPerformed(ActionEvent evt) {
             List<IRawFile> rawFiles = getRawFilesPanel().getSelectedValues();
             if (rawFiles.size() == 1) {
-               mzScopePanel.displayRawAction(rawFiles.get(0), true);
+               mzScopePanel.displayRaw(rawFiles.get(0), true);
             } else {
-               mzScopePanel.displayRawAction(rawFiles);               
+               mzScopePanel.displayRaw(rawFiles);               
             }
          }
       };
@@ -207,7 +212,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       viewAllRawFilesMI.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.displayAllRawAction();
+            mzScopePanel.displayAllRaw();
          }
       });
       popupMenu.add(viewAllRawFilesMI);
@@ -275,7 +280,19 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       compareQCMI.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.displayMetricsComparison(getRawFilesPanel().getSelectedValues());
+            List<QCMetrics> metrics = new ArrayList<>();
+            for (IRawFile file : getRawFilesPanel().getSelectedValues()) {
+                    metrics.add(getFileMetrics(file));
+            }
+            final QCMetricsPanel panel = mzScopePanel.displayMetrics(metrics);
+            JButton loadMetricsBtn = new JButton("#");
+            loadMetricsBtn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    loadMetricsFromCache(panel);
+                }
+            });
+            panel.getToolBar().add(loadMetricsBtn);
          }
       });
       popupMenu.add(compareQCMI);
@@ -324,4 +341,21 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       return viewRawFileAction;
    }
 
+   
+    private void loadMetricsFromCache(QCMetricsPanel panel) {
+        MetricsCache.getInstance();
+        panel.addMetrics(MetricsCache.getInstance().loadAllQC(), "cache");
+    }
+                
+    private QCMetrics getFileMetrics(IRawFile rawFile) {
+        QCMetrics metrics = MetricsCache.getInstance().loadQC(rawFile);
+        if (metrics == null) {
+            logger.info("QC metrics not found for file {}, they will be computed now", this.getName());
+            metrics = rawFile.getFileMetrics();
+            MetricsCache.getInstance().writeQC(rawFile, metrics);
+        } else {
+            metrics.setRawFile(rawFile);
+        }
+        return metrics;
+    }
 }
