@@ -16,7 +16,7 @@ import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.graphics.BaseGraphicsPanel;
 import fr.proline.studio.markerbar.MarkerContainerPanel;
-import fr.proline.studio.table.CompoundTableModel;
+import fr.proline.studio.extendedtablemodel.CompoundTableModel;
 import fr.proline.studio.table.DecoratedMarkerTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
