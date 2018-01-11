@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.proline.studio.table.BeanTableModel;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;

@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.proline.studio.table.BeanTableModel;
 import fr.profi.mzscope.IonEntry;
 import fr.profi.mzscope.IonLibrary;
 import fr.proline.mzscope.model.MsnExtractionRequest;

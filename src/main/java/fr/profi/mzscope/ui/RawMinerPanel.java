@@ -35,6 +35,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,9 @@ import org.slf4j.LoggerFactory;
 public class RawMinerPanel extends JPanel implements ExtractionStateListener, IPopupMenuDelegate {
 
    private final static Logger logger = LoggerFactory.getLogger("ProlineStudio.mzScope.RawMinerPanel");
-   private final static String LAST_DIR = "Last directory";
+   private final static String LAST_DIR = "mzscope.last.raw.directory";
+   private final static String LAST_PEAKEL_DIR = "mzscope.last.peakeldb.directory";
+   
 
    private final RawMinerFrame parentFrame;
    private JFileChooser fileChooser = null;
@@ -55,6 +58,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    private RawFilesPanel rawFilePanel = null;
    private MzScopePanel mzScopePanel = null;
    private JMenuItem detectPeakelsMI;
+   private JMenuItem loadPeakelsMI;   
    private JMenuItem extractFeaturesMI;
    private JMenuItem closeAllFileMI;
    private JMenuItem closeRawFileMI;
@@ -262,6 +266,39 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          }
       });
       popupMenu.add(detectPeakelsMI);
+      
+      // load peakels
+      loadPeakelsMI = new JMenuItem();
+      loadPeakelsMI.setText("Load Peakels...");
+      loadPeakelsMI.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent evt) { 
+            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+            JFileChooser peakelChooser = new JFileChooser();
+            peakelChooser.setDialogTitle("Load peakels");
+            peakelChooser.addChoosableFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.getName().endsWith(".peakeldb") || f.getName().endsWith(".sqlite");
+                }
+
+                @Override
+                public String getDescription() {
+                    return ("*.peakeldb, *.sqlite");
+                }
+            });
+            String directory = prefs.get(LAST_PEAKEL_DIR, peakelChooser.getCurrentDirectory().getAbsolutePath());
+            peakelChooser.setCurrentDirectory(new File(directory));
+            int returnVal = peakelChooser.showOpenDialog(mzScopePanel);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = peakelChooser.getSelectedFile();
+                prefs.put(LAST_PEAKEL_DIR, file.getParentFile().getAbsolutePath());
+                mzScopePanel.loadPeakels(getRawFilesPanel().getSelectedValues().get(0), file);
+            }
+        }
+      });
+      popupMenu.add(loadPeakelsMI);
+
       
       // view LCMS Map
       viewLCMSMap = new JMenuItem();

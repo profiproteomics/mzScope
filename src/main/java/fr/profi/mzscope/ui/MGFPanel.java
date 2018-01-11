@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.proline.studio.table.BeanTableModel;
 import fr.profi.mzscope.MSMSSpectrum;
 import fr.profi.mzscope.Peak;
 import fr.proline.mzscope.model.MsnExtractionRequest;
