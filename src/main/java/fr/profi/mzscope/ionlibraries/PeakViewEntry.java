@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.profi.mzscope;
+package fr.profi.mzscope.ionlibraries;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +15,39 @@ import org.slf4j.LoggerFactory;
  * @author CB205360
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IonEntry {
+public class PeakViewEntry implements IonEntry {
 
-   final private static Logger logger = LoggerFactory.getLogger(IonEntry.class);
+   final private static Logger logger = LoggerFactory.getLogger(PeakViewEntry.class);
    
+   // For strange reasons, first letter must not be Capitalized to be matched on the property. In turn  
+   // this means that written column will be in lowercase 
+   final public static CsvSchema schema = CsvSchema.builder()
+            .addColumn("q1")
+            .addColumn("q3")
+            .addColumn("rt_detected", CsvSchema.ColumnType.NUMBER)
+            .addColumn("protein_name")
+            .addColumn("isotype")
+            .addColumn("relative_intensity", CsvSchema.ColumnType.NUMBER)
+            .addColumn("stripped_sequence")
+            .addColumn("modification_sequence")
+            .addColumn("prec_z")
+            .addColumn("frg_type")
+            .addColumn("frg_z")
+            .addColumn("frg_nr")
+            .addColumn("iRT", CsvSchema.ColumnType.NUMBER)
+            .addColumn("uniprot_id")
+            .addColumn("score")
+            .addColumn("decoy")
+            .addColumn("prec_y")
+            .addColumn("confidence")
+            .addColumn("shared")
+            .addColumn("n")
+            .addColumn("rank")
+            .addColumn("mods")
+            .addColumn("nterm")
+            .addColumn("cterm")
+            .addColumn("rt_source").build().withColumnSeparator('\t').withoutQuoteChar().withHeader().withUseHeader(true).withNullValue(null);
+
    private Double q1;
    private Double q3;
    private Double RT_detected;
@@ -27,7 +56,7 @@ public class IonEntry {
    private Double relative_intensity;
    private String stripped_sequence;
    private String modification_sequence;
-   private String prec_z;
+   private Integer prec_z;
    private String frg_type;
    private String frg_z;
    private String frg_nr;
@@ -35,9 +64,9 @@ public class IonEntry {
    private String uniprot_id;
    private String score;
    private String decoy;
-   private String prec_y;
+   private Double prec_y;
    private String confidence;
-   private String shared;
+   private Boolean shared;
    private String n;
    private String rank;
    private String mods;
@@ -112,11 +141,11 @@ public class IonEntry {
       this.modification_sequence = modification_sequence;
    }
 
-   public String getPrec_z() {
+   public Integer getPrec_z() {
       return prec_z;
    }
 
-   public void setPrec_z(String prec_z) {
+   public void setPrec_z(Integer prec_z) {
       this.prec_z = prec_z;
    }
 
@@ -144,20 +173,16 @@ public class IonEntry {
       this.frg_nr = frg_nr;
    }
 
+   public Double getInitialRT() {
+       return iRT;
+   }
+   
    public Double getiRT() {
       return iRT;
    }
 
-   public void setiRT(Double iRT) {
-      this.iRT = iRT;
-   }
-
    public String getUniprot_id() {
       return uniprot_id;
-   }
-
-   public void setUniprot_id(String uniprot_id) {
-      this.uniprot_id = uniprot_id;
    }
 
    public String getScore() {
@@ -176,11 +201,11 @@ public class IonEntry {
       this.decoy = decoy;
    }
 
-   public String getPrec_y() {
+   public Double getPrec_y() {
       return prec_y;
    }
 
-   public void setPrec_y(String prec_y) {
+   public void setPrec_y(Double prec_y) {
       this.prec_y = prec_y;
    }
 
@@ -192,11 +217,11 @@ public class IonEntry {
       this.confidence = confidence;
    }
 
-   public String getShared() {
+   public Boolean getShared() {
       return shared;
    }
 
-   public void setShared(String shared) {
+   public void setShared(Boolean shared) {
       this.shared = shared;
    }
 
@@ -264,4 +289,16 @@ public class IonEntry {
       this.RT_predicted = RT_predicted;
    }
 
+    public CsvSchema getSchema() {
+        return schema;
+    }
+
+    public String getRT_source() {
+        return RT_source;
+    }
+
+    public void setRT_source(String RT_source) {
+        this.RT_source = RT_source;
+    }
+   
 }

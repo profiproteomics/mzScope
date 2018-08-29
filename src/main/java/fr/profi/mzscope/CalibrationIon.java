@@ -17,7 +17,6 @@ public class CalibrationIon {
    final private static Logger logger = LoggerFactory.getLogger(CalibrationIon.class);
 
    private Double q1;
-   private Double q3;
    private Double RT_observed;
    private String protein_name;
    private String modification_sequence;
@@ -29,14 +28,6 @@ public class CalibrationIon {
 
    public void setQ1(Double q1) {
       this.q1 = q1;
-   }
-
-   public Double getQ3() {
-      return q3;
-   }
-
-   public void setQ3(Double q3) {
-      this.q3 = q3;
    }
 
    public Double getRT_observed() {

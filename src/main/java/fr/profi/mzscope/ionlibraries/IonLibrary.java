@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.profi.mzscope;
+package fr.profi.mzscope.ionlibraries;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -31,84 +31,57 @@ import org.slf4j.LoggerFactory;
 public class IonLibrary {
 
     final private static Logger logger = LoggerFactory.getLogger(IonLibrary.class);
-    final private static CsvSchema schema = CsvSchema.builder()
-            .addColumn("q1")
-            .addColumn("q3")
-            .addColumn("rt_detected", CsvSchema.ColumnType.NUMBER)
-            .addColumn("protein_name")
-            .addColumn("isotype")
-            .addColumn("relative_intensity", CsvSchema.ColumnType.NUMBER)
-            .addColumn("stripped_sequence")
-            .addColumn("modification_sequence")
-            .addColumn("prec_z")
-            .addColumn("frg_type")
-            .addColumn("frg_z")
-            .addColumn("frg_nr")
-            .addColumn("iRT", CsvSchema.ColumnType.NUMBER)
-            .addColumn("uniprot_id")
-            .addColumn("score")
-            .addColumn("decoy")
-            .addColumn("prec_y")
-            .addColumn("confidence")
-            .addColumn("shared")
-            .addColumn("n")
-            .addColumn("rank")
-            .addColumn("mods")
-            .addColumn("nterm")
-            .addColumn("cterm").build().withColumnSeparator('\t').withoutQuoteChar().withHeader().withUseHeader(true).withNullValue(null);
-
+    
     private final List<IonEntry> entries;
     private final List<IonEntry> nonRedondantEntries;
     private final Map<String, List<IonEntry>> entriesBySequence = new HashMap<>();
-    private final Map<String, List<IonEntry>> entriesByProteinName = new HashMap<>();
 
     public static class Peptide {
         
-        private String sequence;
-        private Double q1;
-        private Double relative_intensity;
+        private IonEntry prototype;
         
-        
-        public Peptide(String sequence, Double q1, Double intensity) {
-            this.sequence = sequence;
-            this.q1 = q1;
-            this.relative_intensity = intensity;
+        public Peptide(IonEntry ionPrototype) {
+            this.prototype = ionPrototype;
         }
-
         
         public Double getQ1() {
-            return q1;
+            return prototype.getQ1();
         }
-
         
         public String getSequence() {
-            return sequence;
+            return prototype.getModification_sequence();
         }
 
-        public Double getRelative_intensity() {
-            return relative_intensity;
+        public Double getIntensity() {
+            return prototype.getPrec_y();
+        }
+
+        public Integer getCharge() {
+            return prototype.getPrec_z();
         }
         
+        public Boolean getShared() {
+            return prototype.getShared();
+        }
+        
+        public String getProtein_name() {
+            return prototype.getProtein_name();
+        }
+        
+        public Double getRT_detected() {
+            return prototype.getRT_detected();
+        }
     }
     
-    public static IonLibrary fromFile(File file) {
+    public static IonLibrary fromFile(File file, IonEntry prototypeEntry) {
         List<IonEntry> entries = new ArrayList<>();
         try {
             FileInputStream fis = new FileInputStream(file);
             BufferedReader fReader = new BufferedReader(new InputStreamReader(fis));
             CsvMapper mapper = new CsvMapper();
             mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true); 
-//            CsvSchema bootstrapSchema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
-//            ObjectMapper mapper = new CsvMapper();
-//            MappingIterator<IonEntry> it2 = mapper2.enable(JsonGenerator.Feature.IGNORE_UNKNOWN).readerFor(IonEntry.class).with(bootstrapSchema).readValues(fReader);
-//            IonEntry e = it2.next();          
-//            schema.reordersColumns();
-
             CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
-            MappingIterator<IonEntry> it = mapper.readerFor(IonEntry.class).with(schema).readValues(fReader);
-
-
-//            MappingIterator<IonEntry> it = mapper.reader(schema).forType(IonEntry.class).readValues(fReader//);
+            MappingIterator<IonEntry> it = mapper.readerFor(prototypeEntry.getClass()).with(schema).readValues(fReader);
             while (it.hasNext()) {
                 IonEntry row = it.next();
                 entries.add(row);
@@ -129,12 +102,7 @@ public class IonLibrary {
                 entriesBySequence.put(e.getModification_sequence(), new ArrayList<IonEntry>(10));
                 nonRedondantEntries.add(e);
             }
-            if (!entriesByProteinName.containsKey(e.getProtein_name())) {
-                entriesByProteinName.put(e.getProtein_name(), new ArrayList<IonEntry>(10));
-            }
-
             entriesBySequence.get(e.getModification_sequence()).add(e);
-            entriesByProteinName.get(e.getProtein_name()).add(e);
         }
     }
 
@@ -155,9 +123,10 @@ public class IonLibrary {
         logger.info("Start writing ion library to " + file.getAbsolutePath());
         CsvMapper mapper = new CsvMapper();
         mapper.enable(JsonGenerator.Feature.IGNORE_UNKNOWN);
-        mapper.writer(schema).writeValues(file).writeAll(entries.toArray(new IonEntry[0]));
+        mapper.writer(entries.get(0).getSchema()).writeValues(file).writeAll(entries.toArray(new IonEntry[0]));
         writer.flush();
         writer.close();
+        
         logger.info("Library writed");
     }
 }

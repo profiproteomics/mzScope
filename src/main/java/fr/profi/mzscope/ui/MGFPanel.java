@@ -12,8 +12,7 @@ import fr.proline.mzscope.model.MsnExtractionRequest;
 import fr.proline.mzscope.ui.model.MzScopePreferences;
 import fr.proline.mzscope.ui.IMzScopeController;
 import fr.proline.mzscope.ui.IRawFileViewer;
-import fr.proline.mzscope.utils.MzScopeConstants;
-import fr.proline.mzscope.utils.MzScopeConstants.DisplayMode;
+import fr.proline.mzscope.utils.Display;
 import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.markerbar.MarkerContainerPanel;
@@ -21,6 +20,7 @@ import fr.proline.studio.extendedtablemodel.CompoundTableModel;
 import fr.proline.studio.table.DecoratedMarkerTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -127,21 +127,14 @@ public class MGFPanel extends javax.swing.JPanel {
     private void extractBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractBtnActionPerformed
         IRawFileViewer viewer = appController.getCurrentRawFileViewer();
         if (viewer.getCurrentRawfile().isDIAFile()) {
-            DisplayMode mode = MzScopeConstants.DisplayMode.REPLACE;
-            
+            String identifier = new Timestamp(System.currentTimeMillis()).toString();
+            Display display = new Display(Display.Mode.SERIES, identifier);
             int selectedRow = spectrumTable.convertRowIndexToNonFilteredModel(spectrumTable.getSelectedRow());
             if (selectedRow >= 0) {
                MSMSSpectrum spectrum = ((BeanTableModel<MSMSSpectrum>) spectrumTableModel.getBaseModel()).getData().get(selectedRow);
                MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
                     builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance()).setMz(spectrum.getPrecursorMz());
-                    viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
-                    mode = MzScopeConstants.DisplayMode.OVERLAY;
-                try {
-                    // Beurk : avoid replace/overlay bug
-                    Thread.currentThread().sleep(70);
-                } catch (InterruptedException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
             }
             int[] selectedRows = peaksTable.getSelectedRows();
             List<Peak> entries = ((BeanTableModel<Peak>) peaksTableModel.getBaseModel()).getData();
@@ -151,9 +144,7 @@ public class MGFPanel extends javax.swing.JPanel {
                     MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
                     builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance());
                     builder.setMz(peak.getSpectrum().getPrecursorMz()).setFragmentMz(peak.getMz()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-                    viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
-                    // then change to overlay mode for following extractions : TODO wrong : the extraction may terminate in a different order ! 
-                    mode = MzScopeConstants.DisplayMode.OVERLAY;
+                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
                 }
             }
         }

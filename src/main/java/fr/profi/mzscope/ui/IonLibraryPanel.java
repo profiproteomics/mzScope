@@ -6,26 +6,32 @@
 package fr.profi.mzscope.ui;
 
 import fr.proline.studio.table.BeanTableModel;
-import fr.profi.mzscope.IonEntry;
-import fr.profi.mzscope.IonLibrary;
+import fr.profi.mzscope.ionlibraries.IonEntry;
+import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.proline.mzscope.model.MsnExtractionRequest;
 import fr.proline.mzscope.ui.model.MzScopePreferences;
 import fr.proline.mzscope.ui.IMzScopeController;
 import fr.proline.mzscope.ui.IRawFileViewer;
-import fr.proline.mzscope.utils.MzScopeConstants;
-import fr.proline.mzscope.utils.MzScopeConstants.DisplayMode;
+import fr.proline.mzscope.utils.Display;
 import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.markerbar.MarkerContainerPanel;
 import fr.proline.studio.extendedtablemodel.CompoundTableModel;
+import fr.proline.studio.graphics.marker.IntervalMarker;
 import fr.proline.studio.table.DecoratedMarkerTable;
 import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
 import org.slf4j.Logger;
@@ -39,7 +45,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(IonLibraryPanel.class);
     
-    private final CompoundTableModel ionEntriesTableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class), true);
+    private final CompoundTableModel ionEntriesTableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class, Arrays.asList("class", "schema")), true);
     private final CompoundTableModel peptidesTableModel = new CompoundTableModel(new BeanTableModel<IonLibrary.Peptide>(IonLibrary.Peptide.class), true);
     
     private MarkerContainerPanel ionEntriesMarkerContainerPanel;
@@ -61,11 +67,18 @@ public class IonLibraryPanel extends javax.swing.JPanel {
         ionEntriesMarkerContainerPanel.setMaxLineNumber(library.getNonRedondantEntries().size());
         ((BeanTableModel<IonEntry>) ionEntriesTableModel.getBaseModel()).setData(library.getEntries());
         List<IonLibrary.Peptide> peptides = new ArrayList<IonLibrary.Peptide>();
-        peptidesMarkerContainerPanel.setMaxLineNumber(peptides.size());
         for (IonEntry e : library.getNonRedondantEntries()) {
-            peptides.add(new IonLibrary.Peptide(e.getModification_sequence(), e.getQ1(), e.getRelative_intensity()));
+            List<IonEntry> entries = library.getIonEntryBySequence(e.getModification_sequence());
+            Map<Integer, List<IonEntry>> map = entries.stream().collect(Collectors.groupingBy(IonEntry::getPrec_z));
+            for (Integer charge : map.keySet()) {
+                // get the first IonEntry for this charge state. TODO: a better option will be to select the most abundant fragment
+                // but properties used in Peptide object are the same for each ion
+                IonEntry prototype = map.get(charge).get(0);
+                peptides.add(new IonLibrary.Peptide(prototype));
+            }
         }
         ((BeanTableModel<IonLibrary.Peptide>) peptidesTableModel.getBaseModel()).setData(peptides);
+        peptidesMarkerContainerPanel.setMaxLineNumber(peptides.size());
         
     }
 
@@ -77,23 +90,20 @@ public class IonLibraryPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tableToolbar = new javax.swing.JToolBar();
         jSplitPane1 = new javax.swing.JSplitPane();
-        libraryTabbedPane = new javax.swing.JTabbedPane();
-        tablePane = new javax.swing.JPanel();
+        fragmentsPane = new javax.swing.JPanel();
+        precursorsPane = new javax.swing.JPanel();
         jToolBar1 = new javax.swing.JToolBar();
         alignLibraryBtn = new javax.swing.JButton();
         extractBtn = new javax.swing.JButton();
 
-        tableToolbar.setFloatable(false);
-        tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        tableToolbar.setRollover(true);
-
         jSplitPane1.setDividerLocation(130);
-        jSplitPane1.setLeftComponent(libraryTabbedPane);
 
-        tablePane.setLayout(new java.awt.BorderLayout());
-        jSplitPane1.setRightComponent(tablePane);
+        fragmentsPane.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setRightComponent(fragmentsPane);
+
+        precursorsPane.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setLeftComponent(precursorsPane);
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
@@ -128,7 +138,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSplitPane1)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -137,7 +147,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -154,29 +164,38 @@ public class IonLibraryPanel extends javax.swing.JPanel {
 
     private void extractBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractBtnActionPerformed
         IRawFileViewer viewer = appController.getCurrentRawFileViewer();
-        if (viewer.getCurrentRawfile().isDIAFile()) {
-            DisplayMode mode = MzScopeConstants.DisplayMode.REPLACE;
-            int[] selectedRows = ionEntriesTable.getSelectedRows();
+        if (viewer.getCurrentRawfile() != null && viewer.getCurrentRawfile().isDIAFile()) {
+            String identifier = new Timestamp(System.currentTimeMillis()).toString();
+            // Extract precursor mass
+            int selectedPeptideRow = peptidesTable.convertRowIndexToNonFilteredModel(peptidesTable.getSelectedRow());
+            if (selectedPeptideRow >= 0) {
+               IonLibrary.Peptide peptide = ((BeanTableModel<IonLibrary.Peptide>) peptidesTableModel.getBaseModel()).getData().get(selectedPeptideRow);
+               MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+                    builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance()).setMz(peptide.getQ1());
+                    viewer.extractAndDisplayChromatogram(builder.build(), new Display(Display.Mode.SERIES, identifier), null);
+            }
+            
+            // Then extract fragments (all or selected one)
+            int[] selectedIonsRows = ionEntriesTable.getSelectedRows();
             List<IonEntry> entries = ((BeanTableModel<IonEntry>) ionEntriesTableModel.getBaseModel()).getData();
-            if (selectedRows.length > 0) {
-                for (int k = 0; k < selectedRows.length; k++) {
-                    logger.info("selected row = {} -> {}", selectedRows[k], ionEntriesTable.convertRowIndexToNonFilteredModel(selectedRows[k]));
-                   
-                    IonEntry ion = entries.get(ionEntriesTable.convertRowIndexToNonFilteredModel(selectedRows[k]));
-                    logger.info("select fragment mz={}, type = {}",ion.getQ3(), ion.getFrg_type());
+            IonEntry firstIon = (selectedIonsRows.length > 0) ? entries.get(ionEntriesTable.convertRowIndexToNonFilteredModel(selectedIonsRows[0])) : entries.get(0);
+            Display display = new Display(Display.Mode.SERIES, Arrays.asList(new IntervalMarker(null, Color.ORANGE, Color.RED, firstIon.getRT_detected()-5.0, firstIon.getRT_detected()+5.0)), identifier);
+
+            if (selectedIonsRows.length > 0) {
+                for (int k = 0; k < selectedIonsRows.length; k++) {
+                    IonEntry ion = entries.get(ionEntriesTable.convertRowIndexToNonFilteredModel(selectedIonsRows[k]));
                     MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
                     builder.setMz(ion.getQ1()).setFragmentMz(ion.getQ3()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-                    viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
-                    // then change to overlay mode for following extractions
-                    mode = MzScopeConstants.DisplayMode.OVERLAY;
+                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+                    display = new Display(Display.Mode.SERIES, identifier);
                 }
             } else {
                 for (IonEntry ion : entries) {                
                     MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
                     builder.setMz(ion.getQ1()).setFragmentMz(ion.getQ3()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-                    viewer.extractAndDisplayChromatogram(builder.build(), mode, null);
-                    // then change to overlay mode for following extractions
-                    mode = MzScopeConstants.DisplayMode.OVERLAY;
+                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+                    // then change to overlay mode the next extractions
+                    display = new Display(Display.Mode.SERIES, identifier);
                 }
             }
         }
@@ -201,30 +220,26 @@ public class IonLibraryPanel extends javax.swing.JPanel {
          }
       };
       ionEntriesTable.setModel(ionEntriesTableModel);
-      ionEntriesTable.getColumnExt("RT_detected").setVisible(false);      
-      ionEntriesTable.getColumnExt("frg_nr").setVisible(false);
-      ionEntriesTable.getColumnExt("frg_z").setVisible(false);
-      ionEntriesTable.getColumnExt("n").setVisible(false);
-      ionEntriesTable.getColumnExt("isotype").setVisible(false);
-      ionEntriesTable.getColumnExt("rank").setVisible(false);
-      ionEntriesTable.getColumnExt("score").setVisible(false);
-      ionEntriesTable.getColumnExt("nterm").setVisible(false);
-      ionEntriesTable.getColumnExt("cterm").setVisible(false);
       ionEntriesScrollPane.setViewportView(ionEntriesTable);
       ionEntriesTable.setFillsViewportHeight(true);
       ionEntriesTable.setViewport(ionEntriesScrollPane.getViewport());
 
+      JToolBar toolbar = new JToolBar();
+      toolbar.setFloatable(false);
+      toolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
+      toolbar.setRollover(true);
+      
       ExportButton exportButton = new ExportButton(ionEntriesTableModel, "Export", ionEntriesTable);
-      tableToolbar.add(exportButton);
+      toolbar.add(exportButton);
       FilterButton filterButton = new FilterButton(ionEntriesTableModel) {
          @Override
          protected void filteringDone() {         }
       };
       
-      tableToolbar.add(filterButton);
+      toolbar.add(filterButton);
       ionEntriesMarkerContainerPanel = new MarkerContainerPanel(ionEntriesScrollPane, ionEntriesTable);
-      tablePane.add(tableToolbar, BorderLayout.WEST);
-      tablePane.add(ionEntriesMarkerContainerPanel, BorderLayout.CENTER);
+      fragmentsPane.add(toolbar, BorderLayout.WEST);
+      fragmentsPane.add(ionEntriesMarkerContainerPanel, BorderLayout.CENTER);
 
       
       JScrollPane peptidesScrollPane = new JScrollPane();
@@ -250,7 +265,10 @@ public class IonLibraryPanel extends javax.swing.JPanel {
             int selectedRow = convertRowIndexToNonFilteredModel(this.getSelectedRow());
             if (selectedRow >= 0) {
                List<IonLibrary.Peptide> peptides = ((BeanTableModel<IonLibrary.Peptide>) peptidesTableModel.getBaseModel()).getData();
-               ((BeanTableModel<IonEntry>) ionEntriesTableModel.getBaseModel()).setData(library.getIonEntryBySequence(peptides.get(selectedRow).getSequence()));
+               IonLibrary.Peptide selectedPeptide = peptides.get(selectedRow);
+               List<IonEntry> entries = library.getIonEntryBySequence(selectedPeptide.getSequence());
+               Map<Integer, List<IonEntry>> map = entries.stream().collect(Collectors.groupingBy(IonEntry::getPrec_z));
+               ((BeanTableModel<IonEntry>) ionEntriesTableModel.getBaseModel()).setData(map.get(selectedPeptide.getCharge()));
             }
         }
          
@@ -261,17 +279,28 @@ public class IonLibraryPanel extends javax.swing.JPanel {
       peptidesTable.setFillsViewportHeight(true);
       peptidesTable.setViewport(peptidesScrollPane.getViewport());
       peptidesMarkerContainerPanel = new MarkerContainerPanel(peptidesScrollPane, peptidesTable);
-      libraryTabbedPane.add("Peptides", peptidesMarkerContainerPanel);
+      
+      filterButton = new FilterButton(peptidesTableModel) {
+         @Override
+         protected void filteringDone() {         }
+      };
+      
+      toolbar = new JToolBar();
+      toolbar.setFloatable(false);
+      toolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
+      toolbar.setRollover(true);
+      toolbar.add(filterButton);
+      precursorsPane.add(toolbar, BorderLayout.WEST);
+      precursorsPane.add(peptidesMarkerContainerPanel, BorderLayout.CENTER);
       
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignLibraryBtn;
     private javax.swing.JButton extractBtn;
+    private javax.swing.JPanel fragmentsPane;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JTabbedPane libraryTabbedPane;
-    private javax.swing.JPanel tablePane;
-    private javax.swing.JToolBar tableToolbar;
+    private javax.swing.JPanel precursorsPane;
     // End of variables declaration//GEN-END:variables
 }

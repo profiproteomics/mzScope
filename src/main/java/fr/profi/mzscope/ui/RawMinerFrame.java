@@ -6,9 +6,12 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.InvalidMGFFormatException;
-import fr.profi.mzscope.IonLibrary;
+import fr.profi.mzscope.ionlibraries.IonEntry;
+import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.MGFReader;
 import fr.profi.mzscope.MSMSSpectrum;
+import fr.profi.mzscope.ionlibraries.PeakViewEntry;
+import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.util.version.IVersion;
@@ -80,7 +83,9 @@ public class RawMinerFrame extends JFrame {
         detectFeatureMI = new javax.swing.JMenuItem();
         exportChromatogram = new javax.swing.JMenuItem();
         ToolsMenu = new javax.swing.JMenu();
-        loadLibraryMI = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        loadPeakViewLibraryMI = new javax.swing.JMenuItem();
+        loadSpectronautLibraryMI = new javax.swing.JMenuItem();
         loadMGFMI = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Open Raw file");
@@ -164,13 +169,25 @@ public class RawMinerFrame extends JFrame {
 
         ToolsMenu.setText("Tools");
 
-        loadLibraryMI.setText("Load Ion Library ...");
-        loadLibraryMI.addActionListener(new java.awt.event.ActionListener() {
+        jMenu1.setText("Load Ion Library");
+
+        loadPeakViewLibraryMI.setText("Peakview...");
+        loadPeakViewLibraryMI.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadLibraryMIActionPerformed(evt);
+                loadPeakViewLibraryMIActionPerformed(evt);
             }
         });
-        ToolsMenu.add(loadLibraryMI);
+        jMenu1.add(loadPeakViewLibraryMI);
+
+        loadSpectronautLibraryMI.setText("Proline/Spectronaut...");
+        loadSpectronautLibraryMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadSpectronautLibraryMIActionPerformed(evt);
+            }
+        });
+        jMenu1.add(loadSpectronautLibraryMI);
+
+        ToolsMenu.add(jMenu1);
 
         loadMGFMI.setText("Load MGF File ...");
         loadMGFMI.addActionListener(new java.awt.event.ActionListener() {
@@ -229,23 +246,28 @@ public class RawMinerFrame extends JFrame {
       rawMinerPanel.getMzScopePanel().detectFeatures();
    }//GEN-LAST:event_detectFeatureMIActionPerformed
 
-   private void loadLibraryMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadLibraryMIActionPerformed
+
+   private void loadIonLibraryMI(String dialogTitle, IonEntry prototype) {                                                      
       
       Preferences prefs = Preferences.userNodeForPackage(this.getClass());
       JFileChooser fileChooser = new JFileChooser();
-      fileChooser.setDialogTitle("Open Library file");
+      fileChooser.setDialogTitle(dialogTitle);
       String directory = prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath());
       fileChooser.setCurrentDirectory(new File(directory));
       fileChooser.setMultiSelectionEnabled(true);
       int returnVal = fileChooser.showOpenDialog(this);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            IonLibrary library = IonLibrary.fromFile(file);
+            IonLibrary library = IonLibrary.fromFile(file, prototype);
             prefs.put(LAST_DIR, file.getParent());
-            rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Ion Library", new IonLibraryPanel(library, rawMinerPanel.getMzScopePanel()));
+            rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Ion Lib: "+file.getName(), new IonLibraryPanel(library, rawMinerPanel.getMzScopePanel()));
       } 
       
-   }//GEN-LAST:event_loadLibraryMIActionPerformed
+   }                                                     
+
+   private void loadPeakViewLibraryMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadPeakViewLibraryMIActionPerformed
+      loadIonLibraryMI("Open PeakView Library file", new PeakViewEntry());      
+   }//GEN-LAST:event_loadPeakViewLibraryMIActionPerformed
 
     private void loadMGFMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMGFMIActionPerformed
       Preferences prefs = Preferences.userNodeForPackage(this.getClass());
@@ -268,6 +290,11 @@ public class RawMinerFrame extends JFrame {
       } 
     }//GEN-LAST:event_loadMGFMIActionPerformed
 
+    private void loadSpectronautLibraryMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSpectronautLibraryMIActionPerformed
+        loadIonLibraryMI("Open Spectronaut Library file", new SpectronautEntry());
+    }//GEN-LAST:event_loadSpectronautLibraryMIActionPerformed
+
+    
    /**
     * @param args the command line arguments
     */
@@ -311,10 +338,12 @@ public class RawMinerFrame extends JFrame {
     private javax.swing.JMenuItem exportChromatogram;
     private javax.swing.JMenuItem extractFeaturesMI;
     private javax.swing.JFileChooser fileChooser;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
-    private javax.swing.JMenuItem loadLibraryMI;
     private javax.swing.JMenuItem loadMGFMI;
+    private javax.swing.JMenuItem loadPeakViewLibraryMI;
+    private javax.swing.JMenuItem loadSpectronautLibraryMI;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem openRawMI;

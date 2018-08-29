@@ -9,10 +9,10 @@ import fr.proline.studio.table.BeanTableModel;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import fr.profi.mzscope.Aligner;
+import fr.profi.mzscope.ionlibraries.Aligner;
 import fr.profi.mzscope.CalibrationIon;
-import fr.profi.mzscope.IonEntry;
-import fr.profi.mzscope.IonLibrary;
+import fr.profi.mzscope.ionlibraries.IonEntry;
+import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
 import fr.proline.studio.graphics.BaseGraphicsPanel;
@@ -26,8 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
@@ -40,6 +39,9 @@ import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.databind.MapperFeature;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -50,11 +52,11 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
    private final static String LAST_DIR = "Last ion lib directory";
    final private static Logger logger = LoggerFactory.getLogger(IonLibraryAlignementPanel.class);
 
-   private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class), true);
+   private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class, Arrays.asList("class", "schema")), true);
    private Aligner aligner;
    private BaseGraphicsPanel graphicsPanel;
    private MarkerContainerPanel markerContainerPanel;
-    private final IonLibrary library;
+   private final IonLibrary library;
 
    /**
     * Creates new form IonLibraryAlignementPanel
@@ -273,20 +275,28 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          try {
             File file = fileChooser.getSelectedFile();
             logger.info("Start loading ion library from "+file.getAbsolutePath());
-            CsvSchema schema = CsvSchema.builder()
-                    .addColumn("q1")
-                    .addColumn("q3")
-                    .addColumn("rt_observed", CsvSchema.ColumnType.NUMBER)
-                    .addColumn("protein_name")
-                    .addColumn("modification_sequence")
-                    .addColumn("prec_z").build();
-
+//            CsvSchema schema = CsvSchema.builder()
+//                    .addColumn("q1")
+//                    .addColumn("q3")
+//                    .addColumn("rt_observed", CsvSchema.ColumnType.NUMBER)
+//                    .addColumn("protein_name")
+//                    .addColumn("modification_sequence")
+//                    .addColumn("prec_z").build();
+//
             List<CalibrationIon> entries = new ArrayList<>();
             FileInputStream fis = new FileInputStream(file);
             BufferedReader fReader = new BufferedReader(new InputStreamReader(fis));
+
+//            CsvMapper mapper = new CsvMapper();
+//            schema = schema.withColumnSeparator('\t').withoutQuoteChar().withHeader().withUseHeader(true).withNullValue(null);
+//            MappingIterator<CalibrationIon> it = mapper.reader(schema).forType(CalibrationIon.class). readValues(fReader);
+
             CsvMapper mapper = new CsvMapper();
-            schema = schema.withColumnSeparator('\t').withoutQuoteChar().withHeader().withUseHeader(true).withNullValue(null);
-            MappingIterator<CalibrationIon> it = mapper.reader(schema).forType(CalibrationIon.class).readValues(fReader);
+            mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true); 
+            CsvSchema schema = CsvSchema.emptySchema().withHeader().withColumnSeparator('\t');
+            MappingIterator<CalibrationIon> it = mapper.readerFor(CalibrationIon.class).with(schema).readValues(fReader);
+            
+            
             while (it.hasNext()) {
                CalibrationIon row = it.next();
                entries.add(row);
@@ -350,15 +360,6 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
          }
       };
       table.setModel(tableModel);
-      table.getColumnExt("RT_detected").setVisible(false);      
-      table.getColumnExt("frg_nr").setVisible(false);
-      table.getColumnExt("frg_z").setVisible(false);
-      table.getColumnExt("n").setVisible(false);
-      table.getColumnExt("isotype").setVisible(false);
-      table.getColumnExt("rank").setVisible(false);
-      table.getColumnExt("score").setVisible(false);
-      table.getColumnExt("nterm").setVisible(false);
-      table.getColumnExt("cterm").setVisible(false);
       tableScrollPane.setViewportView(table);
       table.setFillsViewportHeight(true);
       table.setViewport(tableScrollPane.getViewport());
