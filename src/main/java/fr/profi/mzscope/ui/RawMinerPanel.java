@@ -9,7 +9,7 @@ import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.QCMetrics;
 import fr.profi.mzscope.MetricsCache;
-import fr.proline.mzscope.ui.ExtractionResultsPanel2;
+import fr.proline.mzscope.ui.ExtractionResultsPanel;
 import fr.proline.mzscope.ui.MzScopePanel;
 import fr.proline.mzscope.ui.QCMetricsPanel;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
@@ -101,7 +101,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          explorerSplitPane.setDividerLocation(200);
          explorerSplitPane.setOneTouchExpandable(true);
          explorerSplitPane.setTopComponent(getRawFilesPanel());
-         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel2(getMzScopePanel(), ExtractionResultsPanel2.TOOLBAR_ALIGN_HORIZONTAL));
+         explorerSplitPane.setBottomComponent(new ExtractionResultsPanel(getMzScopePanel(), ExtractionResultsPanel.TOOLBAR_ALIGN_HORIZONTAL));
       }
       return explorerSplitPane;
    }
