@@ -22,7 +22,7 @@
     </properties>
     
     <scm>
-	  <connection>scm:svn:https://bioproj.extra.cea.fr/svn/proline/mzDB/mzScope/trunk</connection>
+	  <connection>scm:svn:https://bioproj.extra.cea.fr/svn/proline/mzDB/mzScope/tags/0.6.0</connection>
 	</scm>
     
     <dependencies>
