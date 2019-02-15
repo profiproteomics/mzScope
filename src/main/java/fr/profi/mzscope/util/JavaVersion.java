@@ -9,7 +9,7 @@ public class JavaVersion implements IVersion {
     }
 
     public String getVersion() {
-	return "0.5.0-SNAPSHOT_20171023-1115_JM235353";
+	return "0.6.0_20190215-0940_VD225637";
     }
 
 }
