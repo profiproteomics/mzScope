@@ -6,27 +6,27 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.InvalidMGFFormatException;
-import fr.profi.mzscope.ionlibraries.IonEntry;
-import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.MGFReader;
 import fr.profi.mzscope.MSMSSpectrum;
+import fr.profi.mzscope.ionlibraries.IonEntry;
+import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.ionlibraries.PeakViewEntry;
 import fr.profi.mzscope.ionlibraries.SpectronautEntry;
+import fr.profi.util.version.IVersion;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
-import fr.proline.util.version.IVersion;
-import java.awt.BorderLayout;
+import org.openide.util.Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import org.openide.util.Exceptions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *

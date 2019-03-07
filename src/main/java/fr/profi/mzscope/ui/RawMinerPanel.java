@@ -115,7 +115,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
 
    protected MzScopePanel getMzScopePanel() {
       if (this.mzScopePanel == null) {
-         mzScopePanel = new MzScopePanel(parentFrame, false);
+         mzScopePanel = new MzScopePanel(parentFrame);
          mzScopePanel.addExtractionListener(this);
       }
       return mzScopePanel;
