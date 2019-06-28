@@ -6,6 +6,7 @@
 package fr.profi.mzscope.ui;
 
 import fr.proline.mzscope.model.Chromatogram;
+import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.QCMetrics;
 import fr.profi.mzscope.MetricsCache;
@@ -170,23 +171,23 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       try {
          DecimalFormat df = new DecimalFormat("#.00");
          Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-         Chromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
+         IChromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
          StringBuilder stb = new StringBuilder();
          stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('/');
-         stb.append("extracted_xic_").append(df.format(currentChromatogram.minMz)).append(".tsv");
+         stb.append("extracted_xic_").append(df.format(currentChromatogram.getMinMz())).append(".tsv");
          File file = new File(stb.toString());
          BufferedWriter output = new BufferedWriter(new FileWriter(file));
          output.write("index\trt\tintensity\n");
-         for (int k = 0; k < currentChromatogram.time.length; k++) {
+         for (int k = 0; k < currentChromatogram.getTime().length; k++) {
             stb = new StringBuilder();
-            stb.append(k).append("\t").append(currentChromatogram.time[k]).append("\t").append(currentChromatogram.intensities[k]);
+            stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
             stb.append("\n");
             output.write(stb.toString());
          }
-         logger.info("extracted Chromatogram in " + file.getAbsolutePath());
+         logger.info("extracted IChromatogram in " + file.getAbsolutePath());
          output.close();
       } catch (Exception e) {
-         logger.error("Enable to write current Chromatogram", e);
+         logger.error("Enable to write current IChromatogram", e);
       }
    }
 

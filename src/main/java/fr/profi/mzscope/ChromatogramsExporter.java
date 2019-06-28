@@ -7,6 +7,7 @@ package fr.profi.mzscope;
 
 import com.thoughtworks.xstream.XStream;
 import fr.proline.mzscope.model.Chromatogram;
+import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.MsnExtractionRequest;
 import fr.proline.mzscope.ui.RawFileManager;
@@ -50,32 +51,32 @@ public class ChromatogramsExporter {
                     MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder().setMinMz(nextIon.getMinMz()).setMaxMz(nextIon.getMaxMz());
                     if((nextIon.startRT > 0.0) && (nextIon.stopRT > 0.0))
                        builder.setElutionTimeLowerBound(nextIon.startRT*60.0f).setElutionTimeUpperBound(nextIon.stopRT*60.0f);
-                     Chromatogram currentChromatogram = nextRawFile.getXIC(builder.build());
+                    IChromatogram currentChromatogram = nextRawFile.getXIC(builder.build());
                     StringBuilder stb = new StringBuilder();
                     stb.append(m_outputDir).append('/');
-                    stb.append("extracted_xic_").append(nextRawFile.getName()).append(df.format(currentChromatogram.minMz).replace(',', '.')).append(".tsv");
+                    stb.append("extracted_xic_").append(nextRawFile.getName()).append(df.format(currentChromatogram.getMinMz()).replace(',', '.')).append(".tsv");
                     chromatoFile = stb.toString();
                     logger.info("Extracting chromatogram to file "+chromatoFile);
                     File file = new File(chromatoFile);
                     output = new BufferedWriter(new FileWriter(file));
                     output.write("index\trt\tintensity\n");
-                    for (int k = 0; k < currentChromatogram.time.length; k++) {
+                    for (int k = 0; k < currentChromatogram.getTime().length; k++) {
                         stb = new StringBuilder();
-                        stb.append(k).append("\t").append(currentChromatogram.time[k]).append("\t").append(currentChromatogram.intensities[k]);
+                        stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
                         stb.append("\n");
                         output.write(stb.toString());
                     }
-                    logger.info("extracted Chromatogram in " + file.getAbsolutePath());
+                    logger.info("extracted IChromatogram in " + file.getAbsolutePath());
 
                 } catch (IOException ex) {
                     nbrError++;
-                    logger.error("Unable to write Chromatogram "+chromatoFile, ex);                   
+                    logger.error("Unable to write IChromatogram "+chromatoFile, ex);
                 } finally {
                     try {
                         if(output != null)
                             output.close();
                     } catch (IOException ex) {
-                        logger.error("Unable to write current Chromatogram "+chromatoFile, ex);
+                        logger.error("Unable to write current IChromatogram "+chromatoFile, ex);
                     }
                 }
             }
