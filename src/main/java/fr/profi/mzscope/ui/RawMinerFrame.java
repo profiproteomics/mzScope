@@ -216,7 +216,8 @@ public class RawMinerFrame extends JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exitMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMIActionPerformed
-       System.exit(0);
+       rawMinerPanel.closeAllFiles();
+        System.exit(0);
     }//GEN-LAST:event_exitMIActionPerformed
 
     private void openRawMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openRawMIActionPerformed
