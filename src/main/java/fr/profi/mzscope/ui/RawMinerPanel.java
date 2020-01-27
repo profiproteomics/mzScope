@@ -134,12 +134,14 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    public void closeRawFile(IRawFile rawfile) {
       mzScopePanel.closeRawFile(rawfile);
       rawFilePanel.removeFile(rawfile);
+      RawFileManager.getInstance().removeRawFile(rawfile);
    }
 
    public void closeAllFiles() {
       boolean close = mzScopePanel.closeAllRaw();
       if (close) {
          rawFilePanel.removeAllFiles();
+         RawFileManager.getInstance().removeAllFiles();
       }
    }
 
