@@ -5,7 +5,6 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.QCMetrics;
@@ -36,6 +35,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +60,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    private JMenuItem detectPeakelsMI;
    private JMenuItem loadPeakelsMI;   
    private JMenuItem extractFeaturesMI;
+   private JMenuItem detectFeaturesMI;
    private JMenuItem closeAllFileMI;
    private JMenuItem closeRawFileMI;
    private JMenuItem viewRawFileMI;
@@ -239,69 +240,67 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       // close all files
       closeAllFileMI = new JMenuItem();
       closeAllFileMI.setText("Close All Rawfile...");
-      closeAllFileMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            closeAllFiles();
-         }
+      closeAllFileMI.addActionListener((ActionEvent evt) -> {
+        closeAllFiles();
       });
       popupMenu.add(closeAllFileMI);
       popupMenu.addSeparator();
 
       // extract Features
       extractFeaturesMI = new JMenuItem();
-      extractFeaturesMI.setText("Extract Features...");
-      extractFeaturesMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.extractFeatures(getRawFilesPanel().getSelectedValues());
-         }
+      extractFeaturesMI.setText("Extract Features from MS2...");
+      extractFeaturesMI.addActionListener((ActionEvent evt) -> {
+        mzScopePanel.extractFeatures(getRawFilesPanel().getSelectedValues());
       });
       popupMenu.add(extractFeaturesMI);
+      // detect Features
+      detectFeaturesMI = new JMenuItem();
+      detectFeaturesMI.setText("Detect Features...");
+      detectFeaturesMI.addActionListener((ActionEvent evt) -> {
+        mzScopePanel.detectFeatures(getRawFilesPanel().getSelectedValues());
+      });
+      popupMenu.add(detectFeaturesMI);
       // detect peakels
       detectPeakelsMI = new JMenuItem();
       detectPeakelsMI.setText("Detect Peakels...");
-      detectPeakelsMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.detectPeakels(getRawFilesPanel().getSelectedValues());
-         }
+      detectPeakelsMI.addActionListener((ActionEvent evt) -> {
+        mzScopePanel.detectPeakels(getRawFilesPanel().getSelectedValues());
       });
       popupMenu.add(detectPeakelsMI);
       
       // load peakels
-//      loadPeakelsMI = new JMenuItem();
-//      loadPeakelsMI.setText("Load Peakels...");
-//      loadPeakelsMI.addActionListener(new ActionListener() {
-//         @Override
-//         public void actionPerformed(ActionEvent evt) { 
-//            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-//            JFileChooser peakelChooser = new JFileChooser();
-//            peakelChooser.setDialogTitle("Load peakels");
-//            peakelChooser.addChoosableFileFilter(new FileFilter() {
-//                @Override
-//                public boolean accept(File f) {
-//                    return f.getName().endsWith(".peakeldb") || f.getName().endsWith(".sqlite");
-//                }
-//
-//                @Override
-//                public String getDescription() {
-//                    return ("*.peakeldb, *.sqlite");
-//                }
-//            });
-//            String directory = prefs.get(LAST_PEAKEL_DIR, peakelChooser.getCurrentDirectory().getAbsolutePath());
-//            peakelChooser.setCurrentDirectory(new File(directory));
-//            int returnVal = peakelChooser.showOpenDialog(mzScopePanel);
-//            if (returnVal == JFileChooser.APPROVE_OPTION) {
-//                File file = peakelChooser.getSelectedFile();
-//                prefs.put(LAST_PEAKEL_DIR, file.getParentFile().getAbsolutePath());
-//                mzScopePanel.loadPeakels(getRawFilesPanel().getSelectedValues().get(0), file);
-//            }
-//        }
-//      });
-//      popupMenu.add(loadPeakelsMI);
-//
-//      
+      loadPeakelsMI = new JMenuItem();
+      loadPeakelsMI.setText("Load Peakels...");
+      loadPeakelsMI.addActionListener(new ActionListener() {
+         @Override
+         public void actionPerformed(ActionEvent evt) { 
+            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+            JFileChooser peakelChooser = new JFileChooser();
+            peakelChooser.setDialogTitle("Load peakels");
+            peakelChooser.addChoosableFileFilter(new FileFilter() {
+                @Override
+                public boolean accept(File f) {
+                    return f.getName().endsWith(".peakeldb") || f.getName().endsWith(".sqlite");
+                }
+
+                @Override
+                public String getDescription() {
+                    return ("*.peakeldb, *.sqlite");
+                }
+            });
+            String directory = prefs.get(LAST_PEAKEL_DIR, peakelChooser.getCurrentDirectory().getAbsolutePath());
+            peakelChooser.setCurrentDirectory(new File(directory));
+            int returnVal = peakelChooser.showOpenDialog(mzScopePanel);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = peakelChooser.getSelectedFile();
+                prefs.put(LAST_PEAKEL_DIR, file.getParentFile().getAbsolutePath());
+                mzScopePanel.loadPeakels(getRawFilesPanel().getSelectedValues().get(0), file);
+            }
+        }
+      });
+      popupMenu.add(loadPeakelsMI);
+
+      
       // view LCMS Map
       viewLCMSMap = new JMenuItem();
       viewLCMSMap.setText("View LCMS Map...");

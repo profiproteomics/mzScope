@@ -226,7 +226,9 @@ public class RawMinerFrame extends JFrame {
         
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
         IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-        rawMinerPanel.getMzScopePanel().extractFeatures(Arrays.asList(viewer.getCurrentRawfile()));
+        if ( viewer.getCurrentRawfile() != null) {
+          rawMinerPanel.getMzScopePanel().extractFeatures(Arrays.asList(viewer.getCurrentRawfile()));
+        }
     }//GEN-LAST:event_extractFeaturesMIActionPerformed
 
    private void exportChromatogramActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportChromatogramActionPerformed
@@ -235,7 +237,9 @@ public class RawMinerFrame extends JFrame {
 
    private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
       IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-      rawMinerPanel.getMzScopePanel().detectPeakels(Arrays.asList(viewer.getCurrentRawfile()));
+      if ( viewer.getCurrentRawfile() != null) {
+        rawMinerPanel.getMzScopePanel().detectPeakels(Arrays.asList(viewer.getCurrentRawfile()));
+      }
    }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
     private void closeAllMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMIActionPerformed
@@ -243,7 +247,10 @@ public class RawMinerFrame extends JFrame {
     }//GEN-LAST:event_closeAllMIActionPerformed
 
    private void detectFeatureMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectFeatureMIActionPerformed
-      rawMinerPanel.getMzScopePanel().detectFeatures();
+     IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
+     if (viewer.getCurrentRawfile() != null) {
+      rawMinerPanel.getMzScopePanel().detectFeatures(Arrays.asList(viewer.getCurrentRawfile()));
+     }
    }//GEN-LAST:event_detectFeatureMIActionPerformed
 
 
