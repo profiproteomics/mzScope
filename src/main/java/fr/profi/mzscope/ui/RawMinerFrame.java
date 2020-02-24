@@ -38,7 +38,15 @@ public class RawMinerFrame extends JFrame {
    private final static String LAST_DIR = "Last ion lib directory";
    
    private final RawMinerPanel rawMinerPanel;
-
+    static {
+        try {
+           // System.load("D:\\DEV\\sqlite4java-win32-x64-1.0.392.dll");
+            System.load("C:\\DATA\\sqlite4java-win32-x64-1.0.392.dll");
+        } catch (UnsatisfiedLinkError e) {
+          System.err.println("Native code library failed to load.\n" + e);
+          System.exit(1);
+        }
+  }
    /**
     * Creates new form RawMinerFrame
     */
