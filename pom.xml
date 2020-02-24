@@ -5,12 +5,12 @@
     <parent>
         <artifactId>profi-pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>0.5.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
   
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>0.6.0-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
     
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
@@ -22,9 +22,9 @@
     </properties>
     
     <scm>
-	  <connection>scm:svn:https://bioproj.extra.cea.fr/svn/proline/mzDB/mzScope/trunk</connection>
-	</scm>
-    
+        <connection>scm:git:https://github.com/profiproteomics/mzScope.git</connection>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>com.esotericsoftware</groupId>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-mzscope</artifactId>
-            <version>2.1.0-SNAPSHOT</version>
+            <version>2.2.0-SNAPSHOT</version>
         </dependency>
                 
         <!--<dependency>
