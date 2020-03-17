@@ -171,26 +171,28 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    }
 
    public void exportChromatogram() {
-      try {
-         DecimalFormat df = new DecimalFormat("#.00");
-         Preferences prefs = Preferences.userNodeForPackage(this.getClass());
-         IChromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
-         StringBuilder stb = new StringBuilder();
-         stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('/');
-         stb.append("extracted_xic_").append(df.format(currentChromatogram.getMinMz())).append(".tsv");
-         File file = new File(stb.toString());
-         BufferedWriter output = new BufferedWriter(new FileWriter(file));
-         output.write("index\trt\tintensity\n");
-         for (int k = 0; k < currentChromatogram.getTime().length; k++) {
-            stb = new StringBuilder();
-            stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
-            stb.append("\n");
-            output.write(stb.toString());
+      if (mzScopePanel.getCurrentRawFileViewer() != null) {
+         try {
+            DecimalFormat df = new DecimalFormat("#.00");
+            Preferences prefs = Preferences.userNodeForPackage(this.getClass());
+            IChromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
+            StringBuilder stb = new StringBuilder();
+            stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('/');
+            stb.append("extracted_xic_").append(df.format(currentChromatogram.getMinMz())).append(".tsv");
+            File file = new File(stb.toString());
+            BufferedWriter output = new BufferedWriter(new FileWriter(file));
+            output.write("index\trt\tintensity\n");
+            for (int k = 0; k < currentChromatogram.getTime().length; k++) {
+               stb = new StringBuilder();
+               stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
+               stb.append("\n");
+               output.write(stb.toString());
+            }
+            logger.info("extracted IChromatogram in " + file.getAbsolutePath());
+            output.close();
+         } catch (Exception e) {
+            logger.error("Enable to write current IChromatogram", e);
          }
-         logger.info("extracted IChromatogram in " + file.getAbsolutePath());
-         output.close();
-      } catch (Exception e) {
-         logger.error("Enable to write current IChromatogram", e);
       }
    }
 
@@ -250,7 +252,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       extractFeaturesMI = new JMenuItem();
       extractFeaturesMI.setText("Extract Features from MS2...");
       extractFeaturesMI.addActionListener((ActionEvent evt) -> {
-        mzScopePanel.extractFeatures(getRawFilesPanel().getSelectedValues());
+        mzScopePanel.extractFeaturesFromMS2(getRawFilesPanel().getSelectedValues());
       });
       popupMenu.add(extractFeaturesMI);
       // detect Features

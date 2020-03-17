@@ -226,8 +226,8 @@ public class RawMinerFrame extends JFrame {
         
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
         IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-        if ( viewer.getCurrentRawfile() != null) {
-          rawMinerPanel.getMzScopePanel().extractFeatures(Arrays.asList(viewer.getCurrentRawfile()));
+        if (viewer != null &&  viewer.getCurrentRawfile() != null) {
+          rawMinerPanel.getMzScopePanel().extractFeaturesFromMS2(Arrays.asList(viewer.getCurrentRawfile()));
         }
     }//GEN-LAST:event_extractFeaturesMIActionPerformed
 
@@ -237,7 +237,7 @@ public class RawMinerFrame extends JFrame {
 
    private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
       IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-      if ( viewer.getCurrentRawfile() != null) {
+      if (viewer != null &&  viewer.getCurrentRawfile() != null) {
         rawMinerPanel.getMzScopePanel().detectPeakels(Arrays.asList(viewer.getCurrentRawfile()));
       }
    }//GEN-LAST:event_detectPeakelsMIActionPerformed
@@ -248,7 +248,7 @@ public class RawMinerFrame extends JFrame {
 
    private void detectFeatureMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectFeatureMIActionPerformed
      IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-     if (viewer.getCurrentRawfile() != null) {
+     if (viewer != null && viewer.getCurrentRawfile() != null) {
       rawMinerPanel.getMzScopePanel().detectFeatures(Arrays.asList(viewer.getCurrentRawfile()));
      }
    }//GEN-LAST:event_detectFeatureMIActionPerformed
