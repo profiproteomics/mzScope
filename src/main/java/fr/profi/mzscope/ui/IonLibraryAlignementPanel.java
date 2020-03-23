@@ -15,7 +15,7 @@ import fr.profi.mzscope.ionlibraries.IonEntry;
 import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.proline.studio.export.ExportButton;
 import fr.proline.studio.filter.FilterButton;
-import fr.proline.studio.graphics.BaseGraphicsPanel;
+import fr.proline.studio.graphics.MonoGraphicsPanel;
 import fr.proline.studio.markerbar.MarkerContainerPanel;
 import fr.proline.studio.extendedtablemodel.CompoundTableModel;
 import fr.proline.studio.table.DecoratedMarkerTable;
@@ -54,7 +54,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
 
    private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class, Arrays.asList("class", "schema")), true);
    private Aligner aligner;
-   private BaseGraphicsPanel graphicsPanel;
+   private MonoGraphicsPanel graphicsPanel;
    private MarkerContainerPanel markerContainerPanel;
    private final IonLibrary library;
 
@@ -382,7 +382,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
       tablePane.add(tableToolbar, BorderLayout.WEST);
       tablePane.add(markerContainerPanel, BorderLayout.CENTER);
       
-      graphicsPanel = new BaseGraphicsPanel(false);
+      graphicsPanel = new MonoGraphicsPanel(false);
       graphicsPanel.setData(tableModel, null);
 
       plotPanel.setLayout(new BorderLayout());
