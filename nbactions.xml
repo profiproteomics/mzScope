@@ -10,9 +10,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Djava.library.path=C:\DATA  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
+                <exec.args>-Djava.library.path=C:\vero\DEV  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>C:\DATA</exec.workingdir>
+                <exec.workingdir>C:\vero\DEV</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -25,10 +25,10 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Djava.library.path=C:\DATA  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Djava.library.path=C:\vero\DEV  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>C:\DATA</exec.workingdir>
+                <exec.workingdir>C:\vero\DEV</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -41,9 +41,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Djava.library.path=C:\DATA  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
+                <exec.args>-Djava.library.path=C:\vero\DEV  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>C:\DATA</exec.workingdir>
+                <exec.workingdir>C:\vero\DEV</exec.workingdir>
             </properties>
         </action>
     </actions>
