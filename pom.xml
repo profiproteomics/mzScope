@@ -10,7 +10,7 @@
   
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>0.7.0.peakel-SNAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
     
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
