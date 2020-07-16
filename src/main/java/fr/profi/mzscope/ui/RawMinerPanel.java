@@ -48,6 +48,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
 
    private final static Logger logger = LoggerFactory.getLogger("ProlineStudio.mzScope.RawMinerPanel");
    private final static String LAST_DIR = "mzscope.last.raw.directory";
+   private final static String LAST_PEAKEL_DIR = "mzscope.last.peakeldb.directory";
    
 
    private final RawMinerFrame parentFrame;
@@ -57,6 +58,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    private RawFilesPanel rawFilePanel = null;
    private MzScopePanel mzScopePanel = null;
    private JMenuItem detectPeakelsMI;
+   private JMenuItem loadPeakelsMI;   
    private JMenuItem extractFeaturesMI;
    private JMenuItem detectFeaturesMI;
    private JMenuItem closeAllFileMI;
