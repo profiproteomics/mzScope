@@ -5,12 +5,12 @@
     <parent>
         <artifactId>profi-pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>0.5.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
   
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
