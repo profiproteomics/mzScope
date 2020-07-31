@@ -10,9 +10,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Djava.library.path=C:\Local\bruley\Dev\Libraries\sqlite4java-282  -Xms4g  -Xmx10g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
+                <exec.args>-Djava.library.path=C:\vero\DEV  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
                 <exec.executable>java</exec.executable>
-                
+
             </properties>
         </action>
         <action>
@@ -28,7 +28,7 @@
                 <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Djava.library.path=C:\Local\bruley\Dev\Libraries\sqlite4java-282  -Xms4g  -Xmx6g -classpath %classpath fr.profi.mzscope.ui.RawMinerFrame</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                
+
             </properties>
         </action>
         <action>
