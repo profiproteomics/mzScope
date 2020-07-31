@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +65,12 @@ public class MetricsCache {
             out.close();
             fos.close();
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            logger.error("Error while writing QC", ex);
         } finally {
             try {
                 fos.close();
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                logger.error("Error while writing QC",ex);
             }
         }
     }
@@ -91,12 +90,12 @@ public class MetricsCache {
                 return null;
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            logger.error("Error while loading QC",ex);
         } finally {
             try {
                 if (fis != null) fis.close();
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                logger.error("Error while loading QC",ex);
             }
         }
         return null;
@@ -119,14 +118,14 @@ public class MetricsCache {
                 }
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            logger.error("Error while loading QC",ex);
         } finally {
             try {
                 if (fis != null) {
                     fis.close();
                 }
             } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                logger.error("Error while loading QC",ex);
             }
         }
         return list;

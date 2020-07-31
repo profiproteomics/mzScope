@@ -23,10 +23,7 @@ import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -44,7 +41,8 @@ import org.slf4j.LoggerFactory;
 public class IonLibraryPanel extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(IonLibraryPanel.class);
-    
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("fr.profi.mzscope.ui.Bundle");
+
     private final CompoundTableModel ionEntriesTableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class, Arrays.asList("class", "schema")), true);
     private final CompoundTableModel peptidesTableModel = new CompoundTableModel(new BeanTableModel<IonLibrary.Peptide>(IonLibrary.Peptide.class), true);
     
@@ -108,7 +106,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(alignLibraryBtn, org.openide.util.NbBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.alignLibraryBtn.text")); // NOI18N
+        alignLibraryBtn.setText(bundle.getString("IonLibraryPanel.alignLibraryBtn.text")); // NOI18N
         alignLibraryBtn.setFocusable(false);
         alignLibraryBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         alignLibraryBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -119,7 +117,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
         });
         jToolBar1.add(alignLibraryBtn);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extractBtn, org.openide.util.NbBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.extractBtn.text")); // NOI18N
+        extractBtn.setText(bundle.getString("IonLibraryPanel.extractBtn.text")); // NOI18N
         extractBtn.setFocusable(false);
         extractBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         extractBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

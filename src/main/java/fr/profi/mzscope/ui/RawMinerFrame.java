@@ -15,7 +15,6 @@ import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.profi.util.version.IVersion;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -301,7 +300,7 @@ public class RawMinerFrame extends JFrame {
               rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("MGF file "+file.getName(), new MGFPanel(peakList, rawMinerPanel.getMzScopePanel()));
               prefs.put(LAST_DIR, file.getParent());
           } catch (InvalidMGFFormatException ex) {
-              Exceptions.printStackTrace(ex);
+              logger.error("Error while reading the MGF file", ex);
           }
       } 
     }//GEN-LAST:event_loadMGFMIActionPerformed

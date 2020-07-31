@@ -22,12 +22,12 @@ import fr.proline.studio.table.TablePopupMenu;
 import java.awt.BorderLayout;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,8 @@ import org.slf4j.LoggerFactory;
 public class MGFPanel extends javax.swing.JPanel {
 
     private static final Logger logger = LoggerFactory.getLogger(MGFPanel.class);
-    
+    private static final ResourceBundle bundle = ResourceBundle.getBundle("fr.profi.mzscope.ui.Bundle");
+
     private final CompoundTableModel peaksTableModel = new CompoundTableModel(new BeanTableModel<Peak>(Peak.class), true);
     private final CompoundTableModel spectrumTableModel = new CompoundTableModel(new BeanTableModel<MSMSSpectrum>(MSMSSpectrum.class), true);
     
@@ -89,7 +90,7 @@ public class MGFPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extractBtn, org.openide.util.NbBundle.getMessage(MGFPanel.class, "MGFPanel.extractBtn.text")); // NOI18N
+        extractBtn.setText(bundle.getString("MGFPanel.extractBtn.text")); // NOI18N
         extractBtn.setFocusable(false);
         extractBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         extractBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

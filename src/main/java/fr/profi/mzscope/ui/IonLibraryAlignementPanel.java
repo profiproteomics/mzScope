@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
@@ -36,7 +37,6 @@ import org.apache.commons.math3.analysis.interpolation.AkimaSplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -49,8 +49,10 @@ import java.util.List;
  */
 public class IonLibraryAlignementPanel extends javax.swing.JPanel {
 
-   private final static String LAST_DIR = "Last ion lib directory";
+   final private static String LAST_DIR = "Last ion lib directory";
    final private static Logger logger = LoggerFactory.getLogger(IonLibraryAlignementPanel.class);
+   final private static ResourceBundle bundle = ResourceBundle.getBundle("fr.profi.mzscope.ui.Bundle");
+
 
    private final CompoundTableModel tableModel = new CompoundTableModel(new BeanTableModel<IonEntry>(IonEntry.class, Arrays.asList("class", "schema")), true);
    private Aligner aligner;
@@ -100,22 +102,22 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
         tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
         tableToolbar.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel1.text")); // NOI18N
+        jLabel1.setText(bundle.getString("IonLibraryAlignementPanel.jLabel1.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel2.text")); // NOI18N
+        jLabel2.setText(bundle.getString("IonLibraryAlignementPanel.jLabel2.text")); // NOI18N
 
-        referencePathTF.setText(org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referencePathTF.text")); // NOI18N
+        referencePathTF.setText(bundle.getString("IonLibraryAlignementPanel.referencePathTF.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(loadReferenceBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.loadReferenceBtn.text")); // NOI18N
+        loadReferenceBtn.setText(bundle.getString("IonLibraryAlignementPanel.loadReferenceBtn.text")); // NOI18N
         loadReferenceBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadReferenceBtnActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(libraryEntriesJL, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.libraryEntriesJL.text")); // NOI18N
+        libraryEntriesJL.setText(bundle.getString("IonLibraryAlignementPanel.libraryEntriesJL.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(referenceEntriesJL, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referenceEntriesJL.text")); // NOI18N
+        referenceEntriesJL.setText(bundle.getString("IonLibraryAlignementPanel.referenceEntriesJL.text")); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -159,14 +161,14 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(150);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveLibraryBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.saveLibraryBtn.text")); // NOI18N
+        saveLibraryBtn.setText(bundle.getString("IonLibraryAlignementPanel.saveLibraryBtn.text")); // NOI18N
         saveLibraryBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveLibraryBtnActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(alignBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.alignBtn.text")); // NOI18N
+        alignBtn.setText(bundle.getString("IonLibraryAlignementPanel.alignBtn.text")); // NOI18N
         alignBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 alignBtnActionPerformed(evt);
@@ -315,7 +317,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             prefs.put(LAST_DIR, file.getParent());
             logger.info("Ion Library loaded");
          } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            logger.error("Error while loading reference :", ex);
          }
 
       } else {
@@ -336,7 +338,7 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
             aligner.applyPredictedRT();
             aligner.getLibrary().saveToFile(file);
          } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            logger.error("Error while saving the library ", ex);
          }
       }
    }//GEN-LAST:event_saveLibraryBtnActionPerformed
