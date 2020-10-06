@@ -178,19 +178,26 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
             Preferences prefs = Preferences.userNodeForPackage(this.getClass());
             IChromatogram currentChromatogram = mzScopePanel.getCurrentRawFileViewer().getCurrentChromatogram();
             StringBuilder stb = new StringBuilder();
-            stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('/');
+            stb.append(prefs.get(LAST_DIR, fileChooser.getCurrentDirectory().getAbsolutePath())).append('\\');
             stb.append("extracted_xic_").append(df.format(currentChromatogram.getMinMz())).append(".tsv");
-            File file = new File(stb.toString());
-            BufferedWriter output = new BufferedWriter(new FileWriter(file));
-            output.write("index\trt\tintensity\n");
-            for (int k = 0; k < currentChromatogram.getTime().length; k++) {
-               stb = new StringBuilder();
-               stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
-               stb.append("\n");
-               output.write(stb.toString());
+            
+            JFileChooser saveFileChooser = new JFileChooser();
+            saveFileChooser.setSelectedFile(new File(stb.toString()));
+            int returnVal = saveFileChooser.showSaveDialog(parentFrame);
+            
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+              File file = saveFileChooser.getSelectedFile();
+              BufferedWriter output = new BufferedWriter(new FileWriter(file));
+              output.write("index\trt\tintensity\n");
+              for (int k = 0; k < currentChromatogram.getTime().length; k++) {
+                stb = new StringBuilder();
+                stb.append(k).append("\t").append(currentChromatogram.getTime()[k]).append("\t").append(currentChromatogram.getIntensities()[k]);
+                stb.append("\n");
+                output.write(stb.toString());
+              }
+              logger.info("extracted IChromatogram in " + file.getAbsolutePath());
+              output.close();
             }
-            logger.info("extracted IChromatogram in " + file.getAbsolutePath());
-            output.close();
          } catch (Exception e) {
             logger.error("Enable to write current IChromatogram", e);
          }

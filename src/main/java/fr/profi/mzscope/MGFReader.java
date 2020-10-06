@@ -167,7 +167,7 @@ public class MGFReader {
 					}
 				}// END RET_TIME TAG
 
-                                if (MGFConstants.RAWSCANS.equals(tag)) {
+        if (MGFConstants.RAWSCANS.equals(tag)) {
 					if (value != null) {
 						rawScans = value;
 					}

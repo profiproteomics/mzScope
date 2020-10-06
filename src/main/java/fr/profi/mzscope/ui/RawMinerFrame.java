@@ -276,7 +276,7 @@ public class RawMinerFrame extends JFrame {
             File file = fileChooser.getSelectedFile();
             IonLibrary library = IonLibrary.fromFile(file, prototype);
             prefs.put(LAST_DIR, file.getParent());
-            rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Ion Lib: "+file.getName(), new IonLibraryPanel(library, rawMinerPanel.getMzScopePanel()));
+            rawMinerPanel.getMzScopePanel().addFeatureTab("Ion Lib: "+file.getName(), new IonLibraryPanel(library, rawMinerPanel.getMzScopePanel()), "");
       } 
       
    }                                                     
