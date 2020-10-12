@@ -333,7 +333,8 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
                     metrics.add(getFileMetrics(file));
             }
             final QCMetricsPanel panel = mzScopePanel.displayMetrics(metrics);
-            JButton loadMetricsBtn = new JButton("#");
+            JButton loadMetricsBtn = new JButton("#QC");
+            loadMetricsBtn.setToolTipText("Load existing QC metrics from the internal cache");
             loadMetricsBtn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

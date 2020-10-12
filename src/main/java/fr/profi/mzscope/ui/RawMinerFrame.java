@@ -54,7 +54,7 @@ public class RawMinerFrame extends JFrame {
       initComponents();
       ServiceLoader<IVersion> versionLoader = ServiceLoader.load(IVersion.class);
       Iterator<IVersion> iter = versionLoader.iterator();
-      String version = "unknow version";
+      String version = "snapshot";
       while(iter.hasNext()) {
           IVersion v = iter.next();
           if (v.getModuleName().equalsIgnoreCase("mzScope")) {
