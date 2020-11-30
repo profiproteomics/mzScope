@@ -10,7 +10,7 @@
   
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0.llc-SNAPSHOT</version>
     
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
