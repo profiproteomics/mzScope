@@ -9,7 +9,7 @@ public class JavaVersion implements IVersion {
     }
 
     public String getVersion() {
-	return "0.6.0.peakel-SNAPSHOT_2020-01-24T10:37:40Z_CB205360";
+	return "1.0.0a-SNAPSHOT_2021-07-02T10:02:44Z_VD225637";
     }
 
 }

@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.proline.studio.Exceptions;
 import fr.proline.studio.table.BeanTableModel;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -32,11 +33,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JScrollPane;
 import javax.swing.event.TableModelListener;
+
+import fr.proline.studio.utils.StudioResourceBundle;
 import org.apache.commons.math3.analysis.interpolation.AkimaSplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
 import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
-import org.openide.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -100,22 +102,18 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
         tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
         tableToolbar.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel1.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel2.text")); // NOI18N
-
-        referencePathTF.setText(org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referencePathTF.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(loadReferenceBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.loadReferenceBtn.text")); // NOI18N
+        jLabel1.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel1.text"));
+        jLabel2.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.jLabel2.text"));
+        referencePathTF.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referencePathTF.text")); // NOI18N
+        loadReferenceBtn.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.loadReferenceBtn.text"));
         loadReferenceBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 loadReferenceBtnActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(libraryEntriesJL, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.libraryEntriesJL.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(referenceEntriesJL, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referenceEntriesJL.text")); // NOI18N
+        libraryEntriesJL.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.libraryEntriesJL.text"));
+        referenceEntriesJL.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.referenceEntriesJL.text"));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -159,14 +157,14 @@ public class IonLibraryAlignementPanel extends javax.swing.JPanel {
         jSplitPane1.setDividerLocation(150);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveLibraryBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.saveLibraryBtn.text")); // NOI18N
+        saveLibraryBtn.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.saveLibraryBtn.text"));
         saveLibraryBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveLibraryBtnActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(alignBtn, org.openide.util.NbBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.alignBtn.text")); // NOI18N
+        alignBtn.setText(StudioResourceBundle.getMessage(IonLibraryAlignementPanel.class, "IonLibraryAlignementPanel.alignBtn.text"));
         alignBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 alignBtnActionPerformed(evt);

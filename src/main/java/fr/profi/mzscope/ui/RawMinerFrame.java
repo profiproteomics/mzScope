@@ -15,7 +15,7 @@ import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.profi.util.version.IVersion;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
-import org.openide.util.Exceptions;
+import fr.proline.studio.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
