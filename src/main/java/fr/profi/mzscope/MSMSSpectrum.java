@@ -5,11 +5,7 @@
  */
 package fr.profi.mzscope;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -57,9 +53,10 @@ public class MSMSSpectrum {
         return retentionTime;
     }
     
-     public double getRetentionTimeInMinutes() {
+    public double getRetentionTimeInMinutes() {
         return retentionTime/60.0;
     }
+
     public double[] getMassValues() {
         Iterator<Peak> it = peaks.iterator();
         double[] mass = new double[peaksCount() ];

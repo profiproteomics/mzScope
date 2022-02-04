@@ -87,6 +87,7 @@ public class RawMinerFrame extends JFrame {
         loadPeakViewLibraryMI = new javax.swing.JMenuItem();
         loadSpectronautLibraryMI = new javax.swing.JMenuItem();
         loadMGFMI = new javax.swing.JMenuItem();
+        isotopicToolMI = new javax.swing.JMenuItem();
 
         fileChooser.setDialogTitle("Open Raw file");
         fileChooser.addChoosableFileFilter(new MzdbFilter());
@@ -197,6 +198,14 @@ public class RawMinerFrame extends JFrame {
         });
         ToolsMenu.add(loadMGFMI);
 
+        isotopicToolMI.setText("Isotopic distribution ...");
+        isotopicToolMI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                isotopicToolActionPerformed(evt);
+            }
+        });
+        ToolsMenu.add(isotopicToolMI);
+
         menuBar.add(ToolsMenu);
 
         setJMenuBar(menuBar);
@@ -277,6 +286,10 @@ public class RawMinerFrame extends JFrame {
       loadIonLibraryMI("Open PeakView Library file", new PeakViewEntry());      
    }//GEN-LAST:event_loadPeakViewLibraryMIActionPerformed
 
+  private void isotopicToolActionPerformed(java.awt.event.ActionEvent evt) {
+    rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Isotopic", new IsotopicToolPanel(rawMinerPanel.getMzScopePanel()));
+  }
+
     private void loadMGFMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMGFMIActionPerformed
       Preferences prefs = Preferences.userNodeForPackage(this.getClass());
       JFileChooser fileChooser = new JFileChooser();
@@ -350,6 +363,7 @@ public class RawMinerFrame extends JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JMenuItem loadMGFMI;
+    private javax.swing.JMenuItem isotopicToolMI;
     private javax.swing.JMenuItem loadPeakViewLibraryMI;
     private javax.swing.JMenuItem loadSpectronautLibraryMI;
     private javax.swing.JPanel mainPanel;
