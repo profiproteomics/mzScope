@@ -27,7 +27,8 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
-import org.openide.util.Exceptions;
+
+import fr.proline.studio.utils.StudioResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +90,7 @@ public class MGFPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extractBtn, org.openide.util.NbBundle.getMessage(MGFPanel.class, "MGFPanel.extractBtn.text")); // NOI18N
+        extractBtn.setText(StudioResourceBundle.getMessage(MGFPanel.class, "MGFPanel.extractBtn.text"));
         extractBtn.setFocusable(false);
         extractBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         extractBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);

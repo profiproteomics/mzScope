@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openide.util.Exceptions;
+
+import fr.proline.studio.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

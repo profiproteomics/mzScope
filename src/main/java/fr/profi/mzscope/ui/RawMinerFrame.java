@@ -15,7 +15,7 @@ import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.profi.util.version.IVersion;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
-import org.openide.util.Exceptions;
+import fr.proline.studio.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,15 +38,7 @@ public class RawMinerFrame extends JFrame {
    private final static String LAST_DIR = "Last ion lib directory";
    
    private final RawMinerPanel rawMinerPanel;
-//    static {
-//        try {
-//           // System.load("D:\\DEV\\sqlite4java-win32-x64-1.0.392.dll");
-//            System.load("C:\\DATA\\sqlite4java-win32-x64-1.0.392.dll");
-//        } catch (UnsatisfiedLinkError e) {
-//          System.err.println("Native code library failed to load.\n" + e);
-//          System.exit(1);
-//        }
-//  }
+
    /**
     * Creates new form RawMinerFrame
     */
