@@ -70,27 +70,18 @@ public class ConverterManager extends Thread implements ConverterListener {
   }
 
   public void runConvert() {
-    if (fileToConvertExist()) {
-      logger.debug("CM: Add Tasks");
-      File f = getAndRemoveNextFile();
-      while(f != null) {
+    if (fileToConvertExist()) {  //TODO Add all files to TaskManagerThread instead of in convertEnd
         ConvertRawFile2MzdbCallback callback = new ConvertRawFile2MzdbCallback();
         callback.setListener(this);
         ConvertRawFile2MzdbTask task = new ConvertRawFile2MzdbTask(callback, getAndRemoveNextFile());
         task.setListener(this);
         TaskManagerThread.getTaskManagerThread().addTask(task);
-        f = getAndRemoveNextFile();
-      }
     }
   }
 
   @Override
   public void convertStart(File file2Convert) {
-//    if(file2Convert !=null && rawpanel != null) {
-//      IRawFile eRf = new EmptyRawFile(file2Convert.getName());
-//      m_emptyRawFileByName.put(file2Convert.getName(), eRf );
-//      rawpanel.addRawFile(eRf);
-//    }
+
   }
 
   @Override
@@ -104,6 +95,6 @@ public class ConverterManager extends Thread implements ConverterListener {
           IRawFile rawfile = RawFileManager.getInstance().addRawFile(convertedFile);
           rawpanel.addRawFile(rawfile);
       }
-//      ConverterManager.getInstance().runConvert();
+      ConverterManager.getInstance().runConvert();
   }
 }

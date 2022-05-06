@@ -40,7 +40,6 @@ public class TaskManagerThread extends Thread {
         super("TaskManagerThread"); // useful for debugging
 
         m_actions = new ArrayDeque<>();
-        logger.debug("TMT: get WPool");
         m_workerPool = WorkerPool.getWorkerPool();
     }
 
@@ -84,60 +83,43 @@ public class TaskManagerThread extends Thread {
     @Override
     public void run() {
         try {
-            logger.debug("TMT: Step 1");
+            logger.debug("Start  Tasks Manager Thread");
             Object workerPoolMutex = m_workerPool.getMutex();
             while (true) {
-                logger.debug("TMT: Step 2");
                 AbstractTask action = null;
                 synchronized (this) {
-                    logger.debug("TMT: Step 3");
                     actionSearch:
                     while (true) {
-                        logger.debug("TMT: Step 4");
                         // look for a task to be done
                         if (!m_actions.isEmpty()) {
 
                             // try to get the first action with thread available
                             synchronized (workerPoolMutex) {
-                                logger.debug("TMT: Step 4.1");
                                 for (AbstractTask actionCur : m_actions) {
-                                    logger.debug("TMT: Step 4.2");
                                     if (m_workerPool.getWorkerThread(actionCur.getType()) != null) {
                                         // thread is available for this action
-                                        logger.debug("TMT: Step 4.3");
                                         m_actions.remove(actionCur);
                                         action = actionCur;
                                         break actionSearch;
                                     }
                                 }
                             }
-                            logger.debug("TMT: Step 5");
                             // take the first action, even if thread is not available for this action
                             action = m_actions.poll();
-                            logger.debug("TMT: Step 6");
                             break;
                         }
                         wait();
-                        logger.debug("TMT: Step 7");
                     }
-                    logger.debug("TMT: Step 8");
                     notifyAll();
-                    logger.debug("TMT: Step 9");
                 }
-                logger.debug("TMT: Step 10");
                 synchronized (workerPoolMutex) {
 
                     WorkerThread workerThread = null;
-                    logger.debug("TMT: Step 11");
                     while (true) {
-                        logger.debug("TMT: Step 12");
                         workerThread = m_workerPool.getWorkerThread(action.getType());
-                        logger.debug("TMT: Step 13");
                         if (workerThread != null) {
-                            logger.debug("TMT: Step 14");
                             break;
                         }
-                        logger.debug("TMT: Step 15");
                         workerPoolMutex.wait();
                     }
                     workerThread.setAction(action);

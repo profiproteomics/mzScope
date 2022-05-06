@@ -58,23 +58,17 @@ public class WorkerThread extends Thread {
     public void run() {
         try {
             while (true) {
-                m_logger.debug(" WT : Step 1");
                 AbstractTask action;
 
                 synchronized (this) {
-                    m_logger.debug(" WT : Step 2");
                     while (true) {
-                        m_logger.debug(" WT : Step 2.1");
                         if (m_action != null) {
                             action = m_action;
-                            m_logger.debug(" WT : Step 2.2");
                             break;
                         }
-                        m_logger.debug(" WT : Step 2.3");
                         wait();
                     }
                     notifyAll();
-                    m_logger.debug(" WT : Step 3");
                 }
 
 //                action.getTaskInfo().setRunning(true);
@@ -82,30 +76,22 @@ public class WorkerThread extends Thread {
 
                 // execute action
                 try {
-                    m_logger.debug(" WT : Step 4");
                     boolean success = action.runTask();
-                    m_logger.debug(" WT : Step 5");
                     // call callback code (if there is not a consecutive task)
                     action.callback(success);
-                    m_logger.debug(" WT : Step 6");
-
 
                 } finally {
-                    m_logger.debug(" WT : Step 7");
                     TaskManagerThread.getTaskManagerThread().actionDone(action);
                 }
 
                 synchronized(this) {
-                    m_logger.debug(" WT : Step 8");
                     m_action = null;
                 }
 
-                m_logger.debug(" WT : Step 9");
                 m_workerPool.threadFinished();
             }
 
         } catch (Throwable t) {
-            m_logger.debug(" WT : Step 10");
             m_logger.debug("Unexpected exception in main loop of WorkerThread", t);
         }
 
