@@ -20,6 +20,7 @@ public class ConverterManager extends Thread implements ConverterListener {
   private static List<File> m_rawFiles;
   private static  ConverterManager m_instance;
   private static File m_converterFile;
+  private static String m_converterOption;
   protected final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass().toString());
   private RawMinerPanel rawpanel; //Use listener !!! TODO
   private Map<String, IRawFile> m_emptyRawFileByName;
@@ -40,12 +41,20 @@ public class ConverterManager extends Thread implements ConverterListener {
     m_converterFile =exeFile;
   }
 
+  public static void setConverterOption(String option){
+    m_converterOption = option;
+  }
+
   public void setRawMinerPanel(RawMinerPanel panel){
     rawpanel = panel;
   }
 
   public static File getConverterExeFile(){
     return m_converterFile;
+  }
+
+  public static String getConverterOption(){
+    return m_converterOption;
   }
 
   public void addFiles(List<File> newFiles){

@@ -22,6 +22,7 @@ import fr.profi.mzscope.ConverterManager;
 import fr.profi.mzscope.threading.queue.AbstractCallback;
 import fr.profi.mzscope.threading.queue.AbstractTask;
 import fr.profi.mzscope.threading.queue.WorkerPool;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -188,18 +189,17 @@ public class ConvertRawFile2MzdbTask extends AbstractTask {
                 List<String> command = new ArrayList<>();
                 logger.info("add "+ConverterManager.getConverterExeFile().getAbsolutePath());
                 command.add(ConverterManager.getConverterExeFile().getAbsolutePath());
-//                if(ConfigurationManager.getConverterOptions() != null && !ConfigurationManager.getConverterOptions().trim().isEmpty()) {
-//                    String options = ConfigurationManager.getConverterOptions();
-//                    String[] eachOptions  = options.split(" ");
-//                    for (int i = 0; i<eachOptions.length; i++){
-//                        if(!eachOptions[i].trim().isEmpty())
-//                            command.add(eachOptions[i].trim());
-//                    }
-//                }
+                if(StringUtils.isNotEmpty(ConverterManager.getConverterOption())) {
+                    String options = ConverterManager.getConverterOption();
+                    String[] eachOptions  = options.split(" ");
+                    for (int i = 0; i<eachOptions.length; i++){
+                        if(!eachOptions[i].trim().isEmpty())
+                            command.add(eachOptions[i].trim());
+                    }
+                }
                 command.add("-n");
                 command.add("-i");
                 command.add(getFile().getAbsolutePath());
-                logger.info("add "+getFile().getAbsolutePath());
                 command.add("-o");
                 command.add(m_outputTempFilePath);
 

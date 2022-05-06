@@ -216,6 +216,7 @@ public class RawMinerFrame extends JFrame {
         ConverterManager.getInstance().setRawMinerPanel(rawMinerPanel); //must be set first to display files !
         ConverterManager.getInstance().addFiles(dialog.getFilePaths());
         ConverterManager.setConverterExeFile(dialog.getConverterExeFile());
+        ConverterManager.setConverterOption(dialog.getConverterOption());
         ConverterManager.getInstance().runConvert();
       }
 
