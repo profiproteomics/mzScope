@@ -91,10 +91,10 @@ public class ChromatogramsExporter {
         StringBuffer str = new StringBuffer();
     	
         str.append( "'extract' (shortcut for ChromatogramsExporter) is a command line chromatogram extraction program . It extracts" +
-                    " chromatograms from RAW files (as mzData or mzMl) for specified masses and time window.\n");
-        str.append("One chromatogram file is written for each specified raw file and mass.\n\n");
+                    " chromatograms from mzDB files (as mzData or mzMl) for specified masses and time window.\n");
+        str.append("One chromatogram file is written for each specified mzDB file and mass.\n\n");
 	str.append( "extract options : \n");
-	str.append( "\t<raw_path> :\n\t\t file path for single raw file extraction or path to directory containing raw files to treat\n");
+	str.append( "\t<raw_path> :\n\t\t file path for single mzDB file extraction or path to directory containing mzDB files to treat\n");
         str.append( "\t<properties_filename> : \n\t\t properties file where ions to extract are defined\n");
         str.append( "\t<output_path> : {default= same as input directory}\n\t\t output directory where results are written\n\n");
         str.append( "Properties_filename is a XML file structured as in example file, sample_prop.xml \n");

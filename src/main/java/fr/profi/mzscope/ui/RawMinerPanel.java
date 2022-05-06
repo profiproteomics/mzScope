@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.proline.mzscope.model.EmptyRawFile;
 import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.QCMetrics;
@@ -60,11 +61,13 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    private JMenuItem detectPeakelsMI;
    private JMenuItem loadPeakelsMI;   
    private JMenuItem extractFeaturesMI;
+   private JMenuItem compareQCMI;
    private JMenuItem detectFeaturesMI;
    private JMenuItem closeAllFileMI;
    private JMenuItem closeRawFileMI;
    private JMenuItem viewRawFileMI;
    private ActionListener viewRawFileAction;
+   private JMenuItem propertiesMI;
    private JMenuItem viewAllRawFilesMI;
    private JMenuItem viewLCMSMap;
    private JMenuItem export;
@@ -127,16 +130,21 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       if (this.fileChooser == null) {
          this.fileChooser = new JFileChooser();
          this.fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-         this.fileChooser.setDialogTitle("Open Raw file");
+         this.fileChooser.setDialogTitle("Open mzDB file");
          this.fileChooser.addChoosableFileFilter(new MzdbFilter());
       }
       return this.fileChooser;
    }
 
+   public void addRawFile(IRawFile rawfile){
+      rawFilePanel.addFile(rawfile);
+   }
+
    public void closeRawFile(IRawFile rawfile) {
       mzScopePanel.closeRawFile(rawfile);
       rawFilePanel.removeFile(rawfile);
-      RawFileManager.getInstance().removeRawFile(rawfile);
+      if(! (rawfile instanceof  EmptyRawFile ))
+         RawFileManager.getInstance().removeRawFile(rawfile);
    }
 
    public void closeAllFiles() {
@@ -207,15 +215,12 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
    @Override
    public void initPopupMenu(JPopupMenu popupMenu) {
       // view data
-      viewRawFileAction = new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            List<IRawFile> rawFiles = getRawFilesPanel().getSelectedValues();
-            if (rawFiles.size() == 1) {
-               mzScopePanel.displayRaw(rawFiles.get(0), true);
-            } else {
-               mzScopePanel.displayRaw(rawFiles);               
-            }
+      viewRawFileAction = evt -> {
+         List<IRawFile> rawFiles = getRawFilesPanel().getSelectedValues();
+         if (rawFiles.size() == 1) {
+            mzScopePanel.displayRaw(rawFiles.get(0), true);
+         } else {
+            mzScopePanel.displayRaw(rawFiles);
          }
       };
       viewRawFileMI = new JMenuItem();
@@ -226,64 +231,44 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       // close raw file
       viewAllRawFilesMI = new JMenuItem();
       viewAllRawFilesMI.setText("View all");
-      viewAllRawFilesMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.displayAllRaw();
-         }
-      });
+      viewAllRawFilesMI.addActionListener(evt -> mzScopePanel.displayAllRaw());
       popupMenu.add(viewAllRawFilesMI);
       
       
       // close raw file
       closeRawFileMI = new JMenuItem();
-      closeRawFileMI.setText("Close Rawfile");
-      closeRawFileMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            closeRawFile(getRawFilesPanel().getSelectedValues().get(0));
-         }
-      });
+      closeRawFileMI.setText("Close mzDB file");
+      closeRawFileMI.addActionListener(evt -> closeRawFile(getRawFilesPanel().getSelectedValues().get(0)));
       popupMenu.add(closeRawFileMI);
       popupMenu.addSeparator();
 
       // close all files
       closeAllFileMI = new JMenuItem();
-      closeAllFileMI.setText("Close All Rawfile...");
-      closeAllFileMI.addActionListener((ActionEvent evt) -> {
-        closeAllFiles();
-      });
+      closeAllFileMI.setText("Close All mzDB files...");
+      closeAllFileMI.addActionListener((ActionEvent evt) -> closeAllFiles());
       popupMenu.add(closeAllFileMI);
       popupMenu.addSeparator();
 
       // extract Features
       extractFeaturesMI = new JMenuItem();
       extractFeaturesMI.setText("Extract Features from MS2...");
-      extractFeaturesMI.addActionListener((ActionEvent evt) -> {
-        mzScopePanel.extractFeaturesFromMS2(getRawFilesPanel().getSelectedValues());
-      });
+      extractFeaturesMI.addActionListener((ActionEvent evt) -> mzScopePanel.extractFeaturesFromMS2(getRawFilesPanel().getSelectedValues()));
       popupMenu.add(extractFeaturesMI);
       // detect Features
       detectFeaturesMI = new JMenuItem();
       detectFeaturesMI.setText("Detect Features...");
-      detectFeaturesMI.addActionListener((ActionEvent evt) -> {
-        mzScopePanel.detectFeatures(getRawFilesPanel().getSelectedValues());
-      });
+      detectFeaturesMI.addActionListener((ActionEvent evt) -> mzScopePanel.detectFeatures(getRawFilesPanel().getSelectedValues()));
       popupMenu.add(detectFeaturesMI);
       // detect peakels
       detectPeakelsMI = new JMenuItem();
       detectPeakelsMI.setText("Detect Peakels...");
-      detectPeakelsMI.addActionListener((ActionEvent evt) -> {
-        mzScopePanel.detectPeakels(getRawFilesPanel().getSelectedValues());
-      });
+      detectPeakelsMI.addActionListener((ActionEvent evt) -> mzScopePanel.detectPeakels(getRawFilesPanel().getSelectedValues()));
       popupMenu.add(detectPeakelsMI);
       
       // load peakels
       loadPeakelsMI = new JMenuItem();
       loadPeakelsMI.setText("Load Peakels...");
-      loadPeakelsMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) { 
+      loadPeakelsMI.addActionListener((ActionEvent evt) -> {
             Preferences prefs = Preferences.userNodeForPackage(this.getClass());
             JFileChooser peakelChooser = new JFileChooser();
             peakelChooser.setDialogTitle("Load peakels");
@@ -306,43 +291,28 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
                 prefs.put(LAST_PEAKEL_DIR, file.getParentFile().getAbsolutePath());
                 mzScopePanel.loadPeakels(getRawFilesPanel().getSelectedValues().get(0), file);
             }
-        }
-      });
+        });
       popupMenu.add(loadPeakelsMI);
 
       
       // view LCMS Map
       viewLCMSMap = new JMenuItem();
       viewLCMSMap.setText("View LCMS Map...");
-      viewLCMSMap.addActionListener(new ActionListener() {
-
-          @Override
-          public void actionPerformed(ActionEvent ae) {
-              mzScopePanel.displayLCMSMap(getRawFilesPanel().getSelectedValues().get(0));
-          }
-      });
+      viewLCMSMap.addActionListener(ae -> mzScopePanel.displayLCMSMap(getRawFilesPanel().getSelectedValues().get(0)));
       popupMenu.add(viewLCMSMap);
       
-      JMenuItem compareQCMI = new JMenuItem();
+      compareQCMI = new JMenuItem();
       compareQCMI.setText("QC metrics");
-      compareQCMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            List<QCMetrics> metrics = new ArrayList<>();
-            for (IRawFile file : getRawFilesPanel().getSelectedValues()) {
-                    metrics.add(getFileMetrics(file));
-            }
-            final QCMetricsPanel panel = mzScopePanel.displayMetrics(metrics);
-            JButton loadMetricsBtn = new JButton("#QC");
-            loadMetricsBtn.setToolTipText("Load existing QC metrics from the internal cache");
-            loadMetricsBtn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    loadMetricsFromCache(panel);
-                }
-            });
-            panel.getToolBar().add(loadMetricsBtn);
+      compareQCMI.addActionListener(evt -> {
+         List<QCMetrics> metrics = new ArrayList<>();
+         for (IRawFile file : getRawFilesPanel().getSelectedValues()) {
+                 metrics.add(getFileMetrics(file));
          }
+         final QCMetricsPanel panel = mzScopePanel.displayMetrics(metrics);
+         JButton loadMetricsBtn = new JButton("#QC");
+         loadMetricsBtn.setToolTipText("Load existing QC metrics from the internal cache");
+         loadMetricsBtn.addActionListener(e -> loadMetricsFromCache(panel));
+         panel.getToolBar().add(loadMetricsBtn);
       });
       popupMenu.add(compareQCMI);
       
@@ -350,39 +320,41 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       // export (as MGF or tsv)
       export = new JMenuItem();
       export.setText("Export...");
-      export.addActionListener(new ActionListener() {
-
-          @Override
-          public void actionPerformed(ActionEvent ae) {
-              mzScopePanel.export(getRawFilesPanel().getSelectedValues());
-          }
-      });
+      export.addActionListener(ae -> mzScopePanel.export(getRawFilesPanel().getSelectedValues()));
       popupMenu.add(export);
       
       popupMenu.addSeparator();
-      JMenuItem propertiesMI = new JMenuItem();
+      propertiesMI = new JMenuItem();
       propertiesMI.setText("Properties");
-      propertiesMI.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent evt) {
-            mzScopePanel.displayProperties(getRawFilesPanel().getSelectedValues());
-         }
-      });
+      propertiesMI.addActionListener(evt -> mzScopePanel.displayProperties(getRawFilesPanel().getSelectedValues()));
       popupMenu.add(propertiesMI);
 
    }
 
    @Override
    public void updatePopupMenu() {
-      int nbS = getRawFilesPanel().getSelectedValues().size();
-      viewRawFileMI.setEnabled(nbS > 0);
-      closeRawFileMI.setEnabled(nbS == 1);
-      closeAllFileMI.setEnabled(true);
-      viewAllRawFilesMI.setEnabled(true);
-      extractFeaturesMI.setEnabled(nbS > 0);
-      detectPeakelsMI.setEnabled((nbS > 0));
-      viewLCMSMap.setEnabled(nbS == 1);
-      export.setEnabled(nbS > 0);
+      List<IRawFile> selectedRaws =  getRawFilesPanel().getSelectedValues();
+      int nbS = selectedRaws.size();
+      boolean noEmptyRawFile =true;
+      for (IRawFile rf : selectedRaws){
+         if (rf instanceof EmptyRawFile) {
+            noEmptyRawFile = false;
+            break;
+         }
+      }
+
+      viewRawFileMI.setEnabled(noEmptyRawFile && nbS > 0);
+      closeRawFileMI.setEnabled(noEmptyRawFile && nbS == 1);
+      closeAllFileMI.setEnabled(noEmptyRawFile);
+      viewAllRawFilesMI.setEnabled(noEmptyRawFile);
+      loadPeakelsMI.setEnabled(noEmptyRawFile);
+      detectFeaturesMI.setEnabled(noEmptyRawFile);
+      compareQCMI.setEnabled(noEmptyRawFile);
+      propertiesMI.setEnabled(noEmptyRawFile);
+      extractFeaturesMI.setEnabled(noEmptyRawFile && nbS > 0);
+      detectPeakelsMI.setEnabled((noEmptyRawFile && nbS > 0));
+      viewLCMSMap.setEnabled(noEmptyRawFile && nbS == 1);
+      export.setEnabled(noEmptyRawFile && nbS > 0);
    }
 
    @Override
