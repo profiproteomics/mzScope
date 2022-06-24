@@ -18,6 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
     </properties>
 
@@ -33,9 +34,15 @@
             <version>5.3.0</version>
         </dependency>
 
+
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-mzscope</artifactId>
+            <version>2.2.0_jdk17-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.proline</groupId>
+            <artifactId>prolinestudio-corewrapper</artifactId>
             <version>2.2.0_jdk17-SNAPSHOT</version>
         </dependency>
 
@@ -55,6 +62,23 @@
             <groupId>fr.profi.util</groupId>
             <artifactId>profi-commons-java</artifactId>
             <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.profi</groupId>
+            <artifactId>profi-proteomics_${scala.compat.version}</artifactId>
+            <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.profi</groupId>
+            <artifactId>mzdb-access_${scala.compat.version}</artifactId>
+            <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
         </dependency>
 
         <dependency>
@@ -123,6 +147,11 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>5.0.34</version>
+        </dependency>
     </dependencies>
 
 
