@@ -43,6 +43,7 @@ public class MetricsCache {
     
     private MetricsCache() {
         this.kryo = new Kryo();
+        kryo.setRegistrationRequired(false);
     }
     
     protected File getCacheFolder() {
