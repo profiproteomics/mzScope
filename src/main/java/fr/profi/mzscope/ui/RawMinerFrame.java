@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.*;
@@ -102,12 +103,12 @@ public class RawMinerFrame extends JFrame {
 
         FileMenu.setText("File");
 
-        openRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        openRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         openRawMI.setText("Open mzDB file ...");
         openRawMI.addActionListener(this::openRawMIActionPerformed);
         FileMenu.add(openRawMI);
 
-       convertRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
+       convertRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
        convertRawMI.setText("Convert and open raw files ...");
        convertRawMI.addActionListener(this::convertRawMIActionPerformed);
        FileMenu.add(convertRawMI);
