@@ -6,12 +6,12 @@
     <parent>
         <artifactId>profi-pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>1.1.0_jdk17-SNAPSHOT</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
 
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>0.7.0_jdk17-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
@@ -38,12 +38,12 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-mzscope</artifactId>
-            <version>2.2.0_jdk17-SNAPSHOT</version>
+            <version>2.3.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-corewrapper</artifactId>
-            <version>2.2.0_jdk17-SNAPSHOT</version>
+            <version>2.3.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -55,25 +55,25 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-commons</artifactId>
-            <version>2.2.0_jdk17-SNAPSHOT</version>
+            <version>2.3.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>fr.profi.util</groupId>
             <artifactId>profi-commons-java</artifactId>
-            <version>1.1.0_jdk17-SNAPSHOT</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>fr.profi</groupId>
             <artifactId>profi-proteomics_${scala.compat.version}</artifactId>
-            <version>1.1.0_jdk17-SNAPSHOT</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>fr.profi</groupId>
             <artifactId>mzdb-access_${scala.compat.version}</artifactId>
-            <version>1.1.0_jdk17-SNAPSHOT</version>
+            <version>1.2.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
