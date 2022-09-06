@@ -1,81 +1,145 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+
     <!-- ProFI Master Pom -->
     <parent>
         <artifactId>profi-pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.1.0_jdk17-SNAPSHOT</version>
     </parent>
-  
+
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
-    
+    <version>0.7.0_jdk17-SNAPSHOT</version>
+
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
     </properties>
-    
+
     <scm>
         <connection>scm:git:https://github.com/profiproteomics/mzScope.git</connection>
     </scm>
 
     <dependencies>
+
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
-            <version>4.0.0</version>
+            <version>5.3.0</version>
         </dependency>
-        <!-- Logger -->
+
+
+        <dependency>
+            <groupId>fr.proline</groupId>
+            <artifactId>prolinestudio-mzscope</artifactId>
+            <version>2.2.0_jdk17-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.proline</groupId>
+            <artifactId>prolinestudio-corewrapper</artifactId>
+            <version>2.2.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-all</artifactId>
+            <version>1.6.5-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.proline</groupId>
+            <artifactId>prolinestudio-commons</artifactId>
+            <version>2.2.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.profi.util</groupId>
+            <artifactId>profi-commons-java</artifactId>
+            <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.profi</groupId>
+            <artifactId>profi-proteomics_${scala.compat.version}</artifactId>
+            <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.profi</groupId>
+            <artifactId>mzdb-access_${scala.compat.version}</artifactId>
+            <version>1.1.0_jdk17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
+        <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <!-- <version>1.7.6</version>  -->
             <exclusions>
-                <exclusion> 
+                <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
-                <exclusion> 
+                <exclusion>
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
-            </exclusions> 
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId> 
+            <artifactId>logback-core</artifactId>
             <!-- Version inherited from ProFI-Pom -->
         </dependency>
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId> 
+            <artifactId>logback-classic</artifactId>
             <!-- Version inherited from ProFI-Pom -->
-        </dependency> 
-        
+        </dependency>
+
         <!--  xml serialization -->
         <dependency>
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
-            <version>1.4.7</version>
-        </dependency> 
-        
-        <dependency>
-            <groupId>fr.proline</groupId>
-            <artifactId>prolinestudio-mzscope</artifactId>
-            <version>2.3.0-SNAPSHOT</version>
+            <version>1.4.19</version>
         </dependency>
-                
-        <!--<dependency>
-            <groupId>com.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>3.5</version>
-        </dependency> -->
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -84,30 +148,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-        </dependency>
-                
-        <dependency>
-            <groupId>com.github.davidmoten</groupId>
-            <artifactId>rtree</artifactId>
-            <version>0.8-RC10</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.github.davidmoten</groupId>
-            <artifactId>guava-mini</artifactId>
-            <version>0.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
             <version>5.0.34</version>
         </dependency>
     </dependencies>
-    
-    
+
+
     <build>
         <plugins>
             <plugin>
@@ -117,13 +164,12 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathLayoutType>custom</classpathLayoutType>
-                            <customClasspathLayout>lib/${artifact.artifactId}-${artifact.baseVersion}${dashClassifier?}.${artifact.extension}</customClasspathLayout>
+                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>fr.profi.mzscope.ui.RawMinerFrame</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
-                
+
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -145,8 +191,8 @@
                                 </resource>
                                 <resource>
                                     <directory>src/main/resources</directory>
-                                    <filtering>true</filtering>                          
-                                </resource>                        
+                                    <filtering>true</filtering>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -156,7 +202,7 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -206,44 +252,31 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgs>
+                        <arg>-deprecation</arg>
+                        <arg>-Xlint:all</arg>
+                        <arg>-Xlint:-unchecked</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
-        <plugin>
-        <groupId>com.google.code.maven-replacer-plugin</groupId>
-        <artifactId>replacer</artifactId>
-        <!-- Version inherited from ProFI-Pom -->
-        
-        <executions>
-          <execution>
-            <id>java-version-generation</id>
-            <phase>generate-sources</phase>
-            <!-- Execution and configuration inherited from ProFI-Pom -->
-            <configuration>
-              <skip>false</skip>
-            </configuration>
-          </execution>
-        </executions>
-
-      </plugin>
-            <!--  Maven Release for branches and tags -->
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <providerImplementations>
-                        <svn>javasvn</svn>
-                    </providerImplementations>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.code.maven-scm-provider-svnjava</groupId>
-                        <artifactId>maven-scm-provider-svnjava</artifactId>
-                        <version>2.1.1</version>
-                        <scope>compile</scope>
-                    </dependency>
-                </dependencies>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>replacer</artifactId>
+                <!-- Version inherited from ProFI-Pom -->
+
+                <executions>
+                    <execution>
+                        <id>java-version-generation</id>
+                        <phase>generate-sources</phase>
+                        <!-- Execution and configuration inherited from ProFI-Pom -->
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
+
         </plugins>
     </build>
-   
-    
+
 </project>

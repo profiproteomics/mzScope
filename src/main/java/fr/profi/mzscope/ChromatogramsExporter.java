@@ -6,7 +6,6 @@
 package fr.profi.mzscope;
 
 import com.thoughtworks.xstream.XStream;
-import fr.proline.mzscope.model.Chromatogram;
 import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.model.MsnExtractionRequest;
@@ -31,9 +30,9 @@ public class ChromatogramsExporter {
      final private static Logger logger = LoggerFactory.getLogger(ChromatogramsExporter.class);
 
         
-     private List<IonProperties> ions2Xtract = new ArrayList();
+     private List<IonProperties> ions2Xtract = new ArrayList<>();
      private String m_outputDir;
-     
+
      public ChromatogramsExporter(List<IonProperties> ions, String outputDir){
          ions2Xtract = ions;
          m_outputDir= outputDir;
@@ -88,18 +87,15 @@ public class ChromatogramsExporter {
      
         
     public static String usage() {
-        StringBuffer str = new StringBuffer();
-    	
-        str.append( "'extract' (shortcut for ChromatogramsExporter) is a command line chromatogram extraction program . It extracts" +
-                    " chromatograms from mzDB files (as mzData or mzMl) for specified masses and time window.\n");
-        str.append("One chromatogram file is written for each specified mzDB file and mass.\n\n");
-	str.append( "extract options : \n");
-	str.append( "\t<raw_path> :\n\t\t file path for single mzDB file extraction or path to directory containing mzDB files to treat\n");
-        str.append( "\t<properties_filename> : \n\t\t properties file where ions to extract are defined\n");
-        str.append( "\t<output_path> : {default= same as input directory}\n\t\t output directory where results are written\n\n");
-        str.append( "Properties_filename is a XML file structured as in example file, sample_prop.xml \n");
 
-        return str.toString();
+      return "'extract' (shortcut for ChromatogramsExporter) is a command line chromatogram extraction program . It extracts" +
+              " chromatograms from RAW files (as mzData or mzMl) for specified masses and time window.\n" +
+              "One chromatogram file is written for each specified raw file and mass.\n\n" +
+              "extract options : \n" +
+              "\t<raw_path> :\n\t\t file path for single raw file extraction or path to directory containing raw files to treat\n" +
+              "\t<properties_filename> : \n\t\t properties file where ions to extract are defined\n" +
+              "\t<output_path> : {default= same as input directory}\n\t\t output directory where results are written\n\n" +
+              "Properties_filename is a XML file structured as in example file, sample_prop.xml \n";
     }
         
      public static void main(String[] args) {
@@ -166,7 +162,7 @@ public class ChromatogramsExporter {
      
      
      
-     class IonProperties {
+     static class IonProperties {
          double ppm;
          double ionMz;
          float startRT;

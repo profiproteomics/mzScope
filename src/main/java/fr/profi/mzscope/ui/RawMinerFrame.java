@@ -25,12 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.prefs.Preferences;
 
 /**
@@ -104,12 +103,12 @@ public class RawMinerFrame extends JFrame {
 
         FileMenu.setText("File");
 
-        openRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        openRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         openRawMI.setText("Open mzDB file ...");
         openRawMI.addActionListener(this::openRawMIActionPerformed);
         FileMenu.add(openRawMI);
 
-       convertRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
+       convertRawMI.setAccelerator(javax.swing.KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
        convertRawMI.setText("Convert and open raw files ...");
        convertRawMI.addActionListener(this::convertRawMIActionPerformed);
        FileMenu.add(convertRawMI);
@@ -145,11 +144,7 @@ public class RawMinerFrame extends JFrame {
         ProcessMenu.add(detectFeatureMI);
 
         exportChromatogram.setText("Export chromatogram");
-        exportChromatogram.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                exportChromatogramActionPerformed(evt);
-            }
-        });
+        exportChromatogram.addActionListener(this::exportChromatogramActionPerformed);
         ProcessMenu.add(exportChromatogram);
         exportChromatogram.getAccessibleContext().setAccessibleName("exportChromatogramItem");
 
@@ -225,7 +220,7 @@ public class RawMinerFrame extends JFrame {
     private void extractFeaturesMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_extractFeaturesMIActionPerformed
         IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
         if (viewer != null &&  viewer.getCurrentRawfile() != null) {
-          rawMinerPanel.getMzScopePanel().extractFeaturesFromMS2(Arrays.asList(viewer.getCurrentRawfile()));
+          rawMinerPanel.getMzScopePanel().extractFeaturesFromMS2(Collections.singletonList(viewer.getCurrentRawfile()));
         }
     }//GEN-LAST:event_extractFeaturesMIActionPerformed
 
@@ -236,7 +231,7 @@ public class RawMinerFrame extends JFrame {
    private void detectPeakelsMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectPeakelsMIActionPerformed
       IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
       if (viewer != null &&  viewer.getCurrentRawfile() != null) {
-        rawMinerPanel.getMzScopePanel().detectPeakels(Arrays.asList(viewer.getCurrentRawfile()));
+        rawMinerPanel.getMzScopePanel().detectPeakels(Collections.singletonList(viewer.getCurrentRawfile()));
       }
    }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
@@ -247,7 +242,7 @@ public class RawMinerFrame extends JFrame {
    private void detectFeatureMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_detectFeatureMIActionPerformed
      IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
      if (viewer != null && viewer.getCurrentRawfile() != null) {
-      rawMinerPanel.getMzScopePanel().detectFeatures(Arrays.asList(viewer.getCurrentRawfile()));
+      rawMinerPanel.getMzScopePanel().detectFeatures(Collections.singletonList(viewer.getCurrentRawfile()));
      }
    }//GEN-LAST:event_detectFeatureMIActionPerformed
 
