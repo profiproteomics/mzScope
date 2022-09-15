@@ -41,23 +41,19 @@ public class MGFPanel extends javax.swing.JPanel {
 
   private static final Logger logger = LoggerFactory.getLogger(MGFPanel.class);
 
-  private final CompoundTableModel peaksTableModel = new CompoundTableModel(new BeanTableModel<Peak>(Peak.class), true);
-  private final CompoundTableModel spectrumTableModel = new CompoundTableModel(new BeanTableModel<MSMSSpectrum>(MSMSSpectrum.class), true);
+  protected final CompoundTableModel peaksTableModel = new CompoundTableModel(new BeanTableModel<Peak>(Peak.class), true);
+  protected final CompoundTableModel spectrumTableModel = new CompoundTableModel(new BeanTableModel<MSMSSpectrum>(MSMSSpectrum.class), true);
 
-  private MarkerContainerPanel peaksMarkerContainerPanel;
-  private MarkerContainerPanel spectrumMarkerContainerPanel;
+  protected MarkerContainerPanel peaksMarkerContainerPanel;
+  protected MarkerContainerPanel spectrumMarkerContainerPanel;
 
-  private final IMzScopeController appController;
+  protected final IMzScopeController appController;
 
-  private DecoratedMarkerTable peaksTable;
-  private DecoratedMarkerTable spectrumTable;
-  private javax.swing.JButton extractBtn;
-  private javax.swing.JButton displayBtn;
-  private javax.swing.JSplitPane jSplitPane1;
-  private javax.swing.JToolBar jToolBar1;
-  private javax.swing.JTabbedPane libraryTabbedPane;
-  private javax.swing.JPanel tablePane;
-  private javax.swing.JToolBar tableToolbar;
+  protected DecoratedMarkerTable peaksTable;
+  protected DecoratedMarkerTable spectrumTable;
+  protected javax.swing.JTabbedPane libraryTabbedPane;
+  protected javax.swing.JPanel tablePane;
+  protected javax.swing.JToolBar tableToolbar;
 
   /**
    * Creates new form IonLibraryPanel
@@ -76,13 +72,11 @@ public class MGFPanel extends javax.swing.JPanel {
    */
   private void initComponents() {
 
+    JToolBar panelToolBar = getToolbar();
     tableToolbar = new JToolBar();
-    jSplitPane1 = new JSplitPane();
+    JSplitPane jSplitPane1 = new JSplitPane();
     libraryTabbedPane = new JTabbedPane();
     tablePane = new JPanel();
-    jToolBar1 = new JToolBar();
-    extractBtn = new JButton();
-    displayBtn = new JButton();
 
     tableToolbar.setFloatable(false);
     tableToolbar.setOrientation(javax.swing.SwingConstants.VERTICAL);
@@ -93,6 +87,37 @@ public class MGFPanel extends javax.swing.JPanel {
 
     tablePane.setLayout(new java.awt.BorderLayout());
     jSplitPane1.setRightComponent(tablePane);
+
+    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+    this.setLayout(layout);
+    layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSplitPane1)
+                                    .addComponent(panelToolBar, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
+                            .addContainerGap())
+    );
+
+    layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(panelToolBar, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                            .addContainerGap())
+    );
+
+    initCustomComponents();
+  }
+
+  protected JToolBar getToolbar() {
+
+    JToolBar jToolBar1 = new JToolBar();
+    JButton extractBtn = new JButton();
+    JButton displayBtn = new JButton();
 
     jToolBar1.setFloatable(false);
     jToolBar1.setRollover(true);
@@ -120,34 +145,10 @@ public class MGFPanel extends javax.swing.JPanel {
       }
     });
     jToolBar1.add(displayBtn);
-
-
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-    this.setLayout(layout);
-    layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jSplitPane1)
-                                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
-                            .addContainerGap())
-    );
-    layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                            .addContainerGap())
-    );
-
-    initCustomComponents();
+    return jToolBar1;
   }
 
-
-  private void displayBtnActionPerformed(java.awt.event.ActionEvent evt) {
+  protected void displayBtnActionPerformed(java.awt.event.ActionEvent evt) {
 
     int selectedRow = spectrumTable.convertRowIndexToNonFilteredModel(spectrumTable.getSelectedRow());
     if (selectedRow >= 0) {
@@ -166,7 +167,7 @@ public class MGFPanel extends javax.swing.JPanel {
     }
   }
 
-  private void extractBtnActionPerformed(java.awt.event.ActionEvent evt) {
+  protected void extractBtnActionPerformed(java.awt.event.ActionEvent evt) {
     IRawFileViewer viewer = appController.getCurrentRawFileViewer();
 
     String identifier = new Timestamp(System.currentTimeMillis()).toString();

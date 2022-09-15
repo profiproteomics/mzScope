@@ -151,6 +151,11 @@
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
             <version>5.0.34</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.swinglabs</groupId>
+                    <artifactId>swingx</artifactId>
+                </exclusion></exclusions>
         </dependency>
     </dependencies>
 
