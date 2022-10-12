@@ -270,7 +270,7 @@ public class RawMinerFrame extends JFrame {
    }//GEN-LAST:event_loadPeakViewLibraryMIActionPerformed
 
   private void isotopicToolActionPerformed(java.awt.event.ActionEvent evt) {
-    rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Isotopic", new IsotopicToolPanel(rawMinerPanel.getMzScopePanel()));
+    rawMinerPanel.getMzScopePanel().getFeaturesTabPane().add("Isotopic distribution", new IsotopicToolPanel(rawMinerPanel.getMzScopePanel()));
   }
 
     private void loadMGFMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMGFMIActionPerformed
