@@ -7,7 +7,7 @@ package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.MSMSSpectrum;
 import fr.profi.mzscope.Peak;
-import fr.proline.mzscope.model.MsnExtractionRequest;
+import fr.proline.mzscope.model.ExtractionRequest;
 import fr.proline.mzscope.model.Spectrum;
 import fr.proline.mzscope.ui.IMzScopeController;
 import fr.proline.mzscope.ui.IRawFileViewer;
@@ -176,9 +176,9 @@ public class MGFPanel extends javax.swing.JPanel {
     if (selectedRow >= 0) {
       // extract the MS2 spectrum precursor mz
       MSMSSpectrum spectrum = ((BeanTableModel<MSMSSpectrum>) spectrumTableModel.getBaseModel()).getData().get(selectedRow);
-      MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+      ExtractionRequest.Builder builder = ExtractionRequest.builder(this);
       builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance()).setMz(spectrum.getPrecursorMz());
-      viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+      viewer.extractAndDisplay(builder.build(), display, null);
     }
 
     if (viewer.getCurrentRawfile().isDIAFile()) {
@@ -188,10 +188,10 @@ public class MGFPanel extends javax.swing.JPanel {
         // extract selected fragments
         for (int k = 0; k < selectedRows.length; k++) {
           Peak peak = entries.get(peaksTable.convertRowIndexToNonFilteredModel(selectedRows[k]));
-          MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+          ExtractionRequest.Builder builder = ExtractionRequest.builder(this);
           builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance());
           builder.setMz(peak.getSpectrum().getPrecursorMz()).setFragmentMz(peak.getMz()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-          viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+          viewer.extractAndDisplay(builder.build(), display, null);
         }
       }
     }
