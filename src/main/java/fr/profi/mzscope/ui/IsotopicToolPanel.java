@@ -302,7 +302,7 @@ public class IsotopicToolPanel extends JPanel {
 
       displayAtomComposition(composition);
 
-      logger.info("Formula = {}, mass = {}", composition.toFormula(), composition.getMonoMass());
+//      logger.trace("Formula = {}, mass = {}", composition.toFormula(), composition.getMonoMass());
     }
   }
 
