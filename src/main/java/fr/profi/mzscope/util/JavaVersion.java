@@ -9,7 +9,7 @@ public class JavaVersion implements IVersion {
     }
 
     public String getVersion() {
-	return "1.2.0.ion_mobility-SNAPSHOT_2022-11-18T15:10:16Z_CB205360";
+	return "1.2.0-SNAPSHOT_2023-03-06T14:02:41Z_CB205360";
     }
 
 }

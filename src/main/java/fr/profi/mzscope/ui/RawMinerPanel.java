@@ -106,7 +106,6 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
          explorerSplitPane.setDividerLocation(200);
          explorerSplitPane.setOneTouchExpandable(true);
          explorerSplitPane.setTopComponent(getRawFilesPanel());
-         explorerSplitPane.setBottomComponent(new BatchExtractionPanel(getMzScopePanel(), BatchExtractionPanel.TOOLBAR_ALIGN_HORIZONTAL));
       }
       return explorerSplitPane;
    }
