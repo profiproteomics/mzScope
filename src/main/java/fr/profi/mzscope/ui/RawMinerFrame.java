@@ -5,6 +5,7 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.profi.mzdb.model.Peakel;
 import fr.profi.mzscope.ConverterManager;
 import fr.profi.mzscope.InvalidMGFFormatException;
 import fr.profi.mzscope.MGFReader;
@@ -14,9 +15,13 @@ import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.ionlibraries.PeakViewEntry;
 import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.profi.util.version.IVersion;
+import fr.proline.mzscope.model.FeaturesExtractionRequest;
+import fr.proline.mzscope.model.IPeakel;
+import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.ui.BatchExtractionPanel;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.ConvertRawFilesDialog;
+import fr.proline.mzscope.ui.dialog.ExtractionParamsDialog;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.studio.Exceptions;
 import fr.proline.studio.WindowManager;
@@ -26,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -33,6 +39,7 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
+
 
 /**
  * @author CB205360
@@ -135,6 +142,11 @@ public class RawMinerFrame extends JFrame {
     exportChromatogramMI.addActionListener(this::exportChromatogramActionPerformed);
     processMenu.add(exportChromatogramMI);
     exportChromatogramMI.getAccessibleContext().setAccessibleName("exportChromatogramItem");
+    experimentalMI = new JMenuItem();
+    experimentalMI.setText("Launch calculus");
+    experimentalMI.setActionCommand("Do some calculus");
+    experimentalMI.addActionListener(this::getExperimentalPeakels);
+    processMenu.add(experimentalMI);
 
     menuBar.add(processMenu);
 
@@ -183,6 +195,8 @@ public class RawMinerFrame extends JFrame {
     pack();
   }
 
+
+
   private void exitMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exitMIActionPerformed
     rawMinerPanel.closeAllFiles();
     System.exit(0);
@@ -222,6 +236,7 @@ public class RawMinerFrame extends JFrame {
     if (viewer != null && viewer.getCurrentRawfile() != null) {
       rawMinerPanel.getMzScopePanel().detectPeakels(Collections.singletonList(viewer.getCurrentRawfile()));
     }
+
   }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
   private void closeAllMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMIActionPerformed
@@ -328,6 +343,8 @@ public class RawMinerFrame extends JFrame {
 
   private javax.swing.JMenuItem detectPeakelsMI;
   private javax.swing.JMenuItem extractFeaturesMI;
+
+  private javax.swing.JMenuItem experimentalMI;
   private javax.swing.JPanel mainPanel;
 
 
@@ -337,6 +354,49 @@ public class RawMinerFrame extends JFrame {
 
   public void setDetectPeakelsMIEnabled(boolean detectPeakels) {
     detectPeakelsMI.setEnabled(detectPeakels);
+  }
+  private void getExperimentalPeakels(ActionEvent actionEvent) {
+    IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
+    if (viewer != null && viewer.getCurrentRawfile() != null) {
+
+      IRawFile file=viewer.getCurrentRawfile();
+
+      //TODO open dialog to get params
+     // FeaturesExtractionRequest params = null;
+
+      ExtractionParamsDialog dialog = new ExtractionParamsDialog(null, true, false);
+      dialog.setExtractionParamsTitle("Detect Peakels Parameters");
+      dialog.setLocationRelativeTo(this);
+      dialog.showExtractionParamsDialog();
+      FeaturesExtractionRequest.Builder builder = dialog.getExtractionParams();
+      if (builder != null) {
+        long startTime = System.nanoTime();
+        builder.setExtractionMethod(FeaturesExtractionRequest.ExtractionMethod.DETECT_PEAKELS);
+        FeaturesExtractionRequest params = builder.build();
+        List<IPeakel> listF = file.extractPeakels(params);
+        System.out.println("size  of list of peakels: "+listF.size());
+        IPeakel Ipeakel = listF.get(0);
+        Peakel peakel= Ipeakel.getPeakel();
+        int peakCount=peakel.getPeaksCount();
+        float amplitude=peakel.calcAmplitude();
+        float duration=peakel.calcDuration();
+        float[] elutionArray=peakel.elutionTimes();
+        long endTime = System.nanoTime();
+        long time=(endTime-startTime)/(1000000000);
+        System.out.println("Duration of calculus:  "+time+" seconds");
+
+      }
+
+
+
+
+
+
+
+
+    }
+
+
   }
 }
 
