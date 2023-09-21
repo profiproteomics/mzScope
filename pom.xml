@@ -157,6 +157,17 @@
                     <artifactId>swingx</artifactId>
                 </exclusion></exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.github.psambit9791</groupId>
+            <artifactId>jdsp</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ojalgo</groupId>
+            <artifactId>ojalgo</artifactId>
+            <version>53.0.0</version>
+        </dependency>
+
     </dependencies>
 
 
