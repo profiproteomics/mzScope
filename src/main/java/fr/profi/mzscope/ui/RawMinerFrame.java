@@ -142,11 +142,6 @@ public class RawMinerFrame extends JFrame {
     exportChromatogramMI.addActionListener(this::exportChromatogramActionPerformed);
     processMenu.add(exportChromatogramMI);
     exportChromatogramMI.getAccessibleContext().setAccessibleName("exportChromatogramItem");
-    experimentalMI = new JMenuItem();
-    experimentalMI.setText("Launch calculus");
-    experimentalMI.setActionCommand("Do some calculus");
-    experimentalMI.addActionListener(this::getExperimentalPeakels);
-    processMenu.add(experimentalMI);
 
     menuBar.add(processMenu);
 
@@ -355,48 +350,6 @@ public class RawMinerFrame extends JFrame {
   public void setDetectPeakelsMIEnabled(boolean detectPeakels) {
     detectPeakelsMI.setEnabled(detectPeakels);
   }
-  private void getExperimentalPeakels(ActionEvent actionEvent) {
-    IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
-    if (viewer != null && viewer.getCurrentRawfile() != null) {
 
-      IRawFile file=viewer.getCurrentRawfile();
-
-      //TODO open dialog to get params
-     // FeaturesExtractionRequest params = null;
-
-      ExtractionParamsDialog dialog = new ExtractionParamsDialog(null, true, false);
-      dialog.setExtractionParamsTitle("Detect Peakels Parameters");
-      dialog.setLocationRelativeTo(this);
-      dialog.showExtractionParamsDialog();
-      FeaturesExtractionRequest.Builder builder = dialog.getExtractionParams();
-      if (builder != null) {
-        long startTime = System.nanoTime();
-        builder.setExtractionMethod(FeaturesExtractionRequest.ExtractionMethod.DETECT_PEAKELS);
-        FeaturesExtractionRequest params = builder.build();
-        List<IPeakel> listF = file.extractPeakels(params);
-        System.out.println("size  of list of peakels: "+listF.size());
-        IPeakel Ipeakel = listF.get(0);
-        Peakel peakel= Ipeakel.getPeakel();
-        int peakCount=peakel.getPeaksCount();
-        float amplitude=peakel.calcAmplitude();
-        float duration=peakel.calcDuration();
-        float[] elutionArray=peakel.elutionTimes();
-        long endTime = System.nanoTime();
-        long time=(endTime-startTime)/(1000000000);
-        System.out.println("Duration of calculus:  "+time+" seconds");
-
-      }
-
-
-
-
-
-
-
-
-    }
-
-
-  }
 }
 
