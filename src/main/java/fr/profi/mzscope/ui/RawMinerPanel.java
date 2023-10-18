@@ -207,28 +207,46 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       listPeakel1.sort(peakelComparator);
       listPeakel2.sort(peakelComparator);
       if(listPeakel1.size() != listPeakel2.size()) {
-         String msg  ="Peakel Size differ !! "+r1.getName()+"has got "+listPeakel1.size()+" peakels \n and "+r2.getName()+" has got "+listPeakel2.size()+" detected peakels";
-         JOptionPane.showMessageDialog(this, msg, "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
-      } else {
-         boolean errorFound = false;
-         int nbrErr = 0;
-         for( int i =0;i<listPeakel1.size(); i++){
-            if(!arePeakelEquals(listPeakel1.get(i), listPeakel2.get(i)) ){
-               errorFound = true;
-               nbrErr++;
-            }
-         }
-         if(errorFound)
-            JOptionPane.showMessageDialog(this, "Found "+nbrErr+" error(s) ", "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
-         else
-            JOptionPane.showMessageDialog(this, "NO Error Found ", "Compare peakels list", JOptionPane.INFORMATION_MESSAGE);
+         String msg  ="Peakels Size are different !!\n "+r1.getName()+" has got "+listPeakel1.size()+" peakels\n and "+r2.getName()+" has got "+listPeakel2.size()+" detected peakels.\n Continue any way ? ";
+         int answer = JOptionPane.showConfirmDialog(this, msg, "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
+         if(answer != JOptionPane.YES_OPTION)
+            return;
       }
+      StringBuilder sb = new StringBuilder();
+
+      int minSize = Math.min(listPeakel1.size(), listPeakel2.size());
+      boolean errorFound = false;
+      int nbrErr = 0;
+      for( int i =0, j=0; i<minSize && j<minSize; i++, j++){
+         if(!arePeakelEquals(listPeakel1.get(i), listPeakel2.get(j)) ){
+            if(nbrErr<10) {
+               sb.append(listPeakel1.get(i).getMz()).append(" - ").append(listPeakel1.get(i).getElutionTime()).append("; (").append(i).append(") |||  ");
+               sb.append(listPeakel2.get(j).getMz()).append(" - ").append(listPeakel2.get(j).getElutionTime()).append("; (").append(j).append(")\n ");
+            }
+            if(arePeakelEquals(listPeakel1.get(i), listPeakel2.get(j+1)))
+               j++;
+            else if(arePeakelEquals(listPeakel1.get(i+1), listPeakel2.get(j)))
+               i++;
+            else
+               sb.append("Unable to synchronize at "+i+"\n ");
+
+
+            errorFound = true;
+            nbrErr++;
+         }
+      }
+
+      if(errorFound)
+         JOptionPane.showMessageDialog(this, "Found "+nbrErr+" error(s). First 10 errors (m/z-rt in first - second mzdb):\n "+sb.toString(), "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
+      else
+         JOptionPane.showMessageDialog(this, "NO Error Found ", "Compare peakels list", JOptionPane.INFORMATION_MESSAGE);
+
    }
 
    private boolean arePeakelEquals(IPeakel p1,IPeakel p2){
-      boolean result = Math.abs(p1.getElutionTime() - p2.getElutionTime()) < 0.0001;
-      result = result && Math.abs(p1.getMz() - p2.getMz()) < 0.0001;
-      result = result && Math.abs(p1.getApexIntensity() - p2.getApexIntensity()) < 0.0001;
+      boolean result = Math.abs(p1.getElutionTime() - p2.getElutionTime()) < 0.001;
+      result = result && Math.abs(p1.getMz() - p2.getMz()) < 0.001;
+      result = result && Math.abs(p1.getApexIntensity() - p2.getApexIntensity()) < 0.001;
       return  result;
    }
 
