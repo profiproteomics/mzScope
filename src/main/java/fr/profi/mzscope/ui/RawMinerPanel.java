@@ -5,20 +5,33 @@
  */
 package fr.profi.mzscope.ui;
 
+import fr.profi.mzscope.MetricsCache;
 import fr.proline.mzscope.model.EmptyRawFile;
+import fr.proline.mzscope.model.FeaturesExtractionRequest;
 import fr.proline.mzscope.model.IChromatogram;
 import fr.proline.mzscope.model.IRawFile;
+import fr.proline.mzscope.model.IPeakel;
 import fr.proline.mzscope.model.QCMetrics;
-import fr.profi.mzscope.MetricsCache;
-import fr.proline.mzscope.ui.BatchExtractionPanel;
 import fr.proline.mzscope.ui.MzScopePanel;
 import fr.proline.mzscope.ui.QCMetricsPanel;
-import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.mzscope.ui.RawFileManager;
 import fr.proline.mzscope.ui.RawFilesPanel;
+import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.mzscope.ui.event.ExtractionEvent;
 import fr.proline.mzscope.ui.event.ExtractionStateListener;
 import fr.proline.mzscope.utils.IPopupMenuDelegate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.filechooser.FileFilter;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,18 +40,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.prefs.Preferences;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.filechooser.FileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * main contains which contains the rawFilePanel and the MzScope Panel
@@ -176,6 +180,56 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       } else {
          System.out.println("File access cancelled by user.");
       }
+   }
+
+   public void comparePeakeList(){
+      List<IRawFile> selectedFiles = rawFilePanel.getSelectedValues();
+      if(selectedFiles.size() != 2){
+         JOptionPane.showMessageDialog(this, "Select 2, and only 2, files to compare","Compare peakel list error", JOptionPane.ERROR_MESSAGE);
+         return;
+      }
+      IRawFile r1 = selectedFiles.get(0);
+      IRawFile r2 = selectedFiles.get(1);
+      FeaturesExtractionRequest params =  FeaturesExtractionRequest.builder().build();
+
+      List<IPeakel> listPeakel1 = r1.extractPeakels(params);
+      List<IPeakel> listPeakel2 = r2.extractPeakels(params);
+      Comparator<IPeakel> peakelComparator = new Comparator<IPeakel>() {
+         @Override
+         public int compare(IPeakel o1, IPeakel o2) {
+            if(Math.abs(o1.getApexIntensity()-o2.getApexIntensity()) < 0.000001)
+               return 0;
+            if (o1.getApexIntensity()<o2.getApexIntensity())
+               return -1;
+            return 1;
+         }
+      };
+      listPeakel1.sort(peakelComparator);
+      listPeakel2.sort(peakelComparator);
+      if(listPeakel1.size() != listPeakel2.size()) {
+         String msg  ="Peakel Size differ !! "+r1.getName()+"has got "+listPeakel1.size()+" peakels \n and "+r2.getName()+" has got "+listPeakel2.size()+" detected peakels";
+         JOptionPane.showMessageDialog(this, msg, "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
+      } else {
+         boolean errorFound = false;
+         int nbrErr = 0;
+         for( int i =0;i<listPeakel1.size(); i++){
+            if(!arePeakelEquals(listPeakel1.get(i), listPeakel2.get(i)) ){
+               errorFound = true;
+               nbrErr++;
+            }
+         }
+         if(errorFound)
+            JOptionPane.showMessageDialog(this, "Found "+nbrErr+" error(s) ", "Compare peakels list error", JOptionPane.ERROR_MESSAGE);
+         else
+            JOptionPane.showMessageDialog(this, "NO Error Found ", "Compare peakels list", JOptionPane.INFORMATION_MESSAGE);
+      }
+   }
+
+   private boolean arePeakelEquals(IPeakel p1,IPeakel p2){
+      boolean result = Math.abs(p1.getElutionTime() - p2.getElutionTime()) < 0.0001;
+      result = result && Math.abs(p1.getMz() - p2.getMz()) < 0.0001;
+      result = result && Math.abs(p1.getApexIntensity() - p2.getApexIntensity()) < 0.0001;
+      return  result;
    }
 
    public void exportChromatogram() {

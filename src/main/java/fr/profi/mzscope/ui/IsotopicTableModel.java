@@ -8,14 +8,15 @@ import fr.proline.studio.table.Column;
 import fr.proline.studio.table.LazyData;
 import fr.proline.studio.table.TableDefaultRendererManager;
 import fr.proline.studio.table.renderer.BigFloatOrDoubleRenderer;
-import fr.proline.studio.table.renderer.DefaultRightAlignRenderer;
+import fr.proline.studio.table.renderer.DefaultAlignRenderer;
 
+import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.util.ArrayList;
 
 public class IsotopicTableModel extends AbstractNonLazyTableModel implements GlobalTableModelInterface {
 
-  private static TableCellRenderer FLOAT_2DIGITS = new BigFloatOrDoubleRenderer( new DefaultRightAlignRenderer(TableDefaultRendererManager.getDefaultRenderer(String.class)), 2 );
+  private static TableCellRenderer FLOAT_2DIGITS = new BigFloatOrDoubleRenderer( new DefaultAlignRenderer(TableDefaultRendererManager.getDefaultRenderer(String.class), JLabel.RIGHT), 2 );
 
   public static final Column COLTYPE_FEATURE_INDEX = new Column("index", "index", Integer.class, 0);
   public static final Column COLTYPE_FEATURE_MZCOL = new Column("m/z", "m/z", Double.class, 1, Column.DOUBLE_5DIGITS_RIGHT);

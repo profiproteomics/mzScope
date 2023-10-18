@@ -20,6 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
+        <studio.version>2.3.0tmt-SNAPSHOT</studio.version>
     </properties>
 
     <scm>
@@ -38,12 +39,12 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-mzscope</artifactId>
-            <version>2.3.0-SNAPSHOT</version>
+            <version>${studio.version}</version>
         </dependency>
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-corewrapper</artifactId>
-            <version>2.3.0-SNAPSHOT</version>
+            <version>${studio.version}</version>
         </dependency>
 
         <dependency>
@@ -55,7 +56,7 @@
         <dependency>
             <groupId>fr.proline</groupId>
             <artifactId>prolinestudio-commons</artifactId>
-            <version>2.3.0-SNAPSHOT</version>
+            <version>${studio.version}</version>
         </dependency>
 
         <dependency>

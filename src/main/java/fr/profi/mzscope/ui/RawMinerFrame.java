@@ -123,6 +123,7 @@ public class RawMinerFrame extends JFrame {
     detectPeakelsMI = new JMenuItem();
     JMenuItem detectFeatureMI = new JMenuItem();
     JMenuItem exportChromatogramMI = new JMenuItem();
+    JMenuItem comparePeakelListMI = new JMenuItem();
     processMenu.setText("Process");
 
     extractFeaturesMI.setText("Extract features from MS2");
@@ -142,6 +143,10 @@ public class RawMinerFrame extends JFrame {
     exportChromatogramMI.addActionListener(this::exportChromatogramActionPerformed);
     processMenu.add(exportChromatogramMI);
     exportChromatogramMI.getAccessibleContext().setAccessibleName("exportChromatogramItem");
+
+    comparePeakelListMI.setText("Compare Peakel List");
+    comparePeakelListMI.addActionListener(this::comparePeakelListActionPerformed);
+    processMenu.add(comparePeakelListMI);
 
     menuBar.add(processMenu);
 
@@ -233,6 +238,10 @@ public class RawMinerFrame extends JFrame {
     }
 
   }//GEN-LAST:event_detectPeakelsMIActionPerformed
+
+  private void comparePeakelListActionPerformed(java.awt.event.ActionEvent evt) {
+    rawMinerPanel.comparePeakeList();
+  }
 
   private void closeAllMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMIActionPerformed
     rawMinerPanel.closeAllFiles();
