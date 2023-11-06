@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
-        <studio.version>2.3.0tmt-SNAPSHOT</studio.version>
+        <studio.version>2.3.0-SNAPSHOT</studio.version>
     </properties>
 
     <scm>
