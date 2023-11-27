@@ -126,6 +126,6 @@ public class IonLibrary {
         writer.flush();
         writer.close();
         
-        logger.info("Library writed");
+        logger.info("Library written");
     }
 }

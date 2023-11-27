@@ -126,13 +126,13 @@ public class IsotopicToolPanel extends JPanel {
     c.gridy++;
     c.gridwidth = 2;
     c.weightx = 0;
-    m_averagineBtn = new JRadioButton("Averagine");
+    m_averagineBtn = new JRadioButton("Averagine (based on mass & charge)");
     m_averagineBtn.setSelected(true);
     m_averagineBtn.addActionListener(e -> computeIsotopicDist());
     mainPanel.add(m_averagineBtn, c);
 
     c.gridx+=2;
-    m_binomialBtn = new JRadioButton("Binomial");
+    m_binomialBtn = new JRadioButton("Binomial (based on atomic composition)");
     m_binomialBtn.addActionListener(e -> computeIsotopicDist());
     mainPanel.add(m_binomialBtn, c);
 
@@ -329,14 +329,14 @@ public class IsotopicToolPanel extends JPanel {
   private void computeIsotopicDist() {
     if (m_mozTF.getText() != null && !m_mozTF.getText().isEmpty()) {
       if (m_averagineBtn.isSelected()) {
-
+        logger.info("Compute Isotopic Distribution using Averagine model");
         double moz = Double.parseDouble(m_mozTF.getText());
         int charge = ((Integer) m_chargeCB.getSelectedItem()).intValue();
         TheoreticalIsotopePattern pattern = IsotopePatternEstimator.getTheoreticalPattern(moz, charge);
         m_isotopicTableModel.setPattern(pattern);
 
       } else {
-
+        logger.info("Compute Isotopic Distribution using Binomial model");
         int cAb = m_CTF.getText().length() > 0 ? Integer.parseInt(m_CTF.getText()) : 0;
         int hAb = m_HTF.getText().length() > 0 ? Integer.parseInt(m_HTF.getText()) : 0;
         int nAb = m_NTF.getText().length() > 0 ? Integer.parseInt(m_NTF.getText()) : 0;
@@ -351,7 +351,7 @@ public class IsotopicToolPanel extends JPanel {
         Double[] values = dist.getPercTot();
         Double max = Arrays.stream(values).max(Double::compareTo).get();
 
-        List<Tuple2> l = Arrays.stream(values).map(v -> new Tuple2(scala.Double.box(0.0), scala.Float.box((float) (100 * v / max)))).collect(Collectors.toList());
+        List<Tuple2> l = Arrays.stream(values).map(v -> new Tuple2(0.0, (float) (100 * v / max))).collect(Collectors.toList());
         Tuple2<Object, Object>[] ab = new Tuple2[l.size()];
         for (int k = 0; k < l.size(); k++) {
           ab[k] = new Tuple2(monoMz + k * IsotopePatternEstimator$.MODULE$.avgIsoMassDiff() / charge, l.get(k)._2);
