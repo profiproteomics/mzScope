@@ -197,11 +197,24 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       Comparator<IPeakel> peakelComparator = new Comparator<IPeakel>() {
          @Override
          public int compare(IPeakel o1, IPeakel o2) {
-            if(Math.abs(o1.getApexIntensity()-o2.getApexIntensity()) < 0.000001)
-               return 0;
-            if (o1.getApexIntensity()<o2.getApexIntensity())
-               return -1;
-            return 1;
+
+            if (Math.abs(o1.getApexIntensity()-o2.getApexIntensity()) < 0.000001) {
+
+               if (Math.abs(o1.getElutionTime() - o2.getElutionTime()) < 0.000001) {
+
+                  if (Math.abs(o1.getMz() - o2.getMz()) < 0.000001) {
+                     return 0;
+                  } else {
+                     return o1.getMz()<o2.getMz() ?  -1 : 1;
+                  }
+
+               } else {
+                  return o1.getElutionTime()<o2.getElutionTime() ?  -1 : 1;
+               }
+
+            }
+            return (o1.getApexIntensity()<o2.getApexIntensity()) ? -1 : 1;
+
          }
       };
       listPeakel1.sort(peakelComparator);
