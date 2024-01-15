@@ -144,9 +144,11 @@ public class RawMinerFrame extends JFrame {
     processMenu.add(exportChromatogramMI);
     exportChromatogramMI.getAccessibleContext().setAccessibleName("exportChromatogramItem");
 
+
     comparePeakelListMI.setText("Compare Peakel List");
     comparePeakelListMI.addActionListener(this::comparePeakelListActionPerformed);
     processMenu.add(comparePeakelListMI);
+
 
     menuBar.add(processMenu);
 
@@ -240,7 +242,25 @@ public class RawMinerFrame extends JFrame {
   }//GEN-LAST:event_detectPeakelsMIActionPerformed
 
   private void comparePeakelListActionPerformed(java.awt.event.ActionEvent evt) {
-    rawMinerPanel.comparePeakeList();
+
+    boolean compare = false;
+
+    IRawFileViewer viewer = rawMinerPanel.getMzScopePanel().getCurrentRawFileViewer();
+    if (viewer != null) {
+      List<IRawFile> rawFileList = viewer.getAllRawfiles();
+      if (rawFileList != null && rawFileList.size() == 2) {
+        rawMinerPanel.getMzScopePanel().comparePeakels(rawFileList);
+        compare = true;
+      }
+
+    }
+
+    if (!compare) {
+      JOptionPane.showMessageDialog(this, "You can only compare Peakel lists in a view with 2 mzdb openend", "Warning", JOptionPane.INFORMATION_MESSAGE);
+
+    }
+
+
   }
 
   private void closeAllMIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeAllMIActionPerformed

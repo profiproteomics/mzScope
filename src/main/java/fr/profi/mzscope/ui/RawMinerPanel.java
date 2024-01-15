@@ -40,6 +40,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -182,7 +183,7 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       }
    }
 
-   public void comparePeakeList(){
+   /*public void comparePeakeList(){
       List<IRawFile> selectedFiles = rawFilePanel.getSelectedValues();
       if(selectedFiles.size() != 2){
          JOptionPane.showMessageDialog(this, "Select 2, and only 2, files to compare","Compare peakel list error", JOptionPane.ERROR_MESSAGE);
@@ -254,7 +255,10 @@ public class RawMinerPanel extends JPanel implements ExtractionStateListener, IP
       else
          JOptionPane.showMessageDialog(this, "NO Error Found ", "Compare peakels list", JOptionPane.INFORMATION_MESSAGE);
 
-   }
+   }*/
+
+
+
 
    private boolean arePeakelEquals(IPeakel p1,IPeakel p2){
       boolean result = Math.abs(p1.getElutionTime() - p2.getElutionTime()) < 0.001;
