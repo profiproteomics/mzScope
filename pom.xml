@@ -6,12 +6,12 @@
     <parent>
         <artifactId>profi-pom</artifactId>
         <groupId>fr.proline</groupId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
 
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
 
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
@@ -20,7 +20,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
-        <studio.version>2.3.0-SNAPSHOT</studio.version>
+        <studio.version>2.4.0-SNAPSHOT</studio.version>
+        <commons.version>1.3.0-SNAPSHOT</commons.version>
+        <mzdb.version>1.3.0-SNAPSHOT</mzdb.version>
     </properties>
 
     <scm>
@@ -62,19 +64,19 @@
         <dependency>
             <groupId>fr.profi.util</groupId>
             <artifactId>profi-commons-java</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${commons.version}</version>
         </dependency>
 
         <dependency>
             <groupId>fr.profi</groupId>
             <artifactId>profi-proteomics_${scala.compat.version}</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>${commons.version}</version>
         </dependency>
 
         <dependency>
             <groupId>fr.profi</groupId>
             <artifactId>mzdb-access_${scala.compat.version}</artifactId>
-            <version>1.2.1-SNAPSHOT</version>
+            <version>${mzdb.version}</version>
         </dependency>
 
         <dependency>
