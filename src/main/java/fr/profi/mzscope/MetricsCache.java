@@ -16,7 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.openide.util.Exceptions;
+
+import fr.proline.studio.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ public class MetricsCache {
     
     private MetricsCache() {
         this.kryo = new Kryo();
+        kryo.setRegistrationRequired(false);
     }
     
     protected File getCacheFolder() {

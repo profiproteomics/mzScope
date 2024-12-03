@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.openide.util.Exceptions;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +87,6 @@ public class IonLibrary {
                 entries.add(row);
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
             logger.error("Error while parsing CSV file", ex);
         }
 
@@ -127,6 +126,6 @@ public class IonLibrary {
         writer.flush();
         writer.close();
         
-        logger.info("Library writed");
+        logger.info("Library written");
     }
 }

@@ -8,7 +8,7 @@ package fr.profi.mzscope.ui;
 import fr.proline.studio.table.BeanTableModel;
 import fr.profi.mzscope.ionlibraries.IonEntry;
 import fr.profi.mzscope.ionlibraries.IonLibrary;
-import fr.proline.mzscope.model.MsnExtractionRequest;
+import fr.proline.mzscope.model.ExtractionRequest;
 import fr.proline.mzscope.ui.model.MzScopePreferences;
 import fr.proline.mzscope.ui.IMzScopeController;
 import fr.proline.mzscope.ui.IRawFileViewer;
@@ -34,6 +34,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableModelListener;
+
+import fr.proline.studio.utils.StudioResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +58,13 @@ public class IonLibraryPanel extends javax.swing.JPanel {
     
     private DecoratedMarkerTable ionEntriesTable;
     private DecoratedMarkerTable peptidesTable;
-    
+
+    private javax.swing.JButton alignLibraryBtn;
+    private javax.swing.JButton extractBtn;
+    private javax.swing.JPanel fragmentsPane;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JPanel precursorsPane;
     /**
      * Creates new form IonLibraryPanel
      */
@@ -108,7 +116,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        org.openide.awt.Mnemonics.setLocalizedText(alignLibraryBtn, org.openide.util.NbBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.alignLibraryBtn.text")); // NOI18N
+        alignLibraryBtn.setText(StudioResourceBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.alignLibraryBtn.text"));
         alignLibraryBtn.setFocusable(false);
         alignLibraryBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         alignLibraryBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -119,7 +127,7 @@ public class IonLibraryPanel extends javax.swing.JPanel {
         });
         jToolBar1.add(alignLibraryBtn);
 
-        org.openide.awt.Mnemonics.setLocalizedText(extractBtn, org.openide.util.NbBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.extractBtn.text")); // NOI18N
+        extractBtn.setText(StudioResourceBundle.getMessage(IonLibraryPanel.class, "IonLibraryPanel.extractBtn.text"));
         extractBtn.setFocusable(false);
         extractBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         extractBtn.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -170,9 +178,9 @@ public class IonLibraryPanel extends javax.swing.JPanel {
             int selectedPeptideRow = peptidesTable.convertRowIndexToNonFilteredModel(peptidesTable.getSelectedRow());
             if (selectedPeptideRow >= 0) {
                IonLibrary.Peptide peptide = ((BeanTableModel<IonLibrary.Peptide>) peptidesTableModel.getBaseModel()).getData().get(selectedPeptideRow);
-               MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+               ExtractionRequest.Builder builder = ExtractionRequest.builder(this);
                     builder.setMzTolPPM(MzScopePreferences.getInstance().getMzPPMTolerance()).setMz(peptide.getQ1());
-                    viewer.extractAndDisplayChromatogram(builder.build(), new Display(Display.Mode.SERIES, identifier), null);
+                    viewer.extractAndDisplay(builder.build(), new Display(Display.Mode.SERIES, identifier), null);
             }
             
             // Then extract fragments (all or selected one)
@@ -184,16 +192,16 @@ public class IonLibraryPanel extends javax.swing.JPanel {
             if (selectedIonsRows.length > 0) {
                 for (int k = 0; k < selectedIonsRows.length; k++) {
                     IonEntry ion = entries.get(ionEntriesTable.convertRowIndexToNonFilteredModel(selectedIonsRows[k]));
-                    MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+                    ExtractionRequest.Builder builder = ExtractionRequest.builder(this);
                     builder.setMz(ion.getQ1()).setFragmentMz(ion.getQ3()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+                    viewer.extractAndDisplay(builder.build(), display, null);
                     display = new Display(Display.Mode.SERIES, identifier);
                 }
             } else {
                 for (IonEntry ion : entries) {                
-                    MsnExtractionRequest.Builder builder = MsnExtractionRequest.builder();
+                    ExtractionRequest.Builder builder = ExtractionRequest.builder(this);
                     builder.setMz(ion.getQ1()).setFragmentMz(ion.getQ3()).setFragmentMzTolPPM(MzScopePreferences.getInstance().getFragmentMzPPMTolerance());
-                    viewer.extractAndDisplayChromatogram(builder.build(), display, null);
+                    viewer.extractAndDisplay(builder.build(), display, null);
                     // then change to overlay mode the next extractions
                     display = new Display(Display.Mode.SERIES, identifier);
                 }
@@ -295,12 +303,4 @@ public class IonLibraryPanel extends javax.swing.JPanel {
       
     }
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton alignLibraryBtn;
-    private javax.swing.JButton extractBtn;
-    private javax.swing.JPanel fragmentsPane;
-    private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JPanel precursorsPane;
-    // End of variables declaration//GEN-END:variables
 }
