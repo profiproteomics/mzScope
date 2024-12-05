@@ -11,7 +11,7 @@
 
     <groupId>fr.profi</groupId>
     <artifactId>mzscope</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.2-SNAPSHOT</version>
 
     <name>mzScope</name>
     <description>Proline module to display mzdb files</description>
@@ -20,7 +20,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sqlite4java.version>1.0.392</sqlite4java.version>
         <version.path>${basedir}/src/main/java/fr/profi/mzscope/util</version.path>
-        <studio.version>2.3.2</studio.version>
+        <studio.version>2.3.3</studio.version>
     </properties>
 
     <scm>
