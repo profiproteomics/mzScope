@@ -6,9 +6,9 @@
 package fr.profi.mzscope.ui;
 
 import fr.profi.mzscope.ConverterManager;
-import fr.profi.mzscope.InvalidMGFFormatException;
-import fr.profi.mzscope.MGFReader;
-import fr.profi.mzscope.MSMSSpectrum;
+import fr.profi.mgf.InvalidMGFFormatException;
+import fr.profi.mgf.MGFReader;
+import fr.profi.ms.model.MSMSSpectrum;
 import fr.profi.mzscope.ionlibraries.IonEntry;
 import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.ionlibraries.PeakViewEntry;
@@ -31,7 +31,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
