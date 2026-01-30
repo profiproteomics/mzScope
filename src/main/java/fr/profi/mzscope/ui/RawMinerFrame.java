@@ -5,23 +5,19 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.profi.mzdb.model.Peakel;
 import fr.profi.mzscope.ConverterManager;
-import fr.profi.mzscope.InvalidMGFFormatException;
-import fr.profi.mzscope.MGFReader;
-import fr.profi.mzscope.MSMSSpectrum;
+import fr.profi.mgf.InvalidMGFFormatException;
+import fr.profi.mgf.MGFReader;
+import fr.profi.ms.model.MSMSSpectrum;
 import fr.profi.mzscope.ionlibraries.IonEntry;
 import fr.profi.mzscope.ionlibraries.IonLibrary;
 import fr.profi.mzscope.ionlibraries.PeakViewEntry;
 import fr.profi.mzscope.ionlibraries.SpectronautEntry;
 import fr.profi.util.version.IVersion;
-import fr.proline.mzscope.model.FeaturesExtractionRequest;
-import fr.proline.mzscope.model.IPeakel;
 import fr.proline.mzscope.model.IRawFile;
 import fr.proline.mzscope.ui.BatchExtractionPanel;
 import fr.proline.mzscope.ui.IRawFileViewer;
 import fr.proline.mzscope.ui.dialog.ConvertRawFilesDialog;
-import fr.proline.mzscope.ui.dialog.ExtractionParamsDialog;
 import fr.proline.mzscope.ui.dialog.MzdbFilter;
 import fr.proline.studio.Exceptions;
 import fr.proline.studio.WindowManager;
@@ -31,11 +27,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -316,12 +312,12 @@ public class RawMinerFrame extends JFrame {
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       try {
         File file = fileChooser.getSelectedFile();
-        MGFReader reader = new MGFReader();
-        List<MSMSSpectrum> peakList = reader.read(file);
+        MGFReader reader = new MGFReader(file);
+        List<MSMSSpectrum> peakList = reader.readAllSpectrum();
         String title = "MGF file " + file.getName();
         rawMinerPanel.getMzScopePanel().addFeatureTab(title, new MGFPanel(peakList, rawMinerPanel.getMzScopePanel()), "Spectra loaded from " + title);
         prefs.put(LAST_DIR, file.getParent());
-      } catch (InvalidMGFFormatException ex) {
+      } catch (IOException | InvalidMGFFormatException ex) {
         Exceptions.printStackTrace(ex);
       }
     }

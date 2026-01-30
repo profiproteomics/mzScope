@@ -1,1 +1,1 @@
-javaw -Duser.language=en -Duser.country=US -cp "mzScope-${pom.version}.jar;lib/*" fr.profi.mzscope.ui.RawMinerFrame
+.\jdk\bin\javaw -Duser.language=en -Duser.country=US -cp "mzScope-${pom.version}.jar;lib/*" fr.profi.mzscope.ui.RawMinerFrame
