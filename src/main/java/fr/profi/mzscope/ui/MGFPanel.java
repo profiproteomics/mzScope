@@ -5,8 +5,8 @@
  */
 package fr.profi.mzscope.ui;
 
-import fr.profi.mzscope.MSMSSpectrum;
-import fr.profi.mzscope.Peak;
+import fr.profi.ms.model.MSMSSpectrum;
+import fr.profi.ms.model.Peak;
 import fr.proline.mzscope.model.ExtractionRequest;
 import fr.proline.mzscope.model.Spectrum;
 import fr.proline.mzscope.ui.IMzScopeController;
